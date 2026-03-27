@@ -1,19 +1,20 @@
-
-<!DOCTYPE html>
+.<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Admin | Cyberpunk</title>
+    <title>System Admin | Level 10</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
     <style>
         html { scroll-behavior: smooth; }
-        :root { --cyan: #00f3ff; --magenta: #ff00ea; --yellow: #eaff00; --glass-bg: rgba(20, 20, 35, 0.65); --glass-border: rgba(255, 255, 255, 0.15); }
+        :root { --cyan: #00f3ff; --magenta: #ff00ea; --yellow: #eaff00; --glass-bg: rgba(10, 10, 20, 0.7); --glass-border: rgba(255, 255, 255, 0.1); }
 
         body { margin: 0; padding: 0; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #050510; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
         
-        canvas.bg-canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; opacity: 0.6; }
-        .bg-gradient { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at 50% 50%, rgba(255, 0, 234, 0.1), rgba(0, 243, 255, 0.05), #050510 80%); z-index: -1; }
+        /* Interactive Background */
+        #particles-js { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background: radial-gradient(circle at 50% 50%, #1a0033, #050510 80%); }
 
         .rainbow-text { background: linear-gradient(90deg, var(--cyan), var(--magenta), var(--yellow), var(--cyan)); background-size: 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientMove 5s ease infinite; font-weight: bold; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
         @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
@@ -21,7 +22,7 @@
         #loginScreen, #bootScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050510; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         #bootScreen { justify-content: flex-end; padding: 20px; box-sizing: border-box; font-family: 'Courier New', monospace; color: var(--cyan); }
         
-        .login-box { border: 1px solid var(--magenta); padding: 40px; text-align: center; border-radius: 20px; box-shadow: 0 0 30px rgba(255, 0, 234, 0.3); background: var(--glass-bg); backdrop-filter: blur(10px); width: 80%; max-width: 400px; }
+        .login-box { border: 1px solid var(--cyan); padding: 40px; text-align: center; border-radius: 20px; box-shadow: 0 0 30px rgba(0, 243, 255, 0.3); background: var(--glass-bg); backdrop-filter: blur(10px); width: 80%; max-width: 400px; }
         .login-input { background: rgba(0,0,0,0.5); color: var(--cyan); border: 1px solid var(--cyan); padding: 12px; margin: 20px 0; outline: none; text-align: center; font-family: inherit; font-size: 1.2rem; width: 80%; border-radius: 8px; transition: 0.3s; }
         .login-input:focus { box-shadow: 0 0 15px var(--cyan); }
         
@@ -30,16 +31,13 @@
         .flex-col { display: flex; }
 
         #hud { width: 95%; max-width: 600px; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 0 0 15px 15px; padding: 15px 0; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 50; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-size: 0.9rem; margin-bottom: 20px; display: flex; justify-content: space-around; flex-wrap: wrap; }
-        #hud span { color: #ddd; }
-        #hud i { color: var(--cyan); font-style: normal; margin-right: 5px; }
+        #hud span { color: #ddd; } #hud i { color: var(--cyan); font-style: normal; margin-right: 5px; }
 
         .container { max-width: 600px; width: 90%; text-align: center; margin-bottom: 5vh; z-index: 1; }
-        img { width: 100%; border-radius: 15px; border: 2px solid transparent; background-image: linear-gradient(#050510, #050510), linear-gradient(to right, var(--cyan), var(--magenta)); background-origin: border-box; background-clip: content-box, border-box; margin: 15px 0; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
         
         .btn { background: linear-gradient(45deg, var(--magenta), #7b00ff); color: white; border: none; padding: 12px 25px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: 0.3s; border-radius: 8px; box-shadow: 0 5px 20px rgba(255, 0, 234, 0.4); width: 100%; letter-spacing: 1px; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 0, 234, 0.6); }
         #logoutBtn { background: transparent; color: #ff3e3e; border: 1px solid #ff3e3e; box-shadow: none; width: auto; font-size: 0.8rem; padding: 8px 15px; margin-top: 10px; }
-        #logoutBtn:hover { background: #ff3e3e; color: black; }
 
         .glass-panel { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 15px; padding: 20px; margin-top: 25px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); text-align: left; transition: transform 0.3s, box-shadow 0.3s; }
         .glass-panel:hover { box-shadow: 0 12px 40px rgba(0, 243, 255, 0.15); border-color: rgba(0, 243, 255, 0.3); }
@@ -47,6 +45,19 @@
         
         .reveal { opacity: 0; transform: translateY(40px); transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* GitHub Badge Styles */
+        .gh-badge { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+        .gh-avatar { width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--cyan); box-shadow: 0 0 15px var(--cyan); }
+        .gh-stats { flex-grow: 1; margin-left: 15px; }
+        .gh-name { font-size: 1.2rem; font-weight: bold; color: var(--cyan); }
+        .gh-info { font-size: 0.85rem; color: #aaa; margin-top: 5px; }
+        .gh-info span { color: var(--yellow); font-weight: bold; }
+
+        /* Reddit Feed Styles */
+        .reddit-post { background: rgba(0,0,0,0.5); padding: 10px; margin-bottom: 8px; border-radius: 5px; border-left: 3px solid #ff4500; font-size: 0.85rem; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .reddit-post a { color: #fff; text-decoration: none; }
+        .reddit-post:hover { background: rgba(255,69,0,0.2); transform: translateX(5px); }
 
         .sys-info { font-size: 0.9rem; margin: 10px 0; color: #bbb; display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px; }
         .sys-info span { color: var(--yellow); font-family: 'Courier New', monospace; }
@@ -60,35 +71,29 @@
 
         #visualizer { width: 100%; height: 70px; background: rgba(0,0,0,0.4); border-radius: 8px; margin-top: 15px; border: 1px solid var(--glass-border); }
         #scratchpad { width: 100%; height: 120px; background: rgba(0,0,0,0.4); color: var(--cyan); border: 1px solid var(--glass-border); border-radius: 8px; padding: 12px; font-family: 'Courier New', monospace; outline: none; resize: none; box-sizing: border-box; transition: 0.3s; }
-        #scratchpad:focus { border-color: var(--cyan); box-shadow: 0 0 15px rgba(0, 243, 255, 0.2); }
-
+        
         .input-group { display: flex; gap: 10px; }
-        #taskInput { flex-grow: 1; padding: 12px; background: rgba(0,0,0,0.4); color: white; border: 1px solid var(--glass-border); border-radius: 8px; outline: none; transition: 0.3s; }
-        #taskInput:focus { border-color: var(--magenta); }
-        #addBtn { width: 80px; padding: 12px; background: var(--magenta); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; }
-        #addBtn:hover { background: #ff47f4; box-shadow: 0 0 15px var(--magenta); }
+        #taskInput { flex-grow: 1; padding: 12px; background: rgba(0,0,0,0.4); color: white; border: 1px solid var(--glass-border); border-radius: 8px; outline: none; }
+        #addBtn { width: 80px; padding: 12px; background: var(--magenta); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; }
         ul { list-style-type: none; padding: 0; margin-top: 20px; }
         li { padding: 12px 15px; background: rgba(0,0,0,0.3); margin-bottom: 8px; border-radius: 8px; cursor: pointer; transition: 0.3s; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--cyan); }
-        li:hover { background: rgba(255,255,255,0.05); transform: translateX(5px); }
         .completed { opacity: 0.6; border-left-color: #555; }
         .completed .task-text { text-decoration: line-through; text-decoration-color: var(--magenta); text-decoration-thickness: 2px; }
-        .delete-btn { color: #ff3e3e; font-weight: bold; padding: 5px 10px; background: rgba(255,0,0,0.1); border-radius: 5px; transition: 0.3s; }
-        .delete-btn:hover { background: #ff3e3e; color: white; }
+        .delete-btn { color: #ff3e3e; font-weight: bold; padding: 5px 10px; background: rgba(255,0,0,0.1); border-radius: 5px; }
 
         .cli-box { border: 1px solid var(--cyan); padding: 15px; background: rgba(0,0,0,0.7); border-radius: 10px; display: flex; align-items: center; box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.1); }
         .cli-prompt { font-family: 'Courier New', monospace; color: var(--cyan); font-weight: bold; margin-right: 15px; }
         #cliInput { background: transparent; border: none; color: white; font-family: 'Courier New', monospace; width: 100%; outline: none; font-size: 1rem; }
 
         .panic-btn { background: rgba(255, 0, 0, 0.1); border: 1px solid #ff3e3e; color: #ff3e3e; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 10px; width: 100%; transition: 0.3s; letter-spacing: 2px; }
-        .panic-btn:hover { background: #ff3e3e; color: black; box-shadow: 0 0 30px #ff3e3e; }
-        @keyframes destructFlash { 0% { background-color: black; } 25% { background-color: #ff00ea; } 50% { background-color: #00f3ff; } 75% { background-color: #eaff00; } 100% { background-color: black; } }
+        @keyframes destructFlash { 0% { background-color: black; } 50% { background-color: #ff00ea; } 100% { background-color: black; } }
         .destruct-mode { animation: destructFlash 0.3s infinite; }
-        #destructOverlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,0,0,0.9); z-index: 10000; display:flex; justify-content:center; align-items:center; color:white; font-size: 4rem; font-weight:bold; text-align: center; text-shadow: 0 0 20px black; }
+        #destructOverlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,0,0,0.9); z-index: 10000; display:flex; justify-content:center; align-items:center; color:white; font-size: 4rem; font-weight:bold; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div class="bg-gradient"></div>
+    <div id="particles-js"></div>
 
     <div id="loginScreen">
         <div class="login-box">
@@ -110,15 +115,29 @@
             <span><i>⏱️</i><span id="clockData">00:00</span></span>
         </div>
 
-        <canvas id="matrix" class="bg-canvas"></canvas>
-
         <div class="container" id="mainContainer">
             <h1 class="rainbow-text" style="font-size: 2.5rem; margin-bottom: 5px;">SYSTEM ADMIN</h1>
             <p id="statusText" style="color: var(--cyan); font-family: monospace; margin-top: 0;">>_ Status: Online</p>
-            
             <button id="logoutBtn" class="btn" onclick="logout()">[ Log Out ]</button>
 
-            <img src="https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?w=800" alt="Cyberpunk Aesthetic" class="reveal">
+            <div class="glass-panel reveal">
+                <h3>🐙 DEVELOPER IDENTITY</h3>
+                <div class="gh-badge">
+                    <img id="gh-avatar" class="gh-avatar" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Avatar">
+                    <div class="gh-stats">
+                        <div id="gh-name" class="gh-name">Loading...</div>
+                        <div class="gh-info">Repos: <span id="gh-repos">--</span> | Followers: <span id="gh-followers">--</span></div>
+                        <div style="font-size: 0.75rem; color: #888; margin-top: 5px;">Connected to API</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel reveal">
+                <h3>🌐 GLOBAL UPLINK (r/webdev)</h3>
+                <div id="redditFeed" style="margin-top: 15px;">
+                    <div style="color: #888; text-align: center;">Establishing connection...</div>
+                </div>
+            </div>
 
             <div class="glass-panel reveal">
                 <h3>🔍 System Fingerprint</h3>
@@ -135,9 +154,7 @@
             <div class="glass-panel reveal">
                 <h3>🎵 Audio Terminal</h3>
                 <canvas id="visualizer"></canvas>
-                
                 <button id="audioBtn" class="btn" style="margin-top: 15px; background: linear-gradient(45deg, #00f3ff, #0051ff);" onclick="toggleAudio()">▶ PLAY AUDIO</button>
-                <div style="font-size: 0.8rem; margin-top: 10px; text-align: center; color: #888;">Or type <b style="color:var(--magenta)">/play</b> in terminal below</div>
             </div>
 
             <div class="glass-panel reveal">
@@ -175,89 +192,85 @@
     </div>
 
     <script>
-        const bootMessages = ["Mounting neural net... [OK]", "Injecting custom CSS payloads... [OK]", "Initializing glassmorphism... [DONE]", "Bypassing visual constraints... [ONLINE]", "System Admin recognized. Welcome to the Grid."];
+        // --- BOOT SEQUENCE ---
+        const bootMessages = ["Fetching GitHub Identity... [OK]", "Establishing Reddit Uplink... [OK]", "Igniting Particle Engine... [DONE]", "System Admin recognized."];
         function runBootSequence() {
             document.getElementById("loginScreen").style.display = "none";
             const bootScreen = document.getElementById("bootScreen"); bootScreen.classList.remove("hidden");
             const logsBox = document.getElementById("bootLogs"); logsBox.innerHTML = "";
             let delay = 0;
-            bootMessages.forEach((msg) => { setTimeout(() => { logsBox.innerHTML += `<div><span style="color:var(--magenta)">[${(Math.random() * 2).toFixed(4)}]</span> ${msg}</div>`; }, delay); delay += 100 + Math.random() * 200; });
+            bootMessages.forEach((msg) => { setTimeout(() => { logsBox.innerHTML += `<div><span style="color:var(--magenta)">[${(Math.random() * 2).toFixed(4)}]</span> ${msg}</div>`; }, delay); delay += 150 + Math.random() * 200; });
             setTimeout(() => { bootScreen.classList.add("hidden"); document.getElementById("mainContent").classList.remove("hidden"); startSystem(); }, delay + 500);
         }
 
-        function processLogin() {
-            const pass = document.getElementById("passInput").value.toUpperCase();
-            if(pass === "ADMIN" || pass === "KHUSHAL") { localStorage.setItem("hasAccess", "true"); runBootSequence(); } 
-            else { document.getElementById("errorMsg").style.display = "block"; }
-        }
+        function processLogin() { const pass = document.getElementById("passInput").value.toUpperCase(); if(pass === "ADMIN" || pass === "KHUSHAL") { localStorage.setItem("hasAccess", "true"); runBootSequence(); } else { document.getElementById("errorMsg").style.display = "block"; } }
         function logout() { localStorage.removeItem("hasAccess"); location.reload(); }
 
         window.onload = function() { loadTasks(); loadScratchpad(); if(localStorage.getItem("hasAccess") === "true") { runBootSequence(); } };
-        function startSystem() { startMatrix(); startHUD(); setupCLI(); startTelemetry(); scanFingerprint(); startVisualizer(); initScrollAnimations(); }
+        
+        function startSystem() { initParticles(); fetchGitHubData(); fetchRedditData(); startHUD(); setupCLI(); startTelemetry(); scanFingerprint(); startVisualizer(); initScrollAnimations(); }
 
-        function initScrollAnimations() {
-            function reveal() {
-                var reveals = document.querySelectorAll(".reveal");
-                for (var i = 0; i < reveals.length; i++) {
-                    var windowHeight = window.innerHeight;
-                    var elementTop = reveals[i].getBoundingClientRect().top;
-                    var elementVisible = 50; 
-                    if (elementTop < windowHeight - elementVisible) { reveals[i].classList.add("active"); } 
-                    else { reveals[i].classList.remove("active"); } 
-                }
-            }
-            window.addEventListener("scroll", reveal); reveal(); 
+        // --- 1. GITHUB API FETCH ---
+        function fetchGitHubData() {
+            fetch('https://api.github.com/users/khushalmourya3-eng')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('gh-avatar').src = data.avatar_url;
+                document.getElementById('gh-name').innerText = data.name || data.login;
+                document.getElementById('gh-repos').innerText = data.public_repos;
+                document.getElementById('gh-followers').innerText = data.followers;
+            }).catch(err => { document.getElementById('gh-name').innerText = "API Offline"; });
         }
 
-        function scanFingerprint() {
-            document.getElementById('fp-cores').innerText = navigator.hardwareConcurrency || "N/A";
-            document.getElementById('fp-res').innerText = `${window.screen.width} x ${window.screen.height}`;
-            let engine = "Unknown";
-            if(navigator.userAgent.includes("Chrome")) engine = "Blink / V8";
-            else if(navigator.userAgent.includes("Firefox")) engine = "Gecko";
-            else if(navigator.userAgent.includes("Safari")) engine = "WebKit";
-            document.getElementById('fp-engine').innerText = engine;
+        // --- 2. REDDIT API FETCH ---
+        function fetchRedditData() {
+            fetch('https://www.reddit.com/r/webdev/hot.json?limit=5')
+            .then(res => res.json())
+            .then(data => {
+                let feed = document.getElementById('redditFeed'); feed.innerHTML = '';
+                data.data.children.forEach(post => {
+                    if(!post.data.stickied) { // Ignore pinned posts
+                        feed.innerHTML += `<div class="reddit-post"><a href="https://reddit.com${post.data.permalink}" target="_blank">> ${post.data.title}</a></div>`;
+                    }
+                });
+            }).catch(err => { document.getElementById('redditFeed').innerHTML = "Uplink Failed. Check Network."; });
         }
 
-        const scratchpad = document.getElementById('scratchpad');
-        scratchpad.addEventListener('input', () => { localStorage.setItem('adminScratchpad', scratchpad.value); });
+        // --- 3. PARTICLES.JS ENGINE ---
+        function initParticles() {
+            particlesJS("particles-js", {
+                "particles": {
+                    "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                    "color": { "value": ["#00f3ff", "#ff00ea"] },
+                    "shape": { "type": "circle" },
+                    "opacity": { "value": 0.5, "random": true },
+                    "size": { "value": 3, "random": true },
+                    "line_linked": { "enable": true, "distance": 150, "color": "#00f3ff", "opacity": 0.4, "width": 1 },
+                    "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+                },
+                "interactivity": {
+                    "detect_on": "window",
+                    "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                    "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 1 } }, "push": { "particles_nb": 4 } }
+                },
+                "retina_detect": true
+            });
+        }
+
+        function initScrollAnimations() { function reveal() { var reveals = document.querySelectorAll(".reveal"); for (var i = 0; i < reveals.length; i++) { var windowHeight = window.innerHeight; var elementTop = reveals[i].getBoundingClientRect().top; var elementVisible = 50; if (elementTop < windowHeight - elementVisible) { reveals[i].classList.add("active"); } else { reveals[i].classList.remove("active"); } } } window.addEventListener("scroll", reveal); reveal(); }
+        function scanFingerprint() { document.getElementById('fp-cores').innerText = navigator.hardwareConcurrency || "N/A"; document.getElementById('fp-res').innerText = `${window.screen.width} x ${window.screen.height}`; let engine = "Unknown"; if(navigator.userAgent.includes("Chrome")) engine = "Blink"; else if(navigator.userAgent.includes("Firefox")) engine = "Gecko"; else if(navigator.userAgent.includes("Safari")) engine = "WebKit"; document.getElementById('fp-engine').innerText = engine; }
+        
+        const scratchpad = document.getElementById('scratchpad'); scratchpad.addEventListener('input', () => { localStorage.setItem('adminScratchpad', scratchpad.value); });
         function loadScratchpad() { const saved = localStorage.getItem('adminScratchpad'); if(saved) scratchpad.value = saved; }
 
         let isAudioPlaying = false;
         function startVisualizer() {
-            const canvas = document.getElementById('visualizer'); const ctx = canvas.getContext('2d');
-            canvas.width = canvas.parentElement.clientWidth - 40; canvas.height = 70;
-            const bars = 30; const barWidth = canvas.width / bars - 2;
-            let gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-            gradient.addColorStop(0, "#00f3ff"); gradient.addColorStop(0.5, "#ff00ea"); gradient.addColorStop(1, "#eaff00");
-
-            setInterval(() => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = gradient;
-                for(let i = 0; i < bars; i++) {
-                    let height = isAudioPlaying ? Math.random() * 55 + 5 : 5;
-                    ctx.beginPath(); ctx.roundRect(i * (barWidth + 2), canvas.height - height, barWidth, height, [3, 3, 0, 0]); ctx.fill();
-                }
-            }, 80);
+            const canvas = document.getElementById('visualizer'); const ctx = canvas.getContext('2d'); canvas.width = canvas.parentElement.clientWidth - 40; canvas.height = 70; const bars = 30; const barWidth = canvas.width / bars - 2;
+            let gradient = ctx.createLinearGradient(0, 0, canvas.width, 0); gradient.addColorStop(0, "#00f3ff"); gradient.addColorStop(0.5, "#ff00ea"); gradient.addColorStop(1, "#eaff00");
+            setInterval(() => { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = gradient; for(let i = 0; i < bars; i++) { let height = isAudioPlaying ? Math.random() * 55 + 5 : 5; ctx.beginPath(); ctx.roundRect(i * (barWidth + 2), canvas.height - height, barWidth, height, [3, 3, 0, 0]); ctx.fill(); } }, 80);
         }
 
-        // --- NEW AUDIO TOGGLE FUNCTION ---
-        function toggleAudio() {
-            const a = document.getElementById("myAudio"); 
-            const btn = document.getElementById("audioBtn");
-            const status = document.getElementById('statusText');
-            
-            if(isAudioPlaying) { 
-                a.pause(); 
-                isAudioPlaying = false; 
-                btn.innerHTML = "▶ PLAY AUDIO";
-                status.innerText = ">_ Status: Audio Paused"; 
-            } else { 
-                a.play().catch(e => console.log("Simulating Audio")); 
-                isAudioPlaying = true; 
-                btn.innerHTML = "⏸ PAUSE AUDIO";
-                status.innerText = ">_ Status: Audio Active"; 
-            }
-        }
+        function toggleAudio() { const a = document.getElementById("myAudio"); const btn = document.getElementById("audioBtn"); const status = document.getElementById('statusText'); if(isAudioPlaying) { a.pause(); isAudioPlaying = false; btn.innerHTML = "▶ PLAY AUDIO"; status.innerText = ">_ Status: Audio Paused"; } else { a.play().catch(e=>console.log("Simulating")); isAudioPlaying = true; btn.innerHTML = "⏸ PAUSE AUDIO"; status.innerText = ">_ Status: Audio Active"; } }
 
         function startHUD() {
             setInterval(() => { document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', { hour12: false }); }, 1000);
@@ -266,56 +279,12 @@
             fetch('https://api.open-meteo.com/v1/forecast?latitude=26.9124&longitude=75.7873&current_weather=true').then(res => res.json()).then(data => { document.getElementById('weatherData').innerText = `${data.current_weather.temperature}°C`; }).catch(() => { document.getElementById('weatherData').innerText = "ERR"; });
         }
 
-        function startTelemetry() {
-            setInterval(() => {
-                let rpm = Math.floor(Math.random() * (3500 - 1500) + 1500); if(Math.random() > 0.8) rpm = Math.floor(Math.random() * (7200 - 4500) + 4500);
-                document.getElementById('rpmText').innerText = rpm; document.getElementById('rpmBar').style.width = (rpm / 7500) * 100 + "%";
-                let boost = (rpm > 3000) ? (Math.random() * (18.5 - 10.0) + 10.0).toFixed(1) : (Math.random() * 2.0).toFixed(1);
-                document.getElementById('boostText').innerText = boost + " PSI"; document.getElementById('boostBar').style.width = (boost / 20) * 100 + "%";
-                let temp = (Math.random() * (105 - 95) + 95).toFixed(0);
-                document.getElementById('tempText').innerText = temp + " °C"; document.getElementById('tempBar').style.width = (temp / 130) * 100 + "%";
-            }, 800);
-        }
+        function startTelemetry() { setInterval(() => { let rpm = Math.floor(Math.random() * (3500 - 1500) + 1500); if(Math.random() > 0.8) rpm = Math.floor(Math.random() * (7200 - 4500) + 4500); document.getElementById('rpmText').innerText = rpm; document.getElementById('rpmBar').style.width = (rpm / 7500) * 100 + "%"; let boost = (rpm > 3000) ? (Math.random() * (18.5 - 10.0) + 10.0).toFixed(1) : (Math.random() * 2.0).toFixed(1); document.getElementById('boostText').innerText = boost + " PSI"; document.getElementById('boostBar').style.width = (boost / 20) * 100 + "%"; let temp = (Math.random() * (105 - 95) + 95).toFixed(0); document.getElementById('tempText').innerText = temp + " °C"; document.getElementById('tempBar').style.width = (temp / 130) * 100 + "%"; }, 800); }
 
-        function triggerSelfDestruct() {
-            document.body.classList.add('destruct-mode');
-            const overlay = document.createElement('div'); overlay.id = "destructOverlay"; document.body.appendChild(overlay);
-            let count = 5; overlay.innerHTML = `SYSTEM PURGE IN<br><span style="color:#eaff00">${count}</span>`;
-            let countdown = setInterval(() => {
-                count--; overlay.innerHTML = `SYSTEM PURGE IN<br><span style="color:#eaff00">${count}</span>`;
-                if(count <= 0) {
-                    clearInterval(countdown);
-                    document.body.innerHTML = `<div style="color:#00f3ff; padding:20px; font-family:monospace; font-size:1.5rem; display:flex; height:100vh; align-items:center; justify-content:center;">>_ SYSTEM WIPED.<br>>_ NOTHING REMAINS.</div>`;
-                    document.body.classList.remove('destruct-mode'); document.body.style.background = "#000";
-                }
-            }, 1000);
-        }
+        function triggerSelfDestruct() { document.body.classList.add('destruct-mode'); const overlay = document.createElement('div'); overlay.id = "destructOverlay"; document.body.appendChild(overlay); let count = 5; overlay.innerHTML = `SYSTEM PURGE IN<br><span style="color:#eaff00">${count}</span>`; let countdown = setInterval(() => { count--; overlay.innerHTML = `SYSTEM PURGE IN<br><span style="color:#eaff00">${count}</span>`; if(count <= 0) { clearInterval(countdown); document.body.innerHTML = `<div style="color:#00f3ff; padding:20px; font-family:monospace; font-size:1.5rem; display:flex; height:100vh; align-items:center; justify-content:center;">>_ SYSTEM WIPED.<br>>_ NOTHING REMAINS.</div>`; document.body.classList.remove('destruct-mode'); document.body.style.background = "#000"; } }, 1000); }
 
         function setupCLI() { const cli = document.getElementById('cliInput'); cli.addEventListener('keypress', function(e) { if(e.key === 'Enter') { executeCommand(cli.value.toLowerCase().trim()); cli.value = ''; } }); }
-        
-        // --- CLI COMMAND LOGIC UPDATED ---
-        function executeCommand(cmd) {
-            const status = document.getElementById('statusText');
-            if(cmd === '/help') { alert("COMMANDS:\n/play (toggle audio visualizer)\n/clear (wipe tasks)"); } 
-            else if(cmd === '/play') { toggleAudio(); } // Points to the same function as the button!
-            else if(cmd === '/clear') { document.getElementById("taskList").innerHTML = ""; saveTasks(); status.innerText = ">_ Status: Memory Wiped"; } 
-            else { status.innerText = ">_ Error: Command not found."; }
-        }
-
-        function startMatrix() {
-            const canvas = document.getElementById('matrix'); const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*'; const fontSize = 16; const columns = canvas.width / fontSize;
-            let drops = []; for(let x = 0; x < columns; x++) drops[x] = 1;
-            const colors = ['#00f3ff', '#ff00ea', '#eaff00', '#00ff41']; 
-            setInterval(() => {
-                ctx.fillStyle = 'rgba(5, 5, 16, 0.1)'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.font = fontSize + 'px monospace';
-                for(let i = 0; i < drops.length; i++) {
-                    ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
-                    ctx.fillText(letters.charAt(Math.floor(Math.random() * letters.length)), i * fontSize, drops[i] * fontSize);
-                    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++;
-                }
-            }, 35);
-        }
+        function executeCommand(cmd) { const status = document.getElementById('statusText'); if(cmd === '/help') { alert("COMMANDS:\n/play (toggle audio)\n/clear (wipe tasks)"); } else if(cmd === '/play') { toggleAudio(); } else if(cmd === '/clear') { document.getElementById("taskList").innerHTML = ""; saveTasks(); status.innerText = ">_ Status: Memory Wiped"; } else { status.innerText = ">_ Error: Command not found."; } }
 
         function addTask() { let input = document.getElementById("taskInput"); if(input.value === '') return; let li = document.createElement("li"); li.innerHTML = `<span class="task-text" onclick="toggleTask(this)">${input.value}</span> <span class="delete-btn" onclick="this.parentElement.remove(); saveTasks();">X</span>`; document.getElementById("taskList").appendChild(li); input.value = ""; saveTasks(); }
         function toggleTask(element) { element.parentElement.classList.toggle('completed'); if(element.parentElement.classList.contains('completed')) { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#ff00ea', '#00f3ff', '#eaff00'] }); } saveTasks(); }
