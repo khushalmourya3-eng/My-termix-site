@@ -4,40 +4,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mission NEET 2026 | Control Room</title>
+    <title>Control Room | Authorized Access</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
     <style>
-        body { 
-            margin: 0; padding: 0; color: #00ff41; font-family: 'Courier New', monospace; 
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden;
-        }
-
+        body { margin: 0; padding: 0; color: #00ff41; font-family: 'Courier New', monospace; background-color: black; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
         canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; }
+        
+        /* 1. Login Screen Security Gateway */
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050505; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .login-box { border: 2px solid #00ff41; padding: 30px; text-align: center; border-radius: 10px; box-shadow: 0 0 20px #00ff41; background: rgba(0,0,0,0.9); width: 80%; max-width: 400px; }
+        .login-input { background: black; color: #00ff41; border: 1px solid #00ff41; padding: 10px; margin: 15px 0; outline: none; text-align: center; font-family: inherit; font-size: 1.2rem; width: 80%; }
+        
+        /* General Layout */
+        #mainContent { width: 100%; flex-direction: column; align-items: center; }
+        .hidden { display: none !important; }
+        .flex-col { display: flex; }
 
-        .container { 
-            border: 2px solid #00ff41; padding: 25px; border-radius: 15px; 
-            box-shadow: 0 0 30px rgba(0, 255, 65, 0.4); background: rgba(0, 0, 0, 0.85); 
-            max-width: 500px; width: 90%; text-align: center; margin-top: 5vh; margin-bottom: 5vh;
-            z-index: 1; backdrop-filter: blur(5px);
-        }
-
+        .container { border: 2px solid #00ff41; padding: 25px; border-radius: 15px; box-shadow: 0 0 30px rgba(0, 255, 65, 0.4); background: rgba(0, 0, 0, 0.85); max-width: 500px; width: 90%; text-align: center; margin-top: 5vh; margin-bottom: 5vh; z-index: 1; backdrop-filter: blur(5px); }
         .glow-text { text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41; animation: pulse 2s infinite alternate; }
         @keyframes pulse { from { opacity: 0.8; } to { opacity: 1; text-shadow: 0 0 20px #00ff41, 0 0 40px #00ff41; } }
-
         img { width: 100%; border-radius: 10px; border: 1px solid #00ff41; margin: 15px 0; box-shadow: 0 0 15px rgba(0, 255, 65, 0.5); }
-
         #timer { font-size: 1.2rem; color: #ff3e3e; border: 1px solid #ff3e3e; padding: 10px; margin-top: 10px; display: inline-block; background: rgba(0,0,0,0.7); }
-        
-        .btn { 
-            background: rgba(0,0,0,0.8); color: #00ff41; border: 2px solid #00ff41; padding: 10px 20px; 
-            margin-top: 15px; cursor: pointer; font-family: inherit; font-weight: bold; text-transform: uppercase; 
-            transition: 0.3s; border-radius: 5px; box-shadow: 0 0 10px #00ff41; width: 100%;
-        }
+        .btn { background: rgba(0,0,0,0.8); color: #00ff41; border: 2px solid #00ff41; padding: 10px 20px; margin-top: 15px; cursor: pointer; font-family: inherit; font-weight: bold; text-transform: uppercase; transition: 0.3s; border-radius: 5px; box-shadow: 0 0 10px #00ff41; width: 100%; }
         .btn:hover { background: #00ff41; color: black; box-shadow: 0 0 25px #00ff41; }
-
         .pomodoro-box { border: 1px dashed #00ff41; padding: 15px; margin-top: 25px; border-radius: 10px; background: rgba(0, 255, 65, 0.05); }
         #pomo-time { font-size: 2.5rem; font-weight: bold; text-shadow: 0 0 15px #00ff41; margin: 10px 0; }
+        
+        /* 2. API Quote Box */
+        #quoteBox { border-left: 3px solid #00ff41; padding: 10px; margin-top: 15px; background: rgba(0, 255, 65, 0.1); font-style: italic; font-size: 0.9rem; text-align: left; }
 
-        /* To-Do List Styles */
+        /* To-Do List */
         .todo-box { border: 1px solid #00ff41; padding: 15px; margin-top: 20px; border-radius: 10px; background: rgba(0, 0, 0, 0.6); text-align: left; }
         .todo-box h3 { text-align: center; margin-top: 0; color: white; }
         #taskInput { width: 68%; padding: 10px; background: black; color: #00ff41; border: 1px solid #00ff41; border-radius: 3px; font-family: inherit; outline: none; }
@@ -51,71 +49,112 @@
 </head>
 <body>
 
-    <canvas id="matrix"></canvas>
-
-    <div class="container">
-        <h1 class="glow-text">HELLO FUTURE DOCTORS</h1>
-        <p>>_ Status: Preparing for Surgery (NEET)</p>
-        
-        <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=500" alt="Future Doctor">
-
-        <h3 style="color: white; margin-bottom: 5px;">MISSION: NEET 2026</h3>
-        <div id="timer">Initializing...</div>
-
-        <div class="todo-box">
-            <h3>✅ DAILY TARGETS</h3>
-            <input type="text" id="taskInput" placeholder="e.g. Revise Biology NCERT...">
-            <button id="addBtn" onclick="addTask()">ADD</button>
-            <ul id="taskList"></ul>
+    <div id="loginScreen">
+        <div class="login-box">
+            <h2 class="glow-text">TERMINAL ACCESS</h2>
+            <p>>_ Awaiting Authorization:</p>
+            <input type="password" id="passInput" class="login-input" placeholder="Enter Password">
+            <button class="btn" onclick="checkAccess()">LOGIN</button>
+            <p id="errorMsg" style="color: red; display: none; margin-top: 10px; font-weight: bold;">[!] ACCESS DENIED</p>
         </div>
+    </div>
 
-        <div class="pomodoro-box">
-            <h3 style="color: white; margin: 0;">⚡ FOCUS MODE</h3>
-            <div id="pomo-time">25:00</div>
-            <button class="btn" onclick="startPomodoro()" id="pomo-btn">▶ Start 25m Sprint</button>
+    <div id="mainContent" class="hidden flex-col">
+        <canvas id="matrix"></canvas>
+
+        <div class="container">
+            <h1 class="glow-text">HELLO FUTURE DOCTORS</h1>
+            <p>>_ Status: Preparing for Surgery (NEET)</p>
+            
+            <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=500" alt="Future Doctor">
+
+            <div id="quoteBox">Fetching live data from server...</div>
+
+            <h3 style="color: white; margin-bottom: 5px; margin-top: 20px;">MISSION: NEET 2026</h3>
+            <div id="timer">Initializing...</div>
+
+            <div class="todo-box">
+                <h3>✅ DAILY TARGETS</h3>
+                <input type="text" id="taskInput" placeholder="Add a target...">
+                <button id="addBtn" onclick="addTask()">ADD</button>
+                <ul id="taskList"></ul>
+            </div>
+
+            <div class="pomodoro-box">
+                <h3 style="color: white; margin: 0;">⚡ FOCUS MODE</h3>
+                <div id="pomo-time">25:00</div>
+                <button class="btn" onclick="startPomodoro()" id="pomo-btn">▶ Start 25m Sprint</button>
+            </div>
+
+            <audio id="myAudio" loop><source src="music.mp3" type="audio/mpeg"></audio>
+            <button class="btn" onclick="toggleMusic()" id="btnText" style="margin-top: 20px;">🎧 Start Mission Music</button>
         </div>
-
-        <audio id="myAudio" loop>
-            <source src="music.mp3" type="audio/mpeg">
-        </audio>
-        <button class="btn" onclick="toggleMusic()" id="btnText" style="margin-top: 20px;">🎧 Start Mission Music</button>
     </div>
 
     <script>
-        // Matrix Rain
-        const canvas = document.getElementById('matrix'); const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*';
-        const fontSize = 14; const columns = canvas.width / fontSize;
-        const drops = []; for(let x = 0; x < columns; x++) drops[x] = 1;
-        setInterval(() => {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#0F0'; ctx.font = fontSize + 'px monospace';
-            for(let i = 0; i < drops.length; i++) {
-                ctx.fillText(letters.charAt(Math.floor(Math.random() * letters.length)), i * fontSize, drops[i] * fontSize);
-                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                drops[i]++;
+        // 1. Security Gateway Logic
+        function checkAccess() {
+            const pass = document.getElementById("passInput").value.toUpperCase();
+            if(pass === "ADMIN" || pass === "KHUSHAL") {
+                document.getElementById("loginScreen").style.display = "none";
+                document.getElementById("mainContent").classList.remove("hidden");
+                startMatrix(); // Start heavy graphics only after login
+                fetchQuote();  // Call the live API
+            } else {
+                document.getElementById("errorMsg").style.display = "block";
             }
-        }, 33);
-
-        // Music
-        const audio = document.getElementById("myAudio"); const btnText = document.getElementById("btnText");
-        function toggleMusic() {
-            if (audio.paused) { audio.play(); btnText.innerHTML = "⏸ Pause Music"; } 
-            else { audio.pause(); btnText.innerHTML = "🎧 Start Mission Music"; }
         }
 
-        // Countdown Timer
-        const targetDate = new Date("May 3, 2026 10:00:00").getTime();
-        setInterval(() => {
-            const diff = targetDate - new Date().getTime();
-            document.getElementById("timer").innerHTML = Math.floor(diff / (1000 * 60 * 60 * 24)) + "d " + 
-            Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)) + "h " + 
-            Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)) + "m " + 
-            Math.floor((diff % (1000 * 60)) / 1000) + "s Left";
-        }, 1000);
+        // 2. Live API Fetching
+        function fetchQuote() {
+            fetch('https://dummyjson.com/quotes/random')
+                .then(res => res.json())
+                .then(data => { document.getElementById("quoteBox").innerHTML = `"${data.quote}" <br><br><b>- ${data.author}</b>`; })
+                .catch(err => { document.getElementById("quoteBox").innerHTML = `"Offline Mode Active. Keep grinding."`; });
+        }
 
-        // Pomodoro Timer
+        // 3. To-Do List + Confetti Cannon
+        function addTask() {
+            let input = document.getElementById("taskInput");
+            if(input.value === '') return;
+            let li = document.createElement("li");
+            li.innerHTML = `<span class="task-text" onclick="toggleTask(this)">${input.value}</span> <span class="delete-btn" onclick="this.parentElement.remove(); saveTasks();">X</span>`;
+            document.getElementById("taskList").appendChild(li);
+            input.value = ""; saveTasks();
+        }
+
+        function toggleTask(element) {
+            element.parentElement.classList.toggle('completed');
+            if(element.parentElement.classList.contains('completed')) {
+                // Fire the Confetti!
+                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#00ff41', '#ffffff'] });
+            }
+            saveTasks();
+        }
+
+        function saveTasks() { localStorage.setItem("neetTasks", document.getElementById("taskList").innerHTML); }
+        function loadTasks() { let saved = localStorage.getItem("neetTasks"); if(saved) document.getElementById("taskList").innerHTML = saved; }
+        window.onload = loadTasks;
+
+        // Matrix Background
+        function startMatrix() {
+            const canvas = document.getElementById('matrix'); const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*';
+            const fontSize = 14; const columns = canvas.width / fontSize;
+            const drops = []; for(let x = 0; x < columns; x++) drops[x] = 1;
+            setInterval(() => {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#0F0'; ctx.font = fontSize + 'px monospace';
+                for(let i = 0; i < drops.length; i++) {
+                    ctx.fillText(letters.charAt(Math.floor(Math.random() * letters.length)), i * fontSize, drops[i] * fontSize);
+                    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                }
+            }, 33);
+        }
+
+        // Pomodoro Timer & Music
         let pomoInterval;
         function startPomodoro() {
             clearInterval(pomoInterval); let timeLeft = 25 * 60;
@@ -131,23 +170,21 @@
                 timeLeft--;
             }, 1000);
         }
+        function toggleMusic() {
+            const audio = document.getElementById("myAudio"); const btnText = document.getElementById("btnText");
+            if (audio.paused) { audio.play(); btnText.innerHTML = "⏸ Pause Music"; } 
+            else { audio.pause(); btnText.innerHTML = "🎧 Start Mission Music"; }
+        }
 
-        // Daily Tracker Logic (with LocalStorage saving)
-        function addTask() {
-            let input = document.getElementById("taskInput");
-            if(input.value === '') return;
-            let li = document.createElement("li");
-            li.innerHTML = `<span onclick="this.parentElement.classList.toggle('completed'); saveTasks();">${input.value}</span> <span class="delete-btn" onclick="this.parentElement.remove(); saveTasks();">X</span>`;
-            document.getElementById("taskList").appendChild(li);
-            input.value = "";
-            saveTasks();
-        }
-        function saveTasks() { localStorage.setItem("neetTasks", document.getElementById("taskList").innerHTML); }
-        function loadTasks() { 
-            let saved = localStorage.getItem("neetTasks"); 
-            if(saved) document.getElementById("taskList").innerHTML = saved; 
-        }
-        window.onload = loadTasks;
+        // Countdown Timer
+        const targetDate = new Date("May 3, 2026 10:00:00").getTime();
+        setInterval(() => {
+            const diff = targetDate - new Date().getTime();
+            document.getElementById("timer").innerHTML = Math.floor(diff / (1000 * 60 * 60 * 24)) + "d " + 
+            Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)) + "h " + 
+            Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)) + "m " + 
+            Math.floor((diff % (1000 * 60)) / 1000) + "s Left";
+        }, 1000);
     </script>
 </body>
 </html>
