@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin OS | Neon Supernova</title>
+    <title>Admin OS | Kinetic Neon v20</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -14,19 +14,20 @@
     <style>
         :root { 
             --primary: #00f3ff; --secondary: #ff00ea; --accent: #eaff00; 
-            --glass: rgba(15, 15, 30, 0.8); 
+            --glass: rgba(10, 10, 25, 0.8); 
         }
         
-        /* THEME PRESETS WITH BRIGHT COLORS */
-        body.theme-toxic { --primary: #00ff41; --secondary: #adff2f; --accent: #00ffea; }
-        body.theme-amber { --primary: #ffb100; --secondary: #ff4500; --accent: #ffff00; }
+        body { 
+            margin: 0; padding: 0; color: #fff; font-family: 'Segoe UI', sans-serif; 
+            background: #050510; overflow-x: hidden; display: flex; 
+            flex-direction: column; align-items: center; min-height: 100vh;
+        }
         
-        body { margin: 0; padding: 0; color: #fff; font-family: 'Segoe UI', sans-serif; background: #050510; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
-        #particles-js { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none; }
-
-        /* Multi-Color Gradient Background */
-        .bg-glow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(255, 0, 234, 0.15), rgba(0, 243, 255, 0.1), #050510 80%); z-index: -1; }
+        /* The Background Engine */
+        #particles-js { 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            z-index: -2; background: radial-gradient(circle, #1a0033 0%, #050510 100%);
+        }
 
         .rainbow-text {
             background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--primary));
@@ -35,90 +36,77 @@
             -webkit-text-fill-color: transparent;
             animation: gradientMove 3s linear infinite;
             font-weight: 900;
-            text-shadow: 0 0 20px rgba(255,255,255,0.2);
         }
         @keyframes gradientMove { 0% {background-position: 0% 50%;} 100% {background-position: 100% 50%;} }
 
+        /* Panels with Neon Glow */
         .glass-panel { 
             background: var(--glass); 
-            backdrop-filter: blur(15px); 
+            backdrop-filter: blur(20px); 
             border-radius: 20px; 
             padding: 20px; 
             margin-top: 25px; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            /* NEW: Glowing Border */
-            border: 2px solid transparent;
-            background-image: linear-gradient(var(--glass), var(--glass)), linear-gradient(to right, var(--primary), var(--secondary));
-            background-origin: border-box;
-            background-clip: padding-box, border-box;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2), inset 0 0 10px rgba(255, 0, 234, 0.1);
             transition: 0.3s;
         }
 
-        .drag-handle { cursor: grab; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; font-weight: bold; color: var(--primary); letter-spacing: 1px; }
+        .drag-handle { cursor: grab; padding-bottom: 10px; border-bottom: 1px solid var(--primary); margin-bottom: 15px; font-weight: bold; color: var(--primary); text-transform: uppercase; }
 
         .btn { 
             background: linear-gradient(45deg, var(--primary), var(--secondary)); 
-            color: white; border: none; padding: 12px; cursor: pointer; border-radius: 10px; width: 100%; font-weight: 900; 
-            box-shadow: 0 5px 15px rgba(255, 0, 234, 0.3);
-            transition: 0.3s;
+            color: white; border: none; padding: 12px; cursor: pointer; border-radius: 10px; width: 100%; font-weight: bold; 
+            box-shadow: 0 5px 15px rgba(255, 0, 234, 0.4);
         }
-        .btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px var(--primary); }
+
+        /* Kinetic Ripple effect */
+        .ripple {
+            position: fixed; border-radius: 50%; background: rgba(255, 255, 255, 0.3);
+            transform: scale(0); animation: ripple-anim 0.6s ease-out; pointer-events: none; z-index: 9999;
+        }
+        @keyframes ripple-anim { to { transform: scale(6); opacity: 0; } }
 
         .cli-box { 
-            border: 2px solid var(--primary); padding: 15px; background: rgba(0,0,0,0.8); 
-            display: flex; align-items: center; border-radius: 12px; box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
-            width: 90%; max-width: 550px; margin-top: 25px;
+            border: 2px solid var(--primary); padding: 12px; background: #000; 
+            display: flex; align-items: center; border-radius: 12px; 
+            width: 90%; max-width: 500px; margin-top: 25px;
         }
-        #cliInput { background: transparent; border: none; color: #fff; flex-grow: 1; outline: none; font-family: monospace; font-size: 1rem; }
+        #cliInput { background: transparent; border: none; color: #fff; flex-grow: 1; outline: none; font-family: monospace; }
         
-        .leaflet-tile { filter: invert(100%) hue-rotate(180deg) brightness(140%) contrast(110%); }
-        .ripple { position: fixed; border-radius: 50%; border: 2px solid white; transform: scale(0); animation: ripple-effect 0.5s ease-out; pointer-events: none; z-index: 9999; }
-        @keyframes ripple-effect { to { transform: scale(5); opacity: 0; } }
-
-        #hackerMode { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,5,15,0.95); z-index: 20000; padding: 20px; color: var(--accent); font-size: 1.1rem; overflow: hidden; display: none; word-break: break-all; font-family: monospace; }
+        .leaflet-tile { filter: invert(100%) hue-rotate(180deg) brightness(130%); }
     </style>
 </head>
-<body id="osBody">
-    <div class="bg-glow"></div>
-    <div id="hackerMode"></div>
+<body>
+
     <div id="particles-js"></div>
 
-    <div id="loginScreen">
+    <div id="loginScreen" style="position:fixed; width:100%; height:100%; background:#050510; z-index:10000; display:flex; justify-content:center; align-items:center;">
         <div class="glass-panel" style="width: 300px; text-align: center;">
-            <h2 class="rainbow-text" style="font-size: 2rem;">NEON_LINK</h2>
-            <input type="password" id="passInput" class="btn" style="background:rgba(255,255,255,0.05); border:1px solid var(--primary); text-align:center; margin: 20px 0;" placeholder="ACCESS KEY">
-            <button class="btn" onclick="processLogin()">INITIALIZE CORE</button>
+            <h2 class="rainbow-text">KINETIC_LINK</h2>
+            <input type="password" id="passInput" class="btn" style="background:rgba(255,255,255,0.05); border:1px solid var(--primary); text-align:center; margin-bottom:20px;" placeholder="USER PIN">
+            <button class="btn" onclick="processLogin()">BOOT SYSTEM</button>
         </div>
     </div>
 
     <div id="mainContent" style="display:none; width: 100%; flex-direction: column; align-items: center;">
-        <div id="panelContainer" style="width: 90%; max-width: 550px;">
+        <div id="panelContainer" style="width: 95%; max-width: 500px;">
             
-            <h1 class="rainbow-text" style="font-size: 2.2rem; text-align: center; margin: 40px 0;">NEON_OS v19</h1>
+            <h1 class="rainbow-text" style="font-size: 2rem; text-align: center; margin-top: 40px;">KINETIC_OS v20</h1>
 
             <div class="glass-panel">
-                <div class="drag-handle">🛰️ GLOBAL TRACKER (ISS)</div>
-                <div id="map" style="height: 250px; width:100%; border-radius:15px; border: 1px solid var(--primary);"></div>
+                <div class="drag-handle">🛰️ ISS ORBITAL TRACKER</div>
+                <div id="map" style="height: 200px; width:100%; border-radius:15px; border: 1px solid var(--primary);"></div>
             </div>
 
             <div class="glass-panel">
-                <div class="drag-handle">🎨 NEURAL OVERRIDE</div>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn" onclick="switchTheme('default')" style="background: cyan; color: black;">NEON</button>
-                    <button class="btn" onclick="switchTheme('toxic')" style="background: #00ff41; color: black;">TOXIC</button>
-                    <button class="btn" onclick="switchTheme('amber')" style="background: #ffb100; color: black;">AMBER</button>
-                </div>
+                <div class="drag-handle">💻 NEURAL TERMINAL</div>
+                <button class="btn" onclick="confetti({particleCount:150, spread:70, origin:{y:0.6}})">TEST SYSTEM OVERLOAD</button>
             </div>
 
             <div class="glass-panel">
-                <div class="drag-handle">💻 MATRIX BREAKER</div>
-                <button class="btn" style="background: linear-gradient(45deg, #ff00ea, #7b00ff);" onclick="toggleHackerMode()">START BRUTE FORCE</button>
-            </div>
-
-            <div class="glass-panel">
-                <div class="drag-handle">🎵 FREQUENCY ANALYZER</div>
-                <canvas id="visualizer" style="width:100%; height:60px;"></canvas>
-                <button class="btn" style="margin-top:15px;" onclick="toggleAudio()">PULSE: ON/OFF</button>
+                <div class="drag-handle">📊 FREQUENCY PULSE</div>
+                <canvas id="visualizer" style="width:100%; height:50px;"></canvas>
+                <button class="btn" style="margin-top:10px;" onclick="toggleAudio()">SYNC AUDIO</button>
             </div>
 
         </div>
@@ -126,10 +114,9 @@
         <audio id="myAudio" loop crossorigin="anonymous"><source src="music.mp3" type="audio/mpeg"></audio>
 
         <div class="cli-box">
-            <span style="color:var(--primary); margin-right:10px; font-weight:bold;">root@neon:~#</span>
-            <input type="text" id="cliInput" placeholder="System command...">
+            <span style="color:var(--primary); margin-right:10px;">></span>
+            <input type="text" id="cliInput" placeholder="READY_FOR_COMMAND...">
         </div>
-        <p style="font-size: 0.8rem; color: var(--secondary); margin: 30px 0; font-weight: bold; letter-spacing: 2px;">NEON KERNEL ONLINE</p>
     </div>
 
     <script>
@@ -143,17 +130,17 @@
             o.stop(audioCtx.currentTime + d);
         }
 
+        // --- THE KINETIC TOUCH ---
         window.addEventListener('mousedown', (e) => {
             const rip = document.createElement('div');
             rip.className = 'ripple';
             rip.style.left = e.clientX + 'px';
             rip.style.top = e.clientY + 'px';
-            rip.style.width = rip.style.height = '60px';
-            rip.style.marginLeft = rip.style.marginTop = '-30px';
-            rip.style.borderColor = getComputedStyle(document.body).getPropertyValue('--secondary');
+            rip.style.width = rip.style.height = '40px';
+            rip.style.marginLeft = rip.style.marginTop = '-20px';
             document.body.appendChild(rip);
-            setTimeout(() => rip.remove(), 500);
-            playSfx(200, 'sine', 0.1);
+            setTimeout(() => rip.remove(), 600);
+            playSfx(100, 'sine', 0.1);
         });
 
         function processLogin() {
@@ -171,61 +158,46 @@
             setInterval(updateISS, 3000);
         }
 
-        function switchTheme(t) {
-            playSfx(600, 'triangle', 0.1);
-            document.body.className = t === 'default' ? '' : 'theme-' + t;
-            initParticles();
-        }
-
         let map, issMarker;
         function initMap() {
-            map = L.map('map', { zoomControl: false, attributionControl: false }).setView([26.9, 75.8], 3);
+            map = L.map('map', { zoomControl: false, attributionControl: false }).setView([26.9, 75.8], 2);
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-            issMarker = L.circleMarker([0,0], {color: 'var(--secondary)', radius: 15, fillOpacity: 1, weight: 3}).addTo(map);
+            issMarker = L.circleMarker([0,0], {color: 'var(--secondary)', radius: 10, fillOpacity: 1}).addTo(map);
         }
 
         async function updateISS() {
             try {
                 const res = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
                 const data = await res.json();
-                const pos = [data.latitude, data.longitude];
-                issMarker.setLatLng(pos);
-                map.panTo(pos);
+                issMarker.setLatLng([data.latitude, data.longitude]);
+                map.panTo([data.latitude, data.longitude]);
             } catch(e) {}
         }
 
-        let isHackerMode = false, charIndex = 0;
-        const kernelSource = `/* NEON_RECON_INITIALIZED */ void breach_protocol(){ uint32_t flux = 0xAA00FF; for(int i=0; i<100; i++){ scramble_data(LOCAL_HOST); decrypt_cipher(SHA_256); bypass_biometrics(); } }`.repeat(80);
-
-        function toggleHackerMode() {
-            isHackerMode = !isHackerMode;
-            const el = document.getElementById('hackerMode');
-            el.style.display = isHackerMode ? 'block' : 'none';
-            if(isHackerMode) {
-                el.innerHTML = ">_ INITIALIZING BRIGHT OVERRIDE...<br>";
-                charIndex = 0;
-                playSfx(80, 'sawtooth', 0.4);
-            }
-        }
-
-        function hack(amount) {
-            if(!isHackerMode) return;
-            const el = document.getElementById('hackerMode');
-            el.innerHTML += kernelSource.slice(charIndex, charIndex + amount).replace(/\n/g, '<br>');
-            charIndex += amount;
-            el.scrollTop = el.scrollHeight;
-        }
-
-        document.addEventListener('keydown', () => hack(5));
-        document.addEventListener('touchstart', () => hack(15));
-
         function initParticles() {
-            const clr1 = getComputedStyle(document.body).getPropertyValue('--primary').trim();
-            const clr2 = getComputedStyle(document.body).getPropertyValue('--secondary').trim();
-            particlesJS("particles-js", { "particles": { "number": { "value": 60 }, "color": { "value": [clr1, clr2] }, "shape": {"type": "circle"}, "opacity": {"value": 0.5}, "size": {"value": 3}, "line_linked": { "enable": true, "color": clr1, "opacity": 0.4 }, "move": { "speed": 4 } }, "interactivity": { "events": { "onhover": { "enable": true, "mode": "grab" } } } });
+            particlesJS("particles-js", {
+                "particles": {
+                    "number": { "value": 80 },
+                    "color": { "value": ["#00f3ff", "#ff00ea", "#eaff00"] },
+                    "shape": { "type": "circle" },
+                    "opacity": { "value": 0.6 },
+                    "size": { "value": 3 },
+                    "line_linked": { "enable": true, "distance": 150, "color": "#00f3ff", "opacity": 0.4, "width": 1 },
+                    "move": { "enable": true, "speed": 4, "direction": "none", "out_mode": "bounce" }
+                },
+                "interactivity": {
+                    "events": {
+                        "onhover": { "enable": true, "mode": "grab" }, // Particles follow your finger!
+                        "onclick": { "enable": true, "mode": "push" }
+                    },
+                    "modes": {
+                        "grab": { "distance": 200, "line_linked": { "opacity": 1 } }
+                    }
+                }
+            });
         }
 
-        function initDraggable() { Sortable.create(document.getElementById('panelContainer'), { handle: '.drag-handle', animation: 300, delay: 150, delayOnTouchOnly: true }); }
+        function initDraggable() { Sortable.create(document.getElementById('panelContainer'), { handle: '.drag-handle', animation: 300 }); }
         function setupCLI() { document.getElementById('cliInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') { playSfx(800, 'sine', 0.05); e.target.value = ''; } }); }
 
         let audioCtx2, analyser, source, dataArray, isAudioPlaying = false;
@@ -246,11 +218,8 @@
             requestAnimationFrame(renderViz); if(!isAudioPlaying) return;
             const c = document.getElementById('visualizer'); const ctx = c.getContext('2d');
             analyser.getByteFrequencyData(dataArray); ctx.clearRect(0,0,c.width,c.height);
-            const grad = ctx.createLinearGradient(0,0,c.width,0);
-            grad.addColorStop(0, getComputedStyle(document.body).getPropertyValue('--primary'));
-            grad.addColorStop(1, getComputedStyle(document.body).getPropertyValue('--secondary'));
-            ctx.fillStyle = grad;
-            for(let i=0; i<60; i++) { ctx.fillRect(i*10, 60 - (dataArray[i]/4), 6, dataArray[i]/4); }
+            ctx.fillStyle = "#00f3ff";
+            for(let i=0; i<40; i++) { ctx.fillRect(i*10, 50 - (dataArray[i]/6), 6, dataArray[i]/6); }
         }
     </script>
 </body>
