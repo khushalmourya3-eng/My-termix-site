@@ -1,70 +1,106 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<style>
-  body {
-  	    background-color: #0d0208; /* Deep Black */
-  	        color: #00ff41; /* Dark blue */
-  	            font-family: 'Courier New', monospace;
-  	                display: flex;
-  	                    flex-direction: column;
-  	                        justify-content: center;
-  	                            align-items: center;
-  	                                height: 100vh;
-  	                                    margin: 0;
-  	                                        overflow: hidden;
-  	                                          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khushal's Terminal</title>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            text-align: center;
+            padding: 20px;
+        }
 
-  	                                            .terminal-text {
-  	                                            	    font-size: 24px;
-  	                                            	        border-right: 3px solid #00ff41;
-  	                                            	            white-space: nowrap;
-  	                                            	                overflow: hidden;
-  	                                            	                    width: 0;
-  	                                            	                        animation: typing 3s steps(30) forwards, blink 0.8s infinite;
-  	                                            	                          }
+        .terminal-box {
+            border: 2px solid #00ff41;
+            padding: 30px;
+            box-shadow: 0 0 20px #00ff41;
+            border-radius: 10px;
+            background: rgba(0, 255, 65, 0.05);
+            max-width: 600px;
+        }
 
-  	                                            	                            /* टाइपिंग एनीमेशन */
-  	                                            	                              @keyframes typing {
-  	                                            	                              	    from { width: 0; }
-  	                                            	                              	        to { width: 100%; }
-  	                                            	                              	          }
+        h1 {
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
 
-  	                                            	                              	            /* कर्सर ब्लिंकिंग एनीमेशन */
-  	                                            	                              	              @keyframes blink {
-  	                                            	                              	              	    50% { border-color: transparent; }
-  	                                            	                              	              	      }
+        .typing {
+            width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 3px solid #00ff41;
+            margin: 20px auto;
+            animation: typing 3.5s steps(30) forwards, blink .75s step-end infinite;
+        }
 
-  	                                            	                              	              	        .btn {
-  	                                            	                              	              	        	    margin-top: 20px;
-  	                                            	                              	              	        	        padding: 10px 20px;
-  	                                            	                              	              	        	            background: transparent;
-  	                                            	                              	              	        	                color: #00ff41;
-  	                                            	                              	              	        	                    border: 1px solid #00ff41;
-  	                                            	                              	              	        	                        cursor: pointer;
-  	                                            	                              	              	        	                            text-transform: uppercase;
-  	                                            	                              	              	        	                                transition: 0.3s;
-  	                                            	                              	              	        	                                  }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
 
-  	                                            	                              	              	        	                                    .btn:hover {
-  	                                            	                              	              	        	                                    	    background: #00ff41;
-  	                                            	                              	              	        	                                    	        color: #0d0208;
-  	                                            	                              	              	        	                                    	            box-shadow: 0 0 15px #00ff41;
-  	                                            	                              	              	        	                                    	              }
-  	                                            	                              	              	        	                                    	              </style>
-  	                                            	                              	              	        	                                    	              </head>
-  	                                            	                              	              	        	                                    	              <body>
-<img src="car.jpg" alt="BMW M4" style="width:100%; max-width:400px; border:2px solid #00ff41; margin-top:20px; box-shadow: 0 0 15px #00ff41;">
+        @keyframes blink {
+            from, to { border-color: transparent }
+            50% { border-color: #00ff41 }
+        }
 
-  	                                            	                              	              	        	                                    	                <div class="terminal-text">System access granted, Khushal...</div>
-  	                                            	                              	              	        	                                    	                  <button class="btn" onclick="alert('Accessing Database...')">Initialize</button>
+        img {
+            width: 100%;
+            max-width: 450px;
+            border: 2px solid #00ff41;
+            margin-top: 25px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+        }
 
-  	                                            	                              	              	        	                                    	                  </body>
-  	                                            	                              	              	        	                                    	                  </html>
-  	                                            	                              	              	        	                                    	                  
-  	                                            	                              	              	        	                                    }
-  	                                            	                              	              	        }
-  	                                            	                              	              }
-  	                                            	                              }
-  	                                            }
-  }<h1>hello namste coding jn termux is fun <style>
+        .neet-box {
+            margin-top: 30px;
+            font-weight: bold;
+            color: #ff3e3e; /* Red color for motivation */
+            border: 1px dashed #ff3e3e;
+            padding: 10px;
+        }
+
+        button {
+            background: transparent;
+            color: #00ff41;
+            border: 1px solid #00ff41;
+            padding: 10px 20px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        button:hover {
+            background: #00ff41;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="terminal-box">
+        <h1>System Active: Khushal</h1>
+        <div class="typing">Full access granted to the server...</div>
+        
+        <img src="https://images.unsplash.com/photo-1617814076367-b759c7d826c4?w=800" alt="BMW M4 Competition">
+
+        <div class="neet-box">
+            MISSION: NEET 2026 🩺💉
+        </div>
+
+        <button onclick="alert('Stay Focused, Khushal!')">Execute Motivation</button>
+    </div>
+
+</body>
+</html>
