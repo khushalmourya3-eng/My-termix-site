@@ -53,7 +53,6 @@
         .gh-info { font-size: 0.85rem; color: #aaa; margin-top: 5px; }
         .gh-info span { color: var(--yellow); font-weight: bold; }
 
-        /* News Feed Styles */
         .news-post { background: rgba(0,0,0,0.5); padding: 10px; margin-bottom: 8px; border-radius: 5px; border-left: 3px solid var(--cyan); font-size: 0.85rem; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .news-post a { color: #fff; text-decoration: none; }
         .news-post:hover { background: rgba(0, 243, 255, 0.2); transform: translateX(5px); border-left-color: var(--magenta); }
@@ -175,7 +174,7 @@
                 <ul id="taskList"></ul>
             </div>
 
-            <audio id="myAudio" loop><source src="music.mp3" type="audio/mpeg"></audio>
+            <audio id="myAudio" loop crossorigin="anonymous"><source src="music.mp3" type="audio/mpeg"></audio>
 
             <div class="glass-panel reveal cli-box" style="margin-top: 30px; padding: 0;">
                 <div class="cli-box" style="width: 100%; border: none; margin: 0; box-shadow: none;">
@@ -192,6 +191,7 @@
 
     <script>
         const bootMessages = ["Fetching GitHub Identity... [OK]", "Establishing News Uplink... [OK]", "Igniting Particle Engine... [DONE]", "System Admin recognized."];
+        
         function runBootSequence() {
             document.getElementById("loginScreen").style.display = "none";
             const bootScreen = document.getElementById("bootScreen"); bootScreen.classList.remove("hidden");
@@ -206,7 +206,8 @@
 
         window.onload = function() { loadTasks(); loadScratchpad(); if(localStorage.getItem("hasAccess") === "true") { runBootSequence(); } };
         
-        function startSystem() { initParticles(); fetchGitHubData(); fetchNewsData(); startHUD(); setupCLI(); startTelemetry(); scanFingerprint(); startVisualizer(); initScrollAnimations(); }
+        // --- BOOT SYSTEM (NOTE: Visualizer is NOT started here anymore, it waits for user click) ---
+        function startSystem() { initParticles(); fetchGitHubData(); fetchNewsData(); startHUD(); setupCLI(); startTelemetry(); scanFingerprint(); initScrollAnimations(); }
 
         function fetchGitHubData() {
             fetch('https://api.github.com/users/khushalmourya3-eng')
@@ -219,7 +220,6 @@
             }).catch(err => { document.getElementById('gh-name').innerText = "API Offline"; });
         }
 
-        // --- NEW: DEV.TO API FETCH (Bypasses CORS issues!) ---
         function fetchNewsData() {
             fetch('https://dev.to/api/articles?tag=webdev&top=1&per_page=5')
             .then(res => res.json())
@@ -234,14 +234,79 @@
         function initParticles() { particlesJS("particles-js", { "particles": { "number": { "value": 60, "density": { "enable": true, "value_area": 800 } }, "color": { "value": ["#00f3ff", "#ff00ea"] }, "shape": { "type": "circle" }, "opacity": { "value": 0.5, "random": true }, "size": { "value": 3, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#00f3ff", "opacity": 0.4, "width": 1 }, "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false } }, "interactivity": { "detect_on": "window", "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true }, "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 1 } }, "push": { "particles_nb": 4 } } }, "retina_detect": true }); }
 
         function initScrollAnimations() { function reveal() { var reveals = document.querySelectorAll(".reveal"); for (var i = 0; i < reveals.length; i++) { var windowHeight = window.innerHeight; var elementTop = reveals[i].getBoundingClientRect().top; var elementVisible = 50; if (elementTop < windowHeight - elementVisible) { reveals[i].classList.add("active"); } else { reveals[i].classList.remove("active"); } } } window.addEventListener("scroll", reveal); reveal(); }
+        
         function scanFingerprint() { document.getElementById('fp-cores').innerText = navigator.hardwareConcurrency || "N/A"; document.getElementById('fp-res').innerText = `${window.screen.width} x ${window.screen.height}`; let engine = "Unknown"; if(navigator.userAgent.includes("Chrome")) engine = "Blink"; else if(navigator.userAgent.includes("Firefox")) engine = "Gecko"; else if(navigator.userAgent.includes("Safari")) engine = "WebKit"; document.getElementById('fp-engine').innerText = engine; }
         
         const scratchpad = document.getElementById('scratchpad'); scratchpad.addEventListener('input', () => { localStorage.setItem('adminScratchpad', scratchpad.value); });
         function loadScratchpad() { const saved = localStorage.getItem('adminScratchpad'); if(saved) scratchpad.value = saved; }
 
+        // --- REAL-TIME AUDIO VISUALIZER (Web Audio API) ---
         let isAudioPlaying = false;
-        function startVisualizer() { const canvas = document.getElementById('visualizer'); const ctx = canvas.getContext('2d'); canvas.width = canvas.parentElement.clientWidth - 40; canvas.height = 70; const bars = 30; const barWidth = canvas.width / bars - 2; let gradient = ctx.createLinearGradient(0, 0, canvas.width, 0); gradient.addColorStop(0, "#00f3ff"); gradient.addColorStop(0.5, "#ff00ea"); gradient.addColorStop(1, "#eaff00"); setInterval(() => { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = gradient; for(let i = 0; i < bars; i++) { let height = isAudioPlaying ? Math.random() * 55 + 5 : 5; ctx.beginPath(); ctx.roundRect(i * (barWidth + 2), canvas.height - height, barWidth, height, [3, 3, 0, 0]); ctx.fill(); } }, 80); }
-        function toggleAudio() { const a = document.getElementById("myAudio"); const btn = document.getElementById("audioBtn"); const status = document.getElementById('statusText'); if(isAudioPlaying) { a.pause(); isAudioPlaying = false; btn.innerHTML = "▶ PLAY AUDIO"; status.innerText = ">_ Status: Audio Paused"; } else { a.play().catch(e=>console.log("Simulating")); isAudioPlaying = true; btn.innerHTML = "⏸ PAUSE AUDIO"; status.innerText = ">_ Status: Audio Active"; } }
+        let audioCtx, analyser, source, dataArray;
+        let visualizerInitialized = false;
+
+        function initRealVisualizer() {
+            const a = document.getElementById("myAudio");
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 64; 
+            analyser.smoothingTimeConstant = 0.85; 
+            source = audioCtx.createMediaElementSource(a);
+            source.connect(analyser);
+            analyser.connect(audioCtx.destination);
+            const bufferLength = analyser.frequencyBinCount;
+            dataArray = new Uint8Array(bufferLength);
+            visualizerInitialized = true;
+            drawRealVisualizer();
+        }
+
+        function drawRealVisualizer() {
+            const canvas = document.getElementById('visualizer'); 
+            const ctx = canvas.getContext('2d'); 
+            requestAnimationFrame(drawRealVisualizer);
+            canvas.width = canvas.parentElement.clientWidth - 40; 
+            canvas.height = 70; 
+            const bars = analyser.frequencyBinCount; 
+            const barWidth = canvas.width / bars - 2; 
+            let gradient = ctx.createLinearGradient(0, 0, canvas.width, 0); 
+            gradient.addColorStop(0, "#00f3ff"); 
+            gradient.addColorStop(0.5, "#ff00ea"); 
+            gradient.addColorStop(1, "#eaff00");
+
+            analyser.getByteFrequencyData(dataArray);
+            ctx.clearRect(0, 0, canvas.width, canvas.height); 
+            ctx.fillStyle = gradient; 
+            
+            for(let i = 0; i < bars; i++) { 
+                let barHeight = (dataArray[i] / 255) * (canvas.height - 10) + 5; 
+                if (!isAudioPlaying) barHeight = 5; 
+                ctx.beginPath(); 
+                ctx.roundRect(i * (barWidth + 2), canvas.height - barHeight, barWidth, barHeight, [3, 3, 0, 0]); 
+                ctx.fill(); 
+            }
+        }
+
+        function toggleAudio() { 
+            const a = document.getElementById("myAudio"); 
+            const btn = document.getElementById("audioBtn"); 
+            const status = document.getElementById('statusText'); 
+            
+            if(!visualizerInitialized) { initRealVisualizer(); }
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+
+            if(isAudioPlaying) { 
+                a.pause(); 
+                isAudioPlaying = false; 
+                btn.innerHTML = "▶ PLAY AUDIO"; 
+                status.innerText = ">_ Status: Audio Paused"; 
+            } else { 
+                a.play().catch(e => { console.log("Audio Error:", e); status.innerText = ">_ Error: music.mp3 missing!"; }); 
+                isAudioPlaying = true; 
+                btn.innerHTML = "⏸ PAUSE AUDIO"; 
+                status.innerText = ">_ Status: Audio Active"; 
+            } 
+        }
 
         function startHUD() {
             setInterval(() => { document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', { hour12: false }); }, 1000);
