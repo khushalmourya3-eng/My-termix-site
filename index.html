@@ -4,87 +4,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Room | Authorized Access</title>
+    <title>System Admin | Cyberpunk</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --main-color: #00ff41; --bg-blur: rgba(0, 0, 0, 0.85); }
-        .theme-red { --main-color: #ff3e3e; }
-        .theme-blue { --main-color: #00d2ff; }
+        /* Modern Smooth Scrolling */
+        html { scroll-behavior: smooth; }
+        
+        /* Vibrant Color Palette */
+        :root { 
+            --cyan: #00f3ff;
+            --magenta: #ff00ea;
+            --yellow: #eaff00;
+            --glass-bg: rgba(20, 20, 35, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.15);
+        }
 
-        body { margin: 0; padding: 0; color: var(--main-color); font-family: 'Courier New', monospace; background-color: black; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; transition: color 0.5s; }
-        canvas.bg-canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; }
+        body { margin: 0; padding: 0; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #050510; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
         
-        #loginScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050505; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .login-box { border: 2px solid var(--main-color); padding: 30px; text-align: center; border-radius: 10px; box-shadow: 0 0 20px var(--main-color); background: rgba(0,0,0,0.9); width: 80%; max-width: 400px; }
-        .login-input { background: black; color: var(--main-color); border: 1px solid var(--main-color); padding: 10px; margin: 15px 0; outline: none; text-align: center; font-family: inherit; font-size: 1.2rem; width: 80%; }
+        /* Dynamic Animated Background */
+        canvas.bg-canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; opacity: 0.6; }
+        .bg-gradient { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at 50% 50%, rgba(255, 0, 234, 0.1), rgba(0, 243, 255, 0.05), #050510 80%); z-index: -1; }
+
+        /* Rainbow Text Animation */
+        .rainbow-text {
+            background: linear-gradient(90deg, var(--cyan), var(--magenta), var(--yellow), var(--cyan));
+            background-size: 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientMove 5s ease infinite;
+            font-weight: bold; text-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+        @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
+
+        #loginScreen, #bootScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050510; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #bootScreen { justify-content: flex-end; padding: 20px; box-sizing: border-box; font-family: 'Courier New', monospace; color: var(--cyan); }
         
-        #bootScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: black; color: var(--main-color); font-family: 'Courier New', monospace; z-index: 9998; padding: 20px; box-sizing: border-box; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
-        #bootLogs { font-size: 0.85rem; text-align: left; line-height: 1.4; text-shadow: 0 0 5px var(--main-color); }
+        .login-box { border: 1px solid var(--magenta); padding: 40px; text-align: center; border-radius: 20px; box-shadow: 0 0 30px rgba(255, 0, 234, 0.3); background: var(--glass-bg); backdrop-filter: blur(10px); width: 80%; max-width: 400px; }
+        .login-input { background: rgba(0,0,0,0.5); color: var(--cyan); border: 1px solid var(--cyan); padding: 12px; margin: 20px 0; outline: none; text-align: center; font-family: inherit; font-size: 1.2rem; width: 80%; border-radius: 8px; transition: 0.3s; }
+        .login-input:focus { box-shadow: 0 0 15px var(--cyan); }
         
         #mainContent { width: 100%; flex-direction: column; align-items: center; position: relative; }
         .hidden { display: none !important; }
         .flex-col { display: flex; }
 
-        #hud { width: 100%; background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--main-color); padding: 10px 0; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 10px var(--main-color); font-size: 0.85rem;}
-        #hud span { margin: 0 8px; }
+        /* Glassmorphism HUD */
+        #hud { width: 95%; max-width: 600px; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 0 0 15px 15px; padding: 15px 0; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 50; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-size: 0.9rem; margin-bottom: 20px; display: flex; justify-content: space-around; flex-wrap: wrap; }
+        #hud span { color: #ddd; }
+        #hud i { color: var(--cyan); font-style: normal; margin-right: 5px; }
 
-        .container { border: 2px solid var(--main-color); padding: 25px; border-radius: 15px; box-shadow: 0 0 30px rgba(0, 255, 65, 0.2); background: var(--bg-blur); max-width: 500px; width: 90%; text-align: center; margin-top: 3vh; margin-bottom: 5vh; z-index: 1; backdrop-filter: blur(5px); transition: all 0.5s; }
-        .glow-text { text-shadow: 0 0 10px var(--main-color), 0 0 20px var(--main-color); animation: pulse 2s infinite alternate; }
-        @keyframes pulse { from { opacity: 0.8; } to { opacity: 1; text-shadow: 0 0 20px var(--main-color), 0 0 40px var(--main-color); } }
+        .container { max-width: 600px; width: 90%; text-align: center; margin-bottom: 5vh; z-index: 1; }
         
-        img { width: 100%; border-radius: 10px; border: 1px solid var(--main-color); margin: 15px 0; box-shadow: 0 0 15px rgba(0, 255, 65, 0.3); transition: border 0.5s; }
+        img { width: 100%; border-radius: 15px; border: 2px solid transparent; background-image: linear-gradient(#050510, #050510), linear-gradient(to right, var(--cyan), var(--magenta)); background-origin: border-box; background-clip: content-box, border-box; margin: 15px 0; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
         
-        .btn { background: rgba(0,0,0,0.8); color: var(--main-color); border: 2px solid var(--main-color); padding: 10px 20px; margin-top: 15px; cursor: pointer; font-family: inherit; font-weight: bold; text-transform: uppercase; transition: 0.3s; border-radius: 5px; box-shadow: 0 0 10px var(--main-color); width: 100%; }
-        .btn:hover { background: var(--main-color); color: black; box-shadow: 0 0 25px var(--main-color); }
-        #logoutBtn { position: absolute; top: 50px; right: 10px; background: transparent; color: #ff3e3e; border: 1px solid #ff3e3e; padding: 5px 10px; cursor: pointer; font-family: inherit; border-radius: 3px; z-index: 10; }
+        .btn { background: linear-gradient(45deg, var(--magenta), #7b00ff); color: white; border: none; padding: 12px 25px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: 0.3s; border-radius: 8px; box-shadow: 0 5px 20px rgba(255, 0, 234, 0.4); width: 100%; letter-spacing: 1px; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 0, 234, 0.6); }
+        #logoutBtn { background: transparent; color: #ff3e3e; border: 1px solid #ff3e3e; box-shadow: none; width: auto; font-size: 0.8rem; padding: 8px 15px; margin-top: 10px; }
+        #logoutBtn:hover { background: #ff3e3e; color: black; }
 
-        /* Hardware Fingerprint & Panels */
-        .panel-box { border: 1px solid var(--main-color); padding: 15px; margin-top: 20px; border-radius: 10px; background: rgba(0, 0, 0, 0.6); text-align: left; }
-        .panel-box h3 { text-align: center; margin-top: 0; color: white; font-size: 1rem; border-bottom: 1px dashed var(--main-color); padding-bottom: 5px; }
-        .sys-info { font-size: 0.8rem; margin: 5px 0; color: #aaa; }
-        .sys-info span { color: var(--main-color); float: right; }
+        /* Glass Panels with Scroll Reveal */
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 15px; padding: 20px; margin-top: 25px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); text-align: left; transition: transform 0.3s, box-shadow 0.3s; }
+        .glass-panel:hover { box-shadow: 0 12px 40px rgba(0, 243, 255, 0.15); border-color: rgba(0, 243, 255, 0.3); }
+        .glass-panel h3 { text-align: center; margin-top: 0; color: #fff; font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* Scroll Reveal Animation Classes */
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
 
-        /* BMW Telemetry Box */
-        .t-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.85rem; }
-        .t-bar-bg { width: 100%; background: #222; height: 10px; border-radius: 5px; margin-bottom: 10px; overflow: hidden; }
-        .t-bar-fill { height: 100%; background: var(--main-color); transition: width 0.2s; box-shadow: 0 0 10px var(--main-color); }
+        .sys-info { font-size: 0.9rem; margin: 10px 0; color: #bbb; display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px; }
+        .sys-info span { color: var(--yellow); font-family: 'Courier New', monospace; }
 
-        /* Audio Visualizer */
-        #visualizer { width: 100%; height: 60px; background: #050505; border-radius: 5px; margin-top: 10px; border: 1px solid var(--main-color); }
+        /* Colorful Telemetry */
+        .t-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; color: #ccc; }
+        .t-bar-bg { width: 100%; background: rgba(0,0,0,0.5); height: 12px; border-radius: 6px; margin-bottom: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+        .t-bar-fill { height: 100%; transition: width 0.3s ease-out; }
+        #rpmBar { background: linear-gradient(90deg, #00d2ff, #3a7bd5); }
+        #boostBar { background: linear-gradient(90deg, #f2994a, #f2c94c); }
+        #tempBar { background: linear-gradient(90deg, #ff416c, #ff4b2b); }
 
-        /* Scratchpad */
-        #scratchpad { width: 100%; height: 100px; background: #050505; color: var(--main-color); border: 1px solid var(--main-color); border-radius: 5px; padding: 10px; font-family: inherit; outline: none; resize: none; box-sizing: border-box; }
+        #visualizer { width: 100%; height: 70px; background: rgba(0,0,0,0.4); border-radius: 8px; margin-top: 15px; border: 1px solid var(--glass-border); }
+        #scratchpad { width: 100%; height: 120px; background: rgba(0,0,0,0.4); color: var(--cyan); border: 1px solid var(--glass-border); border-radius: 8px; padding: 12px; font-family: 'Courier New', monospace; outline: none; resize: none; box-sizing: border-box; transition: 0.3s; }
+        #scratchpad:focus { border-color: var(--cyan); box-shadow: 0 0 15px rgba(0, 243, 255, 0.2); }
 
-        /* Todo list */
-        #taskInput { width: 68%; padding: 10px; background: black; color: var(--main-color); border: 1px solid var(--main-color); border-radius: 3px; font-family: inherit; outline: none; }
-        #addBtn { width: 25%; padding: 10px; background: var(--main-color); color: black; border: none; font-weight: bold; cursor: pointer; border-radius: 3px; font-family: inherit;}
-        ul { list-style-type: none; padding: 0; margin-top: 15px; }
-        li { padding: 10px; border-bottom: 1px dashed var(--main-color); cursor: pointer; transition: 0.3s; display: flex; justify-content: space-between; }
-        .completed { text-decoration: line-through; opacity: 0.5; }
-        .delete-btn { color: #ff3e3e; font-weight: bold; cursor: pointer; padding-left: 10px; }
+        /* Rainbow Todo List */
+        .input-group { display: flex; gap: 10px; }
+        #taskInput { flex-grow: 1; padding: 12px; background: rgba(0,0,0,0.4); color: white; border: 1px solid var(--glass-border); border-radius: 8px; outline: none; transition: 0.3s; }
+        #taskInput:focus { border-color: var(--magenta); }
+        #addBtn { width: 80px; padding: 12px; background: var(--magenta); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        #addBtn:hover { background: #ff47f4; box-shadow: 0 0 15px var(--magenta); }
+        ul { list-style-type: none; padding: 0; margin-top: 20px; }
+        li { padding: 12px 15px; background: rgba(0,0,0,0.3); margin-bottom: 8px; border-radius: 8px; cursor: pointer; transition: 0.3s; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--cyan); }
+        li:hover { background: rgba(255,255,255,0.05); transform: translateX(5px); }
+        .completed { opacity: 0.6; border-left-color: #555; }
+        .completed .task-text { text-decoration: line-through; text-decoration-color: var(--magenta); text-decoration-thickness: 2px; }
+        .delete-btn { color: #ff3e3e; font-weight: bold; padding: 5px 10px; background: rgba(255,0,0,0.1); border-radius: 5px; transition: 0.3s; }
+        .delete-btn:hover { background: #ff3e3e; color: white; }
 
-        /* CLI Box */
-        .cli-box { border: 1px solid var(--main-color); padding: 10px; margin-top: 20px; background: black; text-align: left; border-radius: 5px; display: flex; align-items: center; }
-        .cli-prompt { font-weight: bold; margin-right: 10px; }
-        #cliInput { background: transparent; border: none; color: var(--main-color); font-family: inherit; width: 100%; outline: none; font-size: 1rem; }
+        .cli-box { border: 1px solid var(--cyan); padding: 15px; background: rgba(0,0,0,0.7); border-radius: 10px; display: flex; align-items: center; box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.1); }
+        .cli-prompt { font-family: 'Courier New', monospace; color: var(--cyan); font-weight: bold; margin-right: 15px; }
+        #cliInput { background: transparent; border: none; color: white; font-family: 'Courier New', monospace; width: 100%; outline: none; font-size: 1rem; }
 
-        /* Panic Button */
-        .panic-btn { background: #110000; border: 2px solid #ff3e3e; color: #ff3e3e; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 5px; width: 100%; margin-top: 25px; transition: 0.2s; box-shadow: 0 0 10px #ff3e3e; font-family: inherit; }
+        .panic-btn { background: rgba(255, 0, 0, 0.1); border: 1px solid #ff3e3e; color: #ff3e3e; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 10px; width: 100%; transition: 0.3s; letter-spacing: 2px; }
         .panic-btn:hover { background: #ff3e3e; color: black; box-shadow: 0 0 30px #ff3e3e; }
-        @keyframes destructFlash { 0% { background-color: black; } 50% { background-color: #330000; } 100% { background-color: black; } }
-        .destruct-mode { animation: destructFlash 0.5s infinite; }
-        #destructOverlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,0,0,0.8); z-index: 10000; display:flex; justify-content:center; align-items:center; color:white; font-size: 5rem; font-weight:bold; text-align: center;}
+        @keyframes destructFlash { 0% { background-color: black; } 25% { background-color: #ff00ea; } 50% { background-color: #00f3ff; } 75% { background-color: #eaff00; } 100% { background-color: black; } }
+        .destruct-mode { animation: destructFlash 0.3s infinite; }
+        #destructOverlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,0,0,0.9); z-index: 10000; display:flex; justify-content:center; align-items:center; color:white; font-size: 4rem; font-weight:bold; text-align: center; text-shadow: 0 0 20px black; }
     </style>
 </head>
 <body>
 
+    <div class="bg-gradient"></div>
+
     <div id="loginScreen">
         <div class="login-box">
-            <h2 class="glow-text">TERMINAL ACCESS</h2>
-            <p>>_ Awaiting Authorization:</p>
+            <h2 class="rainbow-text" style="font-size: 2rem; margin-top: 0;">TERMINAL ACCESS</h2>
+            <p style="color: #aaa;">>_ Awaiting Authorization:</p>
             <input type="password" id="passInput" class="login-input" placeholder="Enter Password">
             <button class="btn" onclick="processLogin()">LOGIN</button>
-            <p id="errorMsg" style="color: red; display: none; margin-top: 10px; font-weight: bold;">[!] ACCESS DENIED</p>
+            <p id="errorMsg" style="color: #ff3e3e; display: none; margin-top: 15px; font-weight: bold;">[!] ACCESS DENIED</p>
         </div>
     </div>
 
@@ -92,79 +128,84 @@
 
     <div id="mainContent" class="hidden flex-col">
         <div id="hud">
-            <span>🔋 <span id="batData">--%</span></span> | 
-            <span>📡 <span id="netData">--</span></span> | 
-            <span>🌦️ <span id="weatherData">Loading...</span></span> |
-            <span>⏱️ <span id="clockData">00:00</span></span>
+            <span><i>🔋</i><span id="batData">--%</span></span> 
+            <span><i>📡</i><span id="netData">--</span></span> 
+            <span><i>🌦️</i><span id="weatherData">...</span></span>
+            <span><i>⏱️</i><span id="clockData">00:00</span></span>
         </div>
 
-        <button id="logoutBtn" onclick="logout()">LOGOUT</button>
         <canvas id="matrix" class="bg-canvas"></canvas>
 
         <div class="container" id="mainContainer">
-            <h1 class="glow-text">SYSTEM ADMIN</h1>
-            <p id="statusText">>_ Status: Online</p>
+            <h1 class="rainbow-text" style="font-size: 2.5rem; margin-bottom: 5px;">SYSTEM ADMIN</h1>
+            <p id="statusText" style="color: var(--cyan); font-family: monospace; margin-top: 0;">>_ Status: Online</p>
             
-            <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500" alt="Hacker Setup">
+            <button id="logoutBtn" class="btn" onclick="logout()">[ Log Out ]</button>
 
-            <div class="panel-box">
-                <h3>🔍 SYSTEM FINGERPRINT</h3>
-                <div class="sys-info">LOGICAL CORES: <span id="fp-cores">Detecting...</span></div>
-                <div class="sys-info">SCREEN RES: <span id="fp-res">Detecting...</span></div>
-                <div class="sys-info">ENGINE: <span id="fp-engine">Detecting...</span></div>
+            <img src="https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?w=800" alt="Cyberpunk Aesthetic" class="reveal">
+
+            <div class="glass-panel reveal">
+                <h3>🔍 System Fingerprint</h3>
+                <div class="sys-info">Logical Cores: <span id="fp-cores">...</span></div>
+                <div class="sys-info">Resolution: <span id="fp-res">...</span></div>
+                <div class="sys-info">Engine: <span id="fp-engine">...</span></div>
             </div>
 
-            <div class="panel-box">
-                <h3>📝 SECURE SCRATCHPAD</h3>
-                <textarea id="scratchpad" placeholder="Draft logic, code snippets, or ideas here. Auto-saves to local memory..."></textarea>
+            <div class="glass-panel reveal">
+                <h3>📝 Secure Scratchpad</h3>
+                <textarea id="scratchpad" placeholder="Draft your code, logic, or ideas..."></textarea>
             </div>
 
-            <div class="panel-box">
-                <h3>🎵 AUDIO TERMINAL</h3>
+            <div class="glass-panel reveal">
+                <h3>🎵 Audio Terminal</h3>
                 <canvas id="visualizer"></canvas>
-                <div style="font-size: 0.8rem; margin-top: 5px; text-align: center; color: #aaa;">Type <b style="color:var(--main-color)">/play</b> in terminal to toggle</div>
+                <div style="font-size: 0.8rem; margin-top: 10px; text-align: center; color: #888;">Type <b style="color:var(--magenta)">/play</b> in terminal to toggle</div>
             </div>
 
-            <div class="panel-box">
-                <h3>🏎️ M4 COMPETITION TELEMETRY</h3>
-                <div class="t-row"><span>ENGINE RPM</span><span id="rpmText">0</span></div>
+            <div class="glass-panel reveal">
+                <h3>🏎️ M4 Telemetry</h3>
+                <div class="t-row"><span>ENGINE RPM</span><span id="rpmText" style="color: #00d2ff">0</span></div>
                 <div class="t-bar-bg"><div class="t-bar-fill" id="rpmBar" style="width: 0%;"></div></div>
-                <div class="t-row"><span>TURBO BOOST (PSI)</span><span id="boostText">0.0</span></div>
+                <div class="t-row"><span>TURBO BOOST</span><span id="boostText" style="color: #f2c94c">0.0 PSI</span></div>
                 <div class="t-bar-bg"><div class="t-bar-fill" id="boostBar" style="width: 0%;"></div></div>
-                <div class="t-row"><span>OIL TEMP (°C)</span><span id="tempText">90</span></div>
+                <div class="t-row"><span>OIL TEMP</span><span id="tempText" style="color: #ff416c">90 °C</span></div>
                 <div class="t-bar-bg"><div class="t-bar-fill" id="tempBar" style="width: 50%;"></div></div>
             </div>
 
-            <div class="panel-box">
-                <h3>✅ DAILY TARGETS</h3>
-                <input type="text" id="taskInput" placeholder="Add a target...">
-                <button id="addBtn" onclick="addTask()">ADD</button>
+            <div class="glass-panel reveal">
+                <h3>✅ Daily Targets</h3>
+                <div class="input-group">
+                    <input type="text" id="taskInput" placeholder="Add a new target...">
+                    <button id="addBtn" onclick="addTask()">ADD</button>
+                </div>
                 <ul id="taskList"></ul>
             </div>
 
             <audio id="myAudio" loop><source src="music.mp3" type="audio/mpeg"></audio>
 
-            <div class="cli-box">
-                <span class="cli-prompt">root@system:~#</span>
-                <input type="text" id="cliInput" placeholder="Type /help and press Enter..." autocomplete="off">
+            <div class="glass-panel reveal cli-box" style="margin-top: 30px; padding: 0;">
+                <div class="cli-box" style="width: 100%; border: none; margin: 0; box-shadow: none;">
+                    <span class="cli-prompt">root@admin:~#</span>
+                    <input type="text" id="cliInput" placeholder="Type /help..." autocomplete="off">
+                </div>
             </div>
 
-            <button class="panic-btn" onclick="triggerSelfDestruct()">⚠️ INITIATE PROTOCOL ZERO</button>
+            <div class="glass-panel reveal" style="background: transparent; border: none; box-shadow: none;">
+                <button class="panic-btn" onclick="triggerSelfDestruct()">⚠️ INITIATE PROTOCOL ZERO</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- BOOT SEQUENCE LOGIC ---
-        const bootMessages = ["Mounting core filesystems... [OK]", "Loading local user data... [OK]", "Initializing hardware interface...", "Pinging network daemon... [ONLINE]", "Fetching atmospheric data... [OK]", "Calibrating Audio Engine... [SUCCESS]", "System Admin recognized. Welcome back."];
+        // --- BOOT SEQUENCE ---
+        const bootMessages = ["Mounting neural net... [OK]", "Injecting custom CSS payloads... [OK]", "Initializing glassmorphism... [DONE]", "Bypassing visual constraints... [ONLINE]", "System Admin recognized. Welcome to the Grid."];
         function runBootSequence() {
             document.getElementById("loginScreen").style.display = "none";
-            const bootScreen = document.getElementById("bootScreen");
-            bootScreen.classList.remove("hidden");
-            const logsBox = document.getElementById("bootLogs");
-            logsBox.innerHTML = "";
+            const bootScreen = document.getElementById("bootScreen"); bootScreen.classList.remove("hidden");
+            const logsBox = document.getElementById("bootLogs"); logsBox.innerHTML = "";
             let delay = 0;
-            bootMessages.forEach((msg, index) => {
-                setTimeout(() => { logsBox.innerHTML += `<div>[${(Math.random() * 2).toFixed(4)}] ${msg}</div>`; }, delay);
+            bootMessages.forEach((msg) => {
+                setTimeout(() => { logsBox.innerHTML += `<div><span style="color:var(--magenta)">[${(Math.random() * 2).toFixed(4)}]</span> ${msg}</div>`; }, delay);
                 delay += 100 + Math.random() * 200;
             });
             setTimeout(() => { bootScreen.classList.add("hidden"); document.getElementById("mainContent").classList.remove("hidden"); startSystem(); }, delay + 500);
@@ -178,125 +219,142 @@
         function logout() { localStorage.removeItem("hasAccess"); location.reload(); }
 
         window.onload = function() {
-            loadTasks(); loadTheme(); loadScratchpad();
+            loadTasks(); loadScratchpad();
             if(localStorage.getItem("hasAccess") === "true") { runBootSequence(); }
         };
 
-        function startSystem() { startMatrix(); startHUD(); setupCLI(); startTelemetry(); scanFingerprint(); startVisualizer(); }
+        // --- CORE STARTUP ---
+        function startSystem() { 
+            startMatrix(); startHUD(); setupCLI(); startTelemetry(); scanFingerprint(); startVisualizer(); initScrollAnimations(); 
+        }
 
-        // --- DEVICE FINGERPRINT SCANNER ---
+        // --- SMOOTH SCROLL OBSERVER ---
+        function initScrollAnimations() {
+            function reveal() {
+                var reveals = document.querySelectorAll(".reveal");
+                for (var i = 0; i < reveals.length; i++) {
+                    var windowHeight = window.innerHeight;
+                    var elementTop = reveals[i].getBoundingClientRect().top;
+                    var elementVisible = 50; // trigger point
+                    if (elementTop < windowHeight - elementVisible) { reveals[i].classList.add("active"); } 
+                    else { reveals[i].classList.remove("active"); } // removes active class when scrolling up
+                }
+            }
+            window.addEventListener("scroll", reveal);
+            reveal(); // Trigger immediately for elements already in view
+        }
+
+        // --- DEVICE FINGERPRINT ---
         function scanFingerprint() {
-            document.getElementById('fp-cores').innerText = navigator.hardwareConcurrency || "Unknown";
+            document.getElementById('fp-cores').innerText = navigator.hardwareConcurrency || "N/A";
             document.getElementById('fp-res').innerText = `${window.screen.width} x ${window.screen.height}`;
-            // Simplify User Agent to get Engine
             let engine = "Unknown";
             if(navigator.userAgent.includes("Chrome")) engine = "Blink / V8";
-            else if(navigator.userAgent.includes("Firefox")) engine = "Gecko / SpiderMonkey";
-            else if(navigator.userAgent.includes("Safari")) engine = "WebKit / JavaScriptCore";
+            else if(navigator.userAgent.includes("Firefox")) engine = "Gecko";
+            else if(navigator.userAgent.includes("Safari")) engine = "WebKit";
             document.getElementById('fp-engine').innerText = engine;
         }
 
-        // --- AUTO-SAVING SCRATCHPAD ---
+        // --- SCRATCHPAD ---
         const scratchpad = document.getElementById('scratchpad');
         scratchpad.addEventListener('input', () => { localStorage.setItem('adminScratchpad', scratchpad.value); });
-        function loadScratchpad() { const savedText = localStorage.getItem('adminScratchpad'); if(savedText) scratchpad.value = savedText; }
+        function loadScratchpad() { const saved = localStorage.getItem('adminScratchpad'); if(saved) scratchpad.value = saved; }
 
-        // --- AUDIO VISUALIZER (Simulated) ---
+        // --- RAINBOW VISUALIZER ---
         let isAudioPlaying = false;
         function startVisualizer() {
             const canvas = document.getElementById('visualizer'); const ctx = canvas.getContext('2d');
-            canvas.width = canvas.parentElement.clientWidth - 30; canvas.height = 60;
-            const bars = 25; const barWidth = canvas.width / bars - 2;
+            canvas.width = canvas.parentElement.clientWidth - 40; canvas.height = 70;
+            const bars = 30; const barWidth = canvas.width / bars - 2;
+            
+            // Create vibrant gradient
+            let gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            gradient.addColorStop(0, "#00f3ff"); gradient.addColorStop(0.5, "#ff00ea"); gradient.addColorStop(1, "#eaff00");
+
             setInterval(() => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                const compStyles = window.getComputedStyle(document.body);
-                ctx.fillStyle = compStyles.getPropertyValue('--main-color').trim() || '#0F0';
+                ctx.fillStyle = gradient;
                 for(let i = 0; i < bars; i++) {
-                    // If playing, random bounce. If paused, flat line.
-                    let height = isAudioPlaying ? Math.random() * 50 + 5 : 5;
-                    ctx.fillRect(i * (barWidth + 2), canvas.height - height, barWidth, height);
+                    let height = isAudioPlaying ? Math.random() * 55 + 5 : 5;
+                    ctx.beginPath();
+                    ctx.roundRect(i * (barWidth + 2), canvas.height - height, barWidth, height, [3, 3, 0, 0]);
+                    ctx.fill();
                 }
-            }, 100);
+            }, 80);
         }
 
-        // --- HARDWARE & WEATHER HUD ---
+        // --- HUD ---
         function startHUD() {
             setInterval(() => { document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', { hour12: false }); }, 1000);
             if(navigator.getBattery) { navigator.getBattery().then(b => { function u() { document.getElementById('batData').innerText = Math.floor(b.level * 100) + (b.charging ? "% ⚡" : "%"); } u(); b.addEventListener('levelchange', u); b.addEventListener('chargingchange', u); }); }
             if(navigator.connection) { function u() { document.getElementById('netData').innerText = navigator.connection.effectiveType.toUpperCase(); } u(); navigator.connection.addEventListener('change', u); }
             fetch('https://api.open-meteo.com/v1/forecast?latitude=26.9124&longitude=75.7873&current_weather=true')
-                .then(res => res.json())
-                .then(data => { document.getElementById('weatherData').innerText = `${data.current_weather.temperature}°C`; })
+                .then(res => res.json()).then(data => { document.getElementById('weatherData').innerText = `${data.current_weather.temperature}°C`; })
                 .catch(() => { document.getElementById('weatherData').innerText = "ERR"; });
         }
 
-        // --- BMW M4 TELEMETRY SIMULATION ---
+        // --- TELEMETRY ---
         function startTelemetry() {
             setInterval(() => {
-                let rpm = Math.floor(Math.random() * (3500 - 1500) + 1500); 
-                if(Math.random() > 0.8) rpm = Math.floor(Math.random() * (7200 - 4500) + 4500);
+                let rpm = Math.floor(Math.random() * (3500 - 1500) + 1500); if(Math.random() > 0.8) rpm = Math.floor(Math.random() * (7200 - 4500) + 4500);
                 document.getElementById('rpmText').innerText = rpm; document.getElementById('rpmBar').style.width = (rpm / 7500) * 100 + "%";
                 let boost = (rpm > 3000) ? (Math.random() * (18.5 - 10.0) + 10.0).toFixed(1) : (Math.random() * 2.0).toFixed(1);
-                document.getElementById('boostText').innerText = boost; document.getElementById('boostBar').style.width = (boost / 20) * 100 + "%";
+                document.getElementById('boostText').innerText = boost + " PSI"; document.getElementById('boostBar').style.width = (boost / 20) * 100 + "%";
                 let temp = (Math.random() * (105 - 95) + 95).toFixed(0);
-                document.getElementById('tempText').innerText = temp; document.getElementById('tempBar').style.width = (temp / 130) * 100 + "%";
+                document.getElementById('tempText').innerText = temp + " °C"; document.getElementById('tempBar').style.width = (temp / 130) * 100 + "%";
             }, 800);
         }
 
-        // --- SELF DESTRUCT PROTOCOL ---
+        // --- PROTOCOL ZERO ---
         function triggerSelfDestruct() {
             document.body.classList.add('destruct-mode');
             const overlay = document.createElement('div'); overlay.id = "destructOverlay"; document.body.appendChild(overlay);
-            let count = 5; overlay.innerText = `DESTRUCT IN ${count}...`;
+            let count = 5; overlay.innerHTML = `SYSTEM PURGE IN<br><span style="color:#eaff00">${count}</span>`;
             let countdown = setInterval(() => {
-                count--; overlay.innerText = `DESTRUCT IN ${count}...`;
+                count--; overlay.innerHTML = `SYSTEM PURGE IN<br><span style="color:#eaff00">${count}</span>`;
                 if(count <= 0) {
                     clearInterval(countdown);
-                    document.body.innerHTML = `<div style="color:#00ff41; padding:20px; font-family:'Courier New', monospace; font-size:1.5rem;">>_ SYSTEM DESTROYED.<br>>_ REBOOT REQUIRED.</div>`;
-                    document.body.classList.remove('destruct-mode'); document.body.style.backgroundColor = "black";
+                    document.body.innerHTML = `<div style="color:#00f3ff; padding:20px; font-family:monospace; font-size:1.5rem; display:flex; height:100vh; align-items:center; justify-content:center;">>_ SYSTEM WIPED.<br>>_ NOTHING REMAINS.</div>`;
+                    document.body.classList.remove('destruct-mode'); document.body.style.background = "#000";
                 }
             }, 1000);
         }
 
-        // --- CLI & TASKS ---
+        // --- CLI ---
         function setupCLI() { const cli = document.getElementById('cliInput'); cli.addEventListener('keypress', function(e) { if(e.key === 'Enter') { executeCommand(cli.value.toLowerCase().trim()); cli.value = ''; } }); }
         function executeCommand(cmd) {
             const status = document.getElementById('statusText');
-            if(cmd === '/help') { alert("COMMANDS:\n/theme red\n/theme green\n/theme blue\n/play (toggle audio)\n/clear (wipe tasks)"); } 
-            else if(cmd === '/theme red') { setTheme('theme-red'); status.innerText = ">_ Status: EMERGENCY OVERRIDE"; } 
-            else if(cmd === '/theme blue') { setTheme('theme-blue'); status.innerText = ">_ Status: CYBERPUNK MODE"; } 
-            else if(cmd === '/theme green') { setTheme(''); status.innerText = ">_ Status: Online"; } 
+            if(cmd === '/help') { alert("COMMANDS:\n/play (toggle audio visualizer)\n/clear (wipe tasks)"); } 
             else if(cmd === '/play') { 
                 const a = document.getElementById("myAudio"); 
                 if(isAudioPlaying) { a.pause(); isAudioPlaying = false; status.innerText = ">_ Status: Audio Paused"; } 
-                else { a.play().catch(e => console.log("No audio file found, playing visualizer only")); isAudioPlaying = true; status.innerText = ">_ Status: Audio Active"; } 
+                else { a.play().catch(e => console.log("Simulating Audio")); isAudioPlaying = true; status.innerText = ">_ Status: Audio Active"; } 
             } 
             else if(cmd === '/clear') { document.getElementById("taskList").innerHTML = ""; saveTasks(); status.innerText = ">_ Status: Memory Wiped"; } 
-            else { status.innerText = ">_ Error: Command not found. Type /help"; }
+            else { status.innerText = ">_ Error: Command not found."; }
         }
 
-        function setTheme(themeClass) { document.body.className = themeClass; localStorage.setItem('sysTheme', themeClass); updateMatrixColor(); }
-        function loadTheme() { const savedTheme = localStorage.getItem('sysTheme'); if(savedTheme) document.body.className = savedTheme; }
-
-        let drops = [];
+        // --- CYBERPUNK MATRIX BACKGROUND ---
         function startMatrix() {
             const canvas = document.getElementById('matrix'); const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*'; const fontSize = 14; const columns = canvas.width / fontSize;
-            for(let x = 0; x < columns; x++) drops[x] = 1;
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*'; const fontSize = 16; const columns = canvas.width / fontSize;
+            let drops = []; for(let x = 0; x < columns; x++) drops[x] = 1;
+            const colors = ['#00f3ff', '#ff00ea', '#eaff00', '#00ff41']; // Cyberpunk palette
+            
             setInterval(() => {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                const compStyles = window.getComputedStyle(document.body); ctx.fillStyle = compStyles.getPropertyValue('--main-color').trim() || '#0F0';
+                ctx.fillStyle = 'rgba(5, 5, 16, 0.1)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.font = fontSize + 'px monospace';
                 for(let i = 0; i < drops.length; i++) {
+                    ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
                     ctx.fillText(letters.charAt(Math.floor(Math.random() * letters.length)), i * fontSize, drops[i] * fontSize);
                     if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++;
                 }
-            }, 33);
+            }, 35);
         }
-        function updateMatrixColor() { drops = drops.map(() => 0); }
 
+        // --- TASKS ---
         function addTask() { let input = document.getElementById("taskInput"); if(input.value === '') return; let li = document.createElement("li"); li.innerHTML = `<span class="task-text" onclick="toggleTask(this)">${input.value}</span> <span class="delete-btn" onclick="this.parentElement.remove(); saveTasks();">X</span>`; document.getElementById("taskList").appendChild(li); input.value = ""; saveTasks(); }
-        function toggleTask(element) { element.parentElement.classList.toggle('completed'); if(element.parentElement.classList.contains('completed')) { const compColor = window.getComputedStyle(document.body).getPropertyValue('--main-color').trim(); confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: [compColor, '#ffffff'] }); } saveTasks(); }
+        function toggleTask(element) { element.parentElement.classList.toggle('completed'); if(element.parentElement.classList.contains('completed')) { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#ff00ea', '#00f3ff', '#eaff00'] }); } saveTasks(); }
         function saveTasks() { localStorage.setItem("devTasks", document.getElementById("taskList").innerHTML); }
         function loadTasks() { let saved = localStorage.getItem("devTasks"); if(saved) document.getElementById("taskList").innerHTML = saved; }
     </script>
