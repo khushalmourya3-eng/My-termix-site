@@ -12,7 +12,7 @@
         .theme-blue { --main-color: #00d2ff; }
 
         body { margin: 0; padding: 0; color: var(--main-color); font-family: 'Courier New', monospace; background-color: black; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; transition: color 0.5s; }
-        canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; }
+        canvas.bg-canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; }
         
         #loginScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050505; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .login-box { border: 2px solid var(--main-color); padding: 30px; text-align: center; border-radius: 10px; box-shadow: 0 0 20px var(--main-color); background: rgba(0,0,0,0.9); width: 80%; max-width: 400px; }
@@ -36,18 +36,26 @@
         
         .btn { background: rgba(0,0,0,0.8); color: var(--main-color); border: 2px solid var(--main-color); padding: 10px 20px; margin-top: 15px; cursor: pointer; font-family: inherit; font-weight: bold; text-transform: uppercase; transition: 0.3s; border-radius: 5px; box-shadow: 0 0 10px var(--main-color); width: 100%; }
         .btn:hover { background: var(--main-color); color: black; box-shadow: 0 0 25px var(--main-color); }
-        
         #logoutBtn { position: absolute; top: 50px; right: 10px; background: transparent; color: #ff3e3e; border: 1px solid #ff3e3e; padding: 5px 10px; cursor: pointer; font-family: inherit; border-radius: 3px; z-index: 10; }
 
+        /* Hardware Fingerprint & Panels */
+        .panel-box { border: 1px solid var(--main-color); padding: 15px; margin-top: 20px; border-radius: 10px; background: rgba(0, 0, 0, 0.6); text-align: left; }
+        .panel-box h3 { text-align: center; margin-top: 0; color: white; font-size: 1rem; border-bottom: 1px dashed var(--main-color); padding-bottom: 5px; }
+        .sys-info { font-size: 0.8rem; margin: 5px 0; color: #aaa; }
+        .sys-info span { color: var(--main-color); float: right; }
+
         /* BMW Telemetry Box */
-        .telemetry-box { border: 1px solid var(--main-color); padding: 15px; margin-top: 20px; border-radius: 10px; background: rgba(0, 0, 0, 0.6); text-align: left; }
-        .telemetry-box h3 { text-align: center; margin-top: 0; color: white; font-size: 1rem; }
         .t-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.85rem; }
         .t-bar-bg { width: 100%; background: #222; height: 10px; border-radius: 5px; margin-bottom: 10px; overflow: hidden; }
         .t-bar-fill { height: 100%; background: var(--main-color); transition: width 0.2s; box-shadow: 0 0 10px var(--main-color); }
 
-        .todo-box { border: 1px solid var(--main-color); padding: 15px; margin-top: 20px; border-radius: 10px; background: rgba(0, 0, 0, 0.6); text-align: left; }
-        .todo-box h3 { text-align: center; margin-top: 0; color: white; }
+        /* Audio Visualizer */
+        #visualizer { width: 100%; height: 60px; background: #050505; border-radius: 5px; margin-top: 10px; border: 1px solid var(--main-color); }
+
+        /* Scratchpad */
+        #scratchpad { width: 100%; height: 100px; background: #050505; color: var(--main-color); border: 1px solid var(--main-color); border-radius: 5px; padding: 10px; font-family: inherit; outline: none; resize: none; box-sizing: border-box; }
+
+        /* Todo list */
         #taskInput { width: 68%; padding: 10px; background: black; color: var(--main-color); border: 1px solid var(--main-color); border-radius: 3px; font-family: inherit; outline: none; }
         #addBtn { width: 25%; padding: 10px; background: var(--main-color); color: black; border: none; font-weight: bold; cursor: pointer; border-radius: 3px; font-family: inherit;}
         ul { list-style-type: none; padding: 0; margin-top: 15px; }
@@ -55,6 +63,7 @@
         .completed { text-decoration: line-through; opacity: 0.5; }
         .delete-btn { color: #ff3e3e; font-weight: bold; cursor: pointer; padding-left: 10px; }
 
+        /* CLI Box */
         .cli-box { border: 1px solid var(--main-color); padding: 10px; margin-top: 20px; background: black; text-align: left; border-radius: 5px; display: flex; align-items: center; }
         .cli-prompt { font-weight: bold; margin-right: 10px; }
         #cliInput { background: transparent; border: none; color: var(--main-color); font-family: inherit; width: 100%; outline: none; font-size: 1rem; }
@@ -62,11 +71,9 @@
         /* Panic Button */
         .panic-btn { background: #110000; border: 2px solid #ff3e3e; color: #ff3e3e; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 5px; width: 100%; margin-top: 25px; transition: 0.2s; box-shadow: 0 0 10px #ff3e3e; font-family: inherit; }
         .panic-btn:hover { background: #ff3e3e; color: black; box-shadow: 0 0 30px #ff3e3e; }
-
-        /* Flashing Animation for Self Destruct */
         @keyframes destructFlash { 0% { background-color: black; } 50% { background-color: #330000; } 100% { background-color: black; } }
         .destruct-mode { animation: destructFlash 0.5s infinite; }
-        #destructOverlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,0,0,0.8); z-index: 10000; display:flex; justify-content:center; align-items:center; color:white; font-size: 5rem; font-weight:bold; }
+        #destructOverlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,0,0,0.8); z-index: 10000; display:flex; justify-content:center; align-items:center; color:white; font-size: 5rem; font-weight:bold; text-align: center;}
     </style>
 </head>
 <body>
@@ -92,7 +99,7 @@
         </div>
 
         <button id="logoutBtn" onclick="logout()">LOGOUT</button>
-        <canvas id="matrix"></canvas>
+        <canvas id="matrix" class="bg-canvas"></canvas>
 
         <div class="container" id="mainContainer">
             <h1 class="glow-text">SYSTEM ADMIN</h1>
@@ -100,19 +107,35 @@
             
             <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500" alt="Hacker Setup">
 
-            <div class="telemetry-box">
+            <div class="panel-box">
+                <h3>🔍 SYSTEM FINGERPRINT</h3>
+                <div class="sys-info">LOGICAL CORES: <span id="fp-cores">Detecting...</span></div>
+                <div class="sys-info">SCREEN RES: <span id="fp-res">Detecting...</span></div>
+                <div class="sys-info">ENGINE: <span id="fp-engine">Detecting...</span></div>
+            </div>
+
+            <div class="panel-box">
+                <h3>📝 SECURE SCRATCHPAD</h3>
+                <textarea id="scratchpad" placeholder="Draft logic, code snippets, or ideas here. Auto-saves to local memory..."></textarea>
+            </div>
+
+            <div class="panel-box">
+                <h3>🎵 AUDIO TERMINAL</h3>
+                <canvas id="visualizer"></canvas>
+                <div style="font-size: 0.8rem; margin-top: 5px; text-align: center; color: #aaa;">Type <b style="color:var(--main-color)">/play</b> in terminal to toggle</div>
+            </div>
+
+            <div class="panel-box">
                 <h3>🏎️ M4 COMPETITION TELEMETRY</h3>
                 <div class="t-row"><span>ENGINE RPM</span><span id="rpmText">0</span></div>
                 <div class="t-bar-bg"><div class="t-bar-fill" id="rpmBar" style="width: 0%;"></div></div>
-                
                 <div class="t-row"><span>TURBO BOOST (PSI)</span><span id="boostText">0.0</span></div>
                 <div class="t-bar-bg"><div class="t-bar-fill" id="boostBar" style="width: 0%;"></div></div>
-                
                 <div class="t-row"><span>OIL TEMP (°C)</span><span id="tempText">90</span></div>
                 <div class="t-bar-bg"><div class="t-bar-fill" id="tempBar" style="width: 50%;"></div></div>
             </div>
 
-            <div class="todo-box">
+            <div class="panel-box">
                 <h3>✅ DAILY TARGETS</h3>
                 <input type="text" id="taskInput" placeholder="Add a target...">
                 <button id="addBtn" onclick="addTask()">ADD</button>
@@ -132,7 +155,7 @@
 
     <script>
         // --- BOOT SEQUENCE LOGIC ---
-        const bootMessages = ["Mounting core filesystems... [OK]", "Loading local user data... [OK]", "Initializing hardware interface...", "Pinging network daemon... [ONLINE]", "Fetching atmospheric data... [OK]", "Calibrating M4 Engine Sensors... [SUCCESS]", "System Admin recognized. Welcome back."];
+        const bootMessages = ["Mounting core filesystems... [OK]", "Loading local user data... [OK]", "Initializing hardware interface...", "Pinging network daemon... [ONLINE]", "Fetching atmospheric data... [OK]", "Calibrating Audio Engine... [SUCCESS]", "System Admin recognized. Welcome back."];
         function runBootSequence() {
             document.getElementById("loginScreen").style.display = "none";
             const bootScreen = document.getElementById("bootScreen");
@@ -142,9 +165,9 @@
             let delay = 0;
             bootMessages.forEach((msg, index) => {
                 setTimeout(() => { logsBox.innerHTML += `<div>[${(Math.random() * 2).toFixed(4)}] ${msg}</div>`; }, delay);
-                delay += 150 + Math.random() * 250;
+                delay += 100 + Math.random() * 200;
             });
-            setTimeout(() => { bootScreen.classList.add("hidden"); document.getElementById("mainContent").classList.remove("hidden"); startSystem(); }, delay + 600);
+            setTimeout(() => { bootScreen.classList.add("hidden"); document.getElementById("mainContent").classList.remove("hidden"); startSystem(); }, delay + 500);
         }
 
         function processLogin() {
@@ -155,19 +178,52 @@
         function logout() { localStorage.removeItem("hasAccess"); location.reload(); }
 
         window.onload = function() {
-            loadTasks(); loadTheme();
+            loadTasks(); loadTheme(); loadScratchpad();
             if(localStorage.getItem("hasAccess") === "true") { runBootSequence(); }
         };
 
-        function startSystem() { startMatrix(); startHUD(); setupCLI(); startTelemetry(); }
+        function startSystem() { startMatrix(); startHUD(); setupCLI(); startTelemetry(); scanFingerprint(); startVisualizer(); }
+
+        // --- DEVICE FINGERPRINT SCANNER ---
+        function scanFingerprint() {
+            document.getElementById('fp-cores').innerText = navigator.hardwareConcurrency || "Unknown";
+            document.getElementById('fp-res').innerText = `${window.screen.width} x ${window.screen.height}`;
+            // Simplify User Agent to get Engine
+            let engine = "Unknown";
+            if(navigator.userAgent.includes("Chrome")) engine = "Blink / V8";
+            else if(navigator.userAgent.includes("Firefox")) engine = "Gecko / SpiderMonkey";
+            else if(navigator.userAgent.includes("Safari")) engine = "WebKit / JavaScriptCore";
+            document.getElementById('fp-engine').innerText = engine;
+        }
+
+        // --- AUTO-SAVING SCRATCHPAD ---
+        const scratchpad = document.getElementById('scratchpad');
+        scratchpad.addEventListener('input', () => { localStorage.setItem('adminScratchpad', scratchpad.value); });
+        function loadScratchpad() { const savedText = localStorage.getItem('adminScratchpad'); if(savedText) scratchpad.value = savedText; }
+
+        // --- AUDIO VISUALIZER (Simulated) ---
+        let isAudioPlaying = false;
+        function startVisualizer() {
+            const canvas = document.getElementById('visualizer'); const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth - 30; canvas.height = 60;
+            const bars = 25; const barWidth = canvas.width / bars - 2;
+            setInterval(() => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const compStyles = window.getComputedStyle(document.body);
+                ctx.fillStyle = compStyles.getPropertyValue('--main-color').trim() || '#0F0';
+                for(let i = 0; i < bars; i++) {
+                    // If playing, random bounce. If paused, flat line.
+                    let height = isAudioPlaying ? Math.random() * 50 + 5 : 5;
+                    ctx.fillRect(i * (barWidth + 2), canvas.height - height, barWidth, height);
+                }
+            }, 100);
+        }
 
         // --- HARDWARE & WEATHER HUD ---
         function startHUD() {
             setInterval(() => { document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', { hour12: false }); }, 1000);
             if(navigator.getBattery) { navigator.getBattery().then(b => { function u() { document.getElementById('batData').innerText = Math.floor(b.level * 100) + (b.charging ? "% ⚡" : "%"); } u(); b.addEventListener('levelchange', u); b.addEventListener('chargingchange', u); }); }
             if(navigator.connection) { function u() { document.getElementById('netData').innerText = navigator.connection.effectiveType.toUpperCase(); } u(); navigator.connection.addEventListener('change', u); }
-            
-            // Open-Meteo API Fetch for Jaipur coordinates
             fetch('https://api.open-meteo.com/v1/forecast?latitude=26.9124&longitude=75.7873&current_weather=true')
                 .then(res => res.json())
                 .then(data => { document.getElementById('weatherData').innerText = `${data.current_weather.temperature}°C`; })
@@ -177,62 +233,44 @@
         // --- BMW M4 TELEMETRY SIMULATION ---
         function startTelemetry() {
             setInterval(() => {
-                // RPM Fluctuates between 1000 and 7200
                 let rpm = Math.floor(Math.random() * (3500 - 1500) + 1500); 
-                // Random rev spikes
                 if(Math.random() > 0.8) rpm = Math.floor(Math.random() * (7200 - 4500) + 4500);
-                let rpmPercent = (rpm / 7500) * 100;
-                document.getElementById('rpmText').innerText = rpm;
-                document.getElementById('rpmBar').style.width = rpmPercent + "%";
-
-                // Boost PSI based on RPM
+                document.getElementById('rpmText').innerText = rpm; document.getElementById('rpmBar').style.width = (rpm / 7500) * 100 + "%";
                 let boost = (rpm > 3000) ? (Math.random() * (18.5 - 10.0) + 10.0).toFixed(1) : (Math.random() * 2.0).toFixed(1);
-                let boostPercent = (boost / 20) * 100;
-                document.getElementById('boostText').innerText = boost;
-                document.getElementById('boostBar').style.width = boostPercent + "%";
-
-                // Oil Temp slow climb/fluctuation
+                document.getElementById('boostText').innerText = boost; document.getElementById('boostBar').style.width = (boost / 20) * 100 + "%";
                 let temp = (Math.random() * (105 - 95) + 95).toFixed(0);
-                document.getElementById('tempText').innerText = temp;
-                document.getElementById('tempBar').style.width = (temp / 130) * 100 + "%";
+                document.getElementById('tempText').innerText = temp; document.getElementById('tempBar').style.width = (temp / 130) * 100 + "%";
             }, 800);
         }
 
         // --- SELF DESTRUCT PROTOCOL ---
         function triggerSelfDestruct() {
             document.body.classList.add('destruct-mode');
-            const overlay = document.createElement('div');
-            overlay.id = "destructOverlay";
-            document.body.appendChild(overlay);
-            
-            let count = 5;
-            overlay.innerText = `DESTRUCT IN ${count}...`;
-            
+            const overlay = document.createElement('div'); overlay.id = "destructOverlay"; document.body.appendChild(overlay);
+            let count = 5; overlay.innerText = `DESTRUCT IN ${count}...`;
             let countdown = setInterval(() => {
-                count--;
-                overlay.innerText = `DESTRUCT IN ${count}...`;
+                count--; overlay.innerText = `DESTRUCT IN ${count}...`;
                 if(count <= 0) {
                     clearInterval(countdown);
-                    // The Wipe
                     document.body.innerHTML = `<div style="color:#00ff41; padding:20px; font-family:'Courier New', monospace; font-size:1.5rem;">>_ SYSTEM DESTROYED.<br>>_ REBOOT REQUIRED.</div>`;
-                    document.body.classList.remove('destruct-mode');
-                    document.body.style.backgroundColor = "black";
+                    document.body.classList.remove('destruct-mode'); document.body.style.backgroundColor = "black";
                 }
             }, 1000);
         }
 
         // --- CLI & TASKS ---
-        function setupCLI() {
-            const cli = document.getElementById('cliInput');
-            cli.addEventListener('keypress', function(e) { if(e.key === 'Enter') { executeCommand(cli.value.toLowerCase().trim()); cli.value = ''; } });
-        }
+        function setupCLI() { const cli = document.getElementById('cliInput'); cli.addEventListener('keypress', function(e) { if(e.key === 'Enter') { executeCommand(cli.value.toLowerCase().trim()); cli.value = ''; } }); }
         function executeCommand(cmd) {
             const status = document.getElementById('statusText');
-            if(cmd === '/help') { alert("COMMANDS:\n/theme red\n/theme green\n/theme blue\n/play (toggle music)\n/clear (wipe tasks)"); } 
+            if(cmd === '/help') { alert("COMMANDS:\n/theme red\n/theme green\n/theme blue\n/play (toggle audio)\n/clear (wipe tasks)"); } 
             else if(cmd === '/theme red') { setTheme('theme-red'); status.innerText = ">_ Status: EMERGENCY OVERRIDE"; } 
             else if(cmd === '/theme blue') { setTheme('theme-blue'); status.innerText = ">_ Status: CYBERPUNK MODE"; } 
             else if(cmd === '/theme green') { setTheme(''); status.innerText = ">_ Status: Online"; } 
-            else if(cmd === '/play') { const a = document.getElementById("myAudio"); if(a.paused) a.play(); else a.pause(); status.innerText = ">_ Status: Audio Toggled"; } 
+            else if(cmd === '/play') { 
+                const a = document.getElementById("myAudio"); 
+                if(isAudioPlaying) { a.pause(); isAudioPlaying = false; status.innerText = ">_ Status: Audio Paused"; } 
+                else { a.play().catch(e => console.log("No audio file found, playing visualizer only")); isAudioPlaying = true; status.innerText = ">_ Status: Audio Active"; } 
+            } 
             else if(cmd === '/clear') { document.getElementById("taskList").innerHTML = ""; saveTasks(); status.innerText = ">_ Status: Memory Wiped"; } 
             else { status.innerText = ">_ Error: Command not found. Type /help"; }
         }
