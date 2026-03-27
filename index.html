@@ -9,43 +9,58 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
-        body { margin: 0; padding: 0; color: #00ff41; font-family: 'Courier New', monospace; background-color: black; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        /* Dynamic Theme Variables */
+        :root {
+            --main-color: #00ff41; /* Default Matrix Green */
+            --bg-blur: rgba(0, 0, 0, 0.85);
+        }
+        .theme-red { --main-color: #ff3e3e; }
+        .theme-blue { --main-color: #00d2ff; }
+
+        body { margin: 0; padding: 0; color: var(--main-color); font-family: 'Courier New', monospace; background-color: black; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; transition: color 0.5s; }
         canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; }
         
         #loginScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050505; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .login-box { border: 2px solid #00ff41; padding: 30px; text-align: center; border-radius: 10px; box-shadow: 0 0 20px #00ff41; background: rgba(0,0,0,0.9); width: 80%; max-width: 400px; }
-        .login-input { background: black; color: #00ff41; border: 1px solid #00ff41; padding: 10px; margin: 15px 0; outline: none; text-align: center; font-family: inherit; font-size: 1.2rem; width: 80%; }
+        .login-box { border: 2px solid var(--main-color); padding: 30px; text-align: center; border-radius: 10px; box-shadow: 0 0 20px var(--main-color); background: rgba(0,0,0,0.9); width: 80%; max-width: 400px; }
+        .login-input { background: black; color: var(--main-color); border: 1px solid var(--main-color); padding: 10px; margin: 15px 0; outline: none; text-align: center; font-family: inherit; font-size: 1.2rem; width: 80%; }
         
         #mainContent { width: 100%; flex-direction: column; align-items: center; position: relative; }
         .hidden { display: none !important; }
         .flex-col { display: flex; }
 
-        .container { border: 2px solid #00ff41; padding: 25px; border-radius: 15px; box-shadow: 0 0 30px rgba(0, 255, 65, 0.4); background: rgba(0, 0, 0, 0.85); max-width: 500px; width: 90%; text-align: center; margin-top: 5vh; margin-bottom: 5vh; z-index: 1; backdrop-filter: blur(5px); }
-        .glow-text { text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41; animation: pulse 2s infinite alternate; }
-        @keyframes pulse { from { opacity: 0.8; } to { opacity: 1; text-shadow: 0 0 20px #00ff41, 0 0 40px #00ff41; } }
-        img { width: 100%; border-radius: 10px; border: 1px solid #00ff41; margin: 15px 0; box-shadow: 0 0 15px rgba(0, 255, 65, 0.5); }
-        #timer { font-size: 1.2rem; color: #ff3e3e; border: 1px solid #ff3e3e; padding: 10px; margin-top: 10px; display: inline-block; background: rgba(0,0,0,0.7); }
-        .btn { background: rgba(0,0,0,0.8); color: #00ff41; border: 2px solid #00ff41; padding: 10px 20px; margin-top: 15px; cursor: pointer; font-family: inherit; font-weight: bold; text-transform: uppercase; transition: 0.3s; border-radius: 5px; box-shadow: 0 0 10px #00ff41; width: 100%; }
-        .btn:hover { background: #00ff41; color: black; box-shadow: 0 0 25px #00ff41; }
-        
-        /* Logout Button */
-        #logoutBtn { position: absolute; top: 10px; right: 10px; background: transparent; color: #ff3e3e; border: 1px solid #ff3e3e; padding: 5px 10px; cursor: pointer; font-family: inherit; border-radius: 3px; z-index: 10; }
-        #logoutBtn:hover { background: #ff3e3e; color: black; }
+        /* Live HUD Panel */
+        #hud { width: 100%; background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--main-color); padding: 10px 0; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 10px var(--main-color); font-size: 0.9rem;}
+        #hud span { margin: 0 10px; }
 
-        .pomodoro-box { border: 1px dashed #00ff41; padding: 15px; margin-top: 25px; border-radius: 10px; background: rgba(0, 255, 65, 0.05); }
-        #pomo-time { font-size: 2.5rem; font-weight: bold; text-shadow: 0 0 15px #00ff41; margin: 10px 0; }
+        .container { border: 2px solid var(--main-color); padding: 25px; border-radius: 15px; box-shadow: 0 0 30px rgba(0, 255, 65, 0.2); background: var(--bg-blur); max-width: 500px; width: 90%; text-align: center; margin-top: 3vh; margin-bottom: 5vh; z-index: 1; backdrop-filter: blur(5px); transition: all 0.5s; }
+        .glow-text { text-shadow: 0 0 10px var(--main-color), 0 0 20px var(--main-color); animation: pulse 2s infinite alternate; }
+        @keyframes pulse { from { opacity: 0.8; } to { opacity: 1; text-shadow: 0 0 20px var(--main-color), 0 0 40px var(--main-color); } }
         
-        #quoteBox { border-left: 3px solid #00ff41; padding: 10px; margin-top: 15px; background: rgba(0, 255, 65, 0.1); font-style: italic; font-size: 0.9rem; text-align: left; }
+        img { width: 100%; border-radius: 10px; border: 1px solid var(--main-color); margin: 15px 0; box-shadow: 0 0 15px rgba(0, 255, 65, 0.3); transition: border 0.5s; }
+        
+        .btn { background: rgba(0,0,0,0.8); color: var(--main-color); border: 2px solid var(--main-color); padding: 10px 20px; margin-top: 15px; cursor: pointer; font-family: inherit; font-weight: bold; text-transform: uppercase; transition: 0.3s; border-radius: 5px; box-shadow: 0 0 10px var(--main-color); width: 100%; }
+        .btn:hover { background: var(--main-color); color: black; box-shadow: 0 0 25px var(--main-color); }
+        
+        #logoutBtn { position: absolute; top: 50px; right: 10px; background: transparent; color: #ff3e3e; border: 1px solid #ff3e3e; padding: 5px 10px; cursor: pointer; font-family: inherit; border-radius: 3px; z-index: 10; }
 
-        .todo-box { border: 1px solid #00ff41; padding: 15px; margin-top: 20px; border-radius: 10px; background: rgba(0, 0, 0, 0.6); text-align: left; }
+        .pomodoro-box { border: 1px dashed var(--main-color); padding: 15px; margin-top: 25px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); }
+        #pomo-time { font-size: 2.5rem; font-weight: bold; text-shadow: 0 0 15px var(--main-color); margin: 10px 0; }
+        
+        #quoteBox { border-left: 3px solid var(--main-color); padding: 10px; margin-top: 15px; background: rgba(255, 255, 255, 0.05); font-style: italic; font-size: 0.9rem; text-align: left; }
+
+        .todo-box { border: 1px solid var(--main-color); padding: 15px; margin-top: 20px; border-radius: 10px; background: rgba(0, 0, 0, 0.6); text-align: left; }
         .todo-box h3 { text-align: center; margin-top: 0; color: white; }
-        #taskInput { width: 68%; padding: 10px; background: black; color: #00ff41; border: 1px solid #00ff41; border-radius: 3px; font-family: inherit; outline: none; }
-        #addBtn { width: 25%; padding: 10px; background: #00ff41; color: black; border: none; font-weight: bold; cursor: pointer; border-radius: 3px; font-family: inherit;}
+        #taskInput { width: 68%; padding: 10px; background: black; color: var(--main-color); border: 1px solid var(--main-color); border-radius: 3px; font-family: inherit; outline: none; }
+        #addBtn { width: 25%; padding: 10px; background: var(--main-color); color: black; border: none; font-weight: bold; cursor: pointer; border-radius: 3px; font-family: inherit;}
         ul { list-style-type: none; padding: 0; margin-top: 15px; }
-        li { padding: 10px; border-bottom: 1px dashed #004411; cursor: pointer; transition: 0.3s; display: flex; justify-content: space-between; }
-        li:hover { background: rgba(0, 255, 65, 0.1); }
-        .completed { text-decoration: line-through; color: #005511; }
+        li { padding: 10px; border-bottom: 1px dashed var(--main-color); cursor: pointer; transition: 0.3s; display: flex; justify-content: space-between; }
+        .completed { text-decoration: line-through; opacity: 0.5; }
         .delete-btn { color: #ff3e3e; font-weight: bold; cursor: pointer; padding-left: 10px; }
+
+        /* Interactive CLI */
+        .cli-box { border: 1px solid var(--main-color); padding: 10px; margin-top: 20px; background: black; text-align: left; border-radius: 5px; display: flex; align-items: center; }
+        .cli-prompt { font-weight: bold; margin-right: 10px; }
+        #cliInput { background: transparent; border: none; color: var(--main-color); font-family: inherit; width: 100%; outline: none; font-size: 1rem; }
     </style>
 </head>
 <body>
@@ -61,12 +76,19 @@
     </div>
 
     <div id="mainContent" class="hidden flex-col">
+        
+        <div id="hud">
+            <span>🔋 <span id="batData">--%</span></span> | 
+            <span>📡 <span id="netData">--</span></span> | 
+            <span>⏱️ <span id="clockData">00:00</span></span>
+        </div>
+
         <button id="logoutBtn" onclick="logout()">LOGOUT</button>
         <canvas id="matrix"></canvas>
 
-        <div class="container">
+        <div class="container" id="mainContainer">
             <h1 class="glow-text">SYSTEM ADMIN</h1>
-            <p>>_ Status: Online</p>
+            <p id="statusText">>_ Status: Online</p>
             
             <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500" alt="Hacker Setup">
 
@@ -86,86 +108,122 @@
             </div>
 
             <audio id="myAudio" loop><source src="music.mp3" type="audio/mpeg"></audio>
-            <button class="btn" onclick="toggleMusic()" id="btnText" style="margin-top: 20px;">🎧 Start Mission Music</button>
+
+            <div class="cli-box">
+                <span class="cli-prompt">root@system:~#</span>
+                <input type="text" id="cliInput" placeholder="Type /help and press Enter..." autocomplete="off">
+            </div>
+
         </div>
     </div>
 
     <script>
-        // --- 1. NEW LOGIN MEMORY LOGIC ---
+        // --- LOGIN MEMORY ---
         function processLogin() {
             const pass = document.getElementById("passInput").value.toUpperCase();
             if(pass === "ADMIN" || pass === "KHUSHAL") {
-                localStorage.setItem("hasAccess", "true"); // Save the secret key!
-                grantAccess();
-            } else {
-                document.getElementById("errorMsg").style.display = "block";
-            }
+                localStorage.setItem("hasAccess", "true"); grantAccess();
+            } else { document.getElementById("errorMsg").style.display = "block"; }
         }
-
         function grantAccess() {
             document.getElementById("loginScreen").style.display = "none";
             document.getElementById("mainContent").classList.remove("hidden");
-            startMatrix();
-            fetchQuote();
+            startSystem();
         }
+        function logout() { localStorage.removeItem("hasAccess"); location.reload(); }
 
-        function checkStoredLogin() {
-            // If the key exists, skip the login screen automatically
-            if(localStorage.getItem("hasAccess") === "true") {
-                grantAccess();
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem("hasAccess"); // Delete the secret key
-            location.reload(); // Refresh the page to show login screen again
-        }
-
-        // --- 2. Live API Fetching ---
-        function fetchQuote() {
-            fetch('https://dummyjson.com/quotes/random')
-                .then(res => res.json())
-                .then(data => { document.getElementById("quoteBox").innerHTML = `"${data.quote}" <br><br><b>- ${data.author}</b>`; })
-                .catch(err => { document.getElementById("quoteBox").innerHTML = `"Offline Mode Active. Keep grinding."`; });
-        }
-
-        // --- 3. To-Do List + Confetti ---
-        function addTask() {
-            let input = document.getElementById("taskInput");
-            if(input.value === '') return;
-            let li = document.createElement("li");
-            li.innerHTML = `<span class="task-text" onclick="toggleTask(this)">${input.value}</span> <span class="delete-btn" onclick="this.parentElement.remove(); saveTasks();">X</span>`;
-            document.getElementById("taskList").appendChild(li);
-            input.value = ""; saveTasks();
-        }
-
-        function toggleTask(element) {
-            element.parentElement.classList.toggle('completed');
-            if(element.parentElement.classList.contains('completed')) {
-                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#00ff41', '#ffffff'] });
-            }
-            saveTasks();
-        }
-
-        function saveTasks() { localStorage.setItem("devTasks", document.getElementById("taskList").innerHTML); }
-        function loadTasks() { let saved = localStorage.getItem("devTasks"); if(saved) document.getElementById("taskList").innerHTML = saved; }
-        
-        // This runs automatically when the page loads
         window.onload = function() {
-            loadTasks();
-            checkStoredLogin(); // Check if they are already logged in!
+            loadTasks(); loadTheme();
+            if(localStorage.getItem("hasAccess") === "true") grantAccess();
         };
 
-        // --- 4. Matrix Background ---
+        // --- CORE SYSTEM BOOT ---
+        function startSystem() {
+            startMatrix(); fetchQuote(); startHUD(); setupCLI();
+        }
+
+        // --- HARDWARE HUD API ---
+        function startHUD() {
+            // Clock
+            setInterval(() => {
+                document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', { hour12: false });
+            }, 1000);
+
+            // Battery API
+            if(navigator.getBattery) {
+                navigator.getBattery().then(battery => {
+                    function updateBat() { document.getElementById('batData').innerText = Math.floor(battery.level * 100) + (battery.charging ? "% ⚡" : "%"); }
+                    updateBat(); battery.addEventListener('levelchange', updateBat); battery.addEventListener('chargingchange', updateBat);
+                });
+            } else { document.getElementById('batData').innerText = "N/A"; }
+
+            // Network API
+            if(navigator.connection) {
+                function updateNet() { document.getElementById('netData').innerText = navigator.connection.effectiveType.toUpperCase(); }
+                updateNet(); navigator.connection.addEventListener('change', updateNet);
+            } else { document.getElementById('netData').innerText = "WIFI"; }
+        }
+
+        // --- INTERACTIVE CLI ---
+        function setupCLI() {
+            const cli = document.getElementById('cliInput');
+            cli.addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') {
+                    const cmd = cli.value.toLowerCase().trim();
+                    executeCommand(cmd);
+                    cli.value = ''; // clear input
+                }
+            });
+        }
+
+        function executeCommand(cmd) {
+            const status = document.getElementById('statusText');
+            if(cmd === '/help') {
+                alert("COMMANDS:\n/theme red\n/theme green\n/theme blue\n/play (toggle music)\n/clear (wipe tasks)\n/hack (run exploit)");
+            } else if(cmd === '/theme red') {
+                setTheme('theme-red'); status.innerText = ">_ Status: EMERGENCY OVERRIDE";
+            } else if(cmd === '/theme blue') {
+                setTheme('theme-blue'); status.innerText = ">_ Status: CYBERPUNK MODE";
+            } else if(cmd === '/theme green') {
+                setTheme(''); status.innerText = ">_ Status: Online";
+            } else if(cmd === '/play') {
+                toggleMusic(); status.innerText = ">_ Status: Audio Active";
+            } else if(cmd === '/clear') {
+                document.getElementById("taskList").innerHTML = ""; saveTasks(); status.innerText = ">_ Status: Memory Wiped";
+            } else if(cmd === '/hack') {
+                status.innerText = ">_ INJECTING PAYLOAD... ACCESS GRANTED";
+                document.getElementById('mainContainer').style.borderColor = "white";
+                setTimeout(() => { document.getElementById('mainContainer').style.borderColor = "var(--main-color)"; status.innerText = ">_ Status: Online"; }, 3000);
+            } else {
+                status.innerText = ">_ Error: Command not found. Type /help";
+            }
+        }
+
+        // --- THEME SWITCHER ---
+        function setTheme(themeClass) {
+            document.body.className = themeClass;
+            localStorage.setItem('sysTheme', themeClass);
+            updateMatrixColor();
+        }
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('sysTheme');
+            if(savedTheme) document.body.className = savedTheme;
+        }
+
+        // --- MATRIX BACKGROUND ---
+        let drops = [];
         function startMatrix() {
             const canvas = document.getElementById('matrix'); const ctx = canvas.getContext('2d');
             canvas.width = window.innerWidth; canvas.height = window.innerHeight;
             const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*';
             const fontSize = 14; const columns = canvas.width / fontSize;
-            const drops = []; for(let x = 0; x < columns; x++) drops[x] = 1;
+            for(let x = 0; x < columns; x++) drops[x] = 1;
             setInterval(() => {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#0F0'; ctx.font = fontSize + 'px monospace';
+                // Get current dynamic color
+                const compStyles = window.getComputedStyle(document.body);
+                ctx.fillStyle = compStyles.getPropertyValue('--main-color').trim() || '#0F0';
+                ctx.font = fontSize + 'px monospace';
                 for(let i = 0; i < drops.length; i++) {
                     ctx.fillText(letters.charAt(Math.floor(Math.random() * letters.length)), i * fontSize, drops[i] * fontSize);
                     if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
@@ -173,28 +231,20 @@
                 }
             }, 33);
         }
+        function updateMatrixColor() { drops = drops.map(() => 0); /* reset drops to apply new color instantly */ }
 
-        // --- 5. Pomodoro Timer & Music ---
+        // --- API, TASKS, POMODORO ---
+        function fetchQuote() { fetch('https://dummyjson.com/quotes/random').then(res => res.json()).then(data => { document.getElementById("quoteBox").innerHTML = `"${data.quote}" <br><br><b>- ${data.author}</b>`; }).catch(err => { document.getElementById("quoteBox").innerHTML = `"Offline Mode."`; }); }
+        
+        function addTask() { let input = document.getElementById("taskInput"); if(input.value === '') return; let li = document.createElement("li"); li.innerHTML = `<span class="task-text" onclick="toggleTask(this)">${input.value}</span> <span class="delete-btn" onclick="this.parentElement.remove(); saveTasks();">X</span>`; document.getElementById("taskList").appendChild(li); input.value = ""; saveTasks(); }
+        function toggleTask(element) { element.parentElement.classList.toggle('completed'); if(element.parentElement.classList.contains('completed')) { const compColor = window.getComputedStyle(document.body).getPropertyValue('--main-color').trim(); confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: [compColor, '#ffffff'] }); } saveTasks(); }
+        function saveTasks() { localStorage.setItem("devTasks", document.getElementById("taskList").innerHTML); }
+        function loadTasks() { let saved = localStorage.getItem("devTasks"); if(saved) document.getElementById("taskList").innerHTML = saved; }
+
         let pomoInterval;
-        function startPomodoro() {
-            clearInterval(pomoInterval); let timeLeft = 25 * 60;
-            const display = document.getElementById('pomo-time'); const btn = document.getElementById('pomo-btn');
-            btn.innerHTML = "⏸ Focus Mode Active...";
-            pomoInterval = setInterval(() => {
-                let m = Math.floor(timeLeft / 60); let s = timeLeft % 60;
-                display.innerHTML = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
-                if (timeLeft <= 0) {
-                    clearInterval(pomoInterval); display.innerHTML = "00:00"; btn.innerHTML = "▶ Restart Sprint";
-                    alert("Mission Complete! Take a 5-minute break.");
-                }
-                timeLeft--;
-            }, 1000);
-        }
-        function toggleMusic() {
-            const audio = document.getElementById("myAudio"); const btnText = document.getElementById("btnText");
-            if (audio.paused) { audio.play(); btnText.innerHTML = "⏸ Pause Music"; } 
-            else { audio.pause(); btnText.innerHTML = "🎧 Start Mission Music"; }
-        }
+        function startPomodoro() { clearInterval(pomoInterval); let timeLeft = 25 * 60; const display = document.getElementById('pomo-time'); const btn = document.getElementById('pomo-btn'); btn.innerHTML = "⏸ Focus Mode Active..."; pomoInterval = setInterval(() => { let m = Math.floor(timeLeft / 60); let s = timeLeft % 60; display.innerHTML = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s); if (timeLeft <= 0) { clearInterval(pomoInterval); display.innerHTML = "00:00"; btn.innerHTML = "▶ Restart Sprint"; alert("Mission Complete!"); } timeLeft--; }, 1000); }
+        
+        function toggleMusic() { const audio = document.getElementById("myAudio"); if (audio.paused) { audio.play(); } else { audio.pause(); } }
     </script>
 </body>
 </html>
