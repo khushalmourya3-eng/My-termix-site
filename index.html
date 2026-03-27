@@ -4,13 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Admin | Level 12 OS</title>
+    <title>System Admin | Level 13 OS</title>
     
     <link rel="manifest" href='data:application/manifest+json,{"name":"System Admin","short_name":"Admin OS","start_url":".","display":"standalone","background_color":"#050510","theme_color":"#00f3ff","icons":[{"src":"https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png","sizes":"512x512","type":"image/png"}]}'>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <style>
         html { scroll-behavior: smooth; }
@@ -44,9 +48,12 @@
         .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 0, 234, 0.6); }
 
         .glass-panel { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 15px; padding: 20px; margin-top: 25px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); text-align: left; transition: transform 0.3s, box-shadow 0.3s; }
-        .glass-panel:hover { box-shadow: 0 12px 40px rgba(0, 243, 255, 0.15); border-color: rgba(0, 243, 255, 0.3); }
-        .glass-panel h3 { text-align: center; margin-top: 0; color: #fff; font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
         
+        /* Draggable Handle Styles */
+        .drag-handle { cursor: grab; text-align: center; margin-top: 0; color: #fff; font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .drag-handle:active { cursor: grabbing; color: var(--cyan); }
+        .sortable-ghost { opacity: 0.4; border: 2px dashed var(--cyan); }
+
         .reveal { opacity: 0; transform: translateY(40px); transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
@@ -59,12 +66,14 @@
         .news-post { background: rgba(0,0,0,0.5); padding: 10px; margin-bottom: 8px; border-radius: 5px; border-left: 3px solid var(--cyan); font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .news-post a { color: #fff; text-decoration: none; }
 
-        /* VFS Styling */
         .vfs-item { display: flex; align-items: center; padding: 8px; background: rgba(0,0,0,0.4); margin-bottom: 5px; border-radius: 5px; font-family: monospace; font-size: 0.9rem; border: 1px solid transparent; transition: 0.2s; }
         .vfs-item:hover { border-color: var(--cyan); background: rgba(0, 243, 255, 0.1); }
-        .vfs-icon { font-size: 1.2rem; margin-right: 10px; }
+        
+        /* Map Customization */
+        .leaflet-container { background: #050510; }
+        .radar-blip { background-color: var(--cyan); border-radius: 50%; box-shadow: 0 0 15px var(--cyan); animation: radarPulse 2s infinite; }
+        @keyframes radarPulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
 
-        /* Security Cam Filter */
         .sec-cam-container { position: relative; border: 1px solid var(--cyan); border-radius: 8px; overflow: hidden; background: #000; min-height: 180px; display: flex; justify-content: center; align-items: center; }
         #secCam { width: 100%; filter: sepia(100%) hue-rotate(130deg) saturate(300%) contrast(1.5); display: none; object-fit: cover; }
         .cam-overlay { position: absolute; top: 10px; left: 10px; color: var(--cyan); font-family: monospace; font-size: 0.8rem; font-weight: bold; z-index: 5; display: none; }
@@ -76,7 +85,17 @@
         .t-bar-fill { height: 100%; transition: width 0.3s ease-out; background: linear-gradient(90deg, #ff416c, #ff4b2b); }
 
         #visualizer { width: 100%; height: 70px; background: rgba(0,0,0,0.4); border-radius: 8px; margin-top: 15px; border: 1px solid var(--glass-border); }
+        #scratchpad { width: 100%; height: 120px; background: rgba(0,0,0,0.4); color: var(--yellow); border: 1px solid var(--glass-border); border-radius: 8px; padding: 12px; font-family: 'Courier New', monospace; outline: none; resize: none; box-sizing: border-box; transition: 0.3s; }
         
+        .input-group { display: flex; gap: 10px; }
+        #taskInput { flex-grow: 1; padding: 12px; background: rgba(0,0,0,0.4); color: white; border: 1px solid var(--glass-border); border-radius: 8px; outline: none; }
+        #addBtn { width: 80px; padding: 12px; background: var(--magenta); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; }
+        ul { list-style-type: none; padding: 0; margin-top: 20px; }
+        li { padding: 12px 15px; background: rgba(0,0,0,0.3); margin-bottom: 8px; border-radius: 8px; cursor: pointer; transition: 0.3s; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--cyan); }
+        .completed { opacity: 0.6; border-left-color: #555; }
+        .completed .task-text { text-decoration: line-through; text-decoration-color: var(--magenta); text-decoration-thickness: 2px; }
+        .delete-btn { color: #ff3e3e; font-weight: bold; padding: 5px 10px; background: rgba(255,0,0,0.1); border-radius: 5px; }
+
         .cli-box { border: 1px solid var(--cyan); padding: 15px; background: rgba(0,0,0,0.7); border-radius: 10px; display: flex; align-items: center; box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.1); }
         .cli-prompt { font-family: 'Courier New', monospace; color: var(--cyan); font-weight: bold; margin-right: 15px; }
         #cliInput { background: transparent; border: none; color: white; font-family: 'Courier New', monospace; width: 100%; outline: none; font-size: 1rem; }
@@ -125,56 +144,76 @@
             <h1 class="rainbow-text" style="font-size: 2.5rem; margin-bottom: 5px;">SYSTEM ADMIN</h1>
             <p id="statusText" style="color: var(--cyan); font-family: monospace; margin-top: 0;">>_ Status: Online</p>
             
-            <div class="glass-panel reveal">
-                <h3>🐙 DEVELOPER IDENTITY</h3>
-                <div class="gh-badge">
-                    <img id="gh-avatar" class="gh-avatar" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png">
-                    <div class="gh-stats">
-                        <div id="gh-name" class="gh-name">Loading...</div>
-                        <div class="gh-info">Repos: <span id="gh-repos">--</span> | Followers: <span id="gh-followers">--</span></div>
+            <div id="panelContainer">
+                
+                <div class="glass-panel reveal">
+                    <h3 class="drag-handle">🐙 DEVELOPER IDENTITY</h3>
+                    <div class="gh-badge">
+                        <img id="gh-avatar" class="gh-avatar" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png">
+                        <div class="gh-stats">
+                            <div id="gh-name" class="gh-name">Loading...</div>
+                            <div class="gh-info">Repos: <span id="gh-repos">--</span> | Followers: <span id="gh-followers">--</span></div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="glass-panel reveal">
-                <h3>🗂️ VIRTUAL DIRECTORY</h3>
-                <div style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px; text-align: center;">Use CLI: <b style="color:var(--magenta)">/mkdir [name]</b> or <b style="color:var(--magenta)">/touch [name]</b> or <b style="color:var(--magenta)">/rm [name]</b></div>
-                <div id="vfsContainer" style="min-height: 80px; max-height: 200px; overflow-y: auto;">
-                    </div>
-            </div>
-
-            <div class="glass-panel reveal">
-                <h3>🌐 GLOBAL TECH UPLINK</h3>
-                <div id="newsFeed" style="margin-top: 15px;"></div>
-            </div>
-
-            <div class="glass-panel reveal">
-                <h3>📷 LOCAL SECURITY FEED</h3>
-                <div class="sec-cam-container">
-                    <div id="camOverlay" class="cam-overlay"><span class="rec-dot"></span>REC / SECTOR 7G</div>
-                    <video id="secCam" autoplay playsinline></video>
-                    <button id="camBtn" class="btn" onclick="initCamera()" style="position: absolute; width: auto; z-index: 10; font-size: 0.8rem;">CONNECT FEED</button>
+                <div class="glass-panel reveal">
+                    <h3 class="drag-handle">🌍 GEOLOCATION RADAR</h3>
+                    <div id="map" style="height: 200px; width: 100%; border-radius: 8px; border: 1px solid var(--glass-border); z-index: 1;"></div>
                 </div>
-            </div>
 
-            <div class="glass-panel reveal">
-                <h3>🎵 Audio Terminal</h3>
-                <canvas id="visualizer"></canvas>
-                <button id="audioBtn" class="btn" style="margin-top: 15px; background: linear-gradient(45deg, #00f3ff, #0051ff);" onclick="toggleAudio()">▶ PLAY AUDIO</button>
-            </div>
+                <div class="glass-panel reveal">
+                    <h3 class="drag-handle">🗂️ VIRTUAL DIRECTORY</h3>
+                    <div style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px; text-align: center;">Use CLI: <b style="color:var(--magenta)">/mkdir [name]</b> or <b style="color:var(--magenta)">/touch [name]</b></div>
+                    <div id="vfsContainer" style="min-height: 80px; max-height: 200px; overflow-y: auto;"></div>
+                </div>
 
-            <div class="glass-panel reveal">
-                <h3>📈 SERVER TRAFFIC MATRIX</h3>
-                <div style="height: 150px; width: 100%;"><canvas id="trafficChart"></canvas></div>
-                <div class="t-row" style="margin-top: 15px;"><span>CPU TEMP</span><span id="tempText" style="color: #ff416c">90 °C</span></div>
-                <div class="t-bar-bg"><div class="t-bar-fill" id="tempBar" style="width: 50%;"></div></div>
-            </div>
+                <div class="glass-panel reveal">
+                    <h3 class="drag-handle">🌐 GLOBAL TECH UPLINK</h3>
+                    <div id="newsFeed" style="margin-top: 15px;"></div>
+                </div>
 
-            <audio id="myAudio" loop crossorigin="anonymous"><source src="music.mp3" type="audio/mpeg"></audio>
+                <div class="glass-panel reveal">
+                    <h3 class="drag-handle">📷 LOCAL SECURITY FEED</h3>
+                    <div class="sec-cam-container">
+                        <div id="camOverlay" class="cam-overlay"><span class="rec-dot"></span>REC / SECTOR 7G</div>
+                        <video id="secCam" autoplay playsinline></video>
+                        <button id="camBtn" class="btn" onclick="initCamera()" style="position: absolute; width: auto; z-index: 10; font-size: 0.8rem;">CONNECT FEED</button>
+                    </div>
+                </div>
 
-            <div class="glass-panel reveal" style="margin-top: 30px; padding: 0; background: transparent; border: none; box-shadow: none;">
+                <div class="glass-panel reveal">
+                    <h3 class="drag-handle">⚙️ MACRO SCRIPT ENGINE</h3>
+                    <textarea id="scratchpad" placeholder="// Write custom JS macros here...&#10;// Type /execute in CLI to run"></textarea>
+                </div>
+
+                <div class="glass-panel reveal">
+                    <h3 class="drag-handle">🎵 Audio Terminal</h3>
+                    <canvas id="visualizer"></canvas>
+                    <button id="audioBtn" class="btn" style="margin-top: 15px; background: linear-gradient(45deg, #00f3ff, #0051ff);" onclick="toggleAudio()">▶ PLAY AUDIO</button>
+                </div>
+
+                <div class="glass-panel reveal">
+                    <h3 class="drag-handle">📈 SERVER TRAFFIC MATRIX</h3>
+                    <div style="height: 150px; width: 100%;"><canvas id="trafficChart"></canvas></div>
+                    <div class="t-row" style="margin-top: 15px;"><span>CPU TEMP</span><span id="tempText" style="color: #ff416c">90 °C</span></div>
+                    <div class="t-bar-bg"><div class="t-bar-fill" id="tempBar" style="width: 50%;"></div></div>
+                </div>
+
+                <div class="glass-panel reveal">
+                    <h3 class="drag-handle">✅ Daily Targets</h3>
+                    <div class="input-group">
+                        <input type="text" id="taskInput" placeholder="Add a new target...">
+                        <button id="addBtn" onclick="addTask()">ADD</button>
+                    </div>
+                    <ul id="taskList"></ul>
+                </div>
+
+            </div> <audio id="myAudio" loop crossorigin="anonymous"><source src="music.mp3" type="audio/mpeg"></audio>
+
+            <div style="margin-top: 30px; width: 100%;">
                 <div id="voiceStatus">Listening for command...</div>
-                <div class="cli-box" style="width: 100%; border: 1px solid var(--cyan); margin: 0; display: flex;">
+                <div class="cli-box" style="width: 100%; border: 1px solid var(--cyan); margin: 0; display: flex; box-sizing: border-box;">
                     <span class="cli-prompt">root@admin:~#</span>
                     <input type="text" id="cliInput" placeholder="Type /help or use mic..." autocomplete="off">
                     <button id="voiceBtn" onclick="startVoice()">🎙️</button>
@@ -186,99 +225,41 @@
     </div>
 
     <script>
-        // --- 1. SECURITY IDLE LOCK LOGIC ---
-        let idleTime = 0;
-        let isLocked = false;
-        
-        // Reset timer on any interaction
-        function resetIdleTimer() { if(!isLocked) idleTime = 0; }
-        window.onload = function() {
-            document.onmousemove = resetIdleTimer;
-            document.onkeypress = resetIdleTimer;
-            document.ontouchstart = resetIdleTimer; // For mobile taps
-            
-            setInterval(checkIdle, 1000); // Check every second
-            
-            initVFS();
-            if(localStorage.getItem("hasAccess") === "true") { runBootSequence(); }
-        };
-
-        function checkIdle() {
-            if(document.getElementById("mainContent").classList.contains("hidden")) return; // Don't run if on login/boot screen
-            idleTime++;
-            if (idleTime >= 60 && !isLocked) { // 60 seconds idle
-                lockSystem();
-            }
-        }
-
-        function lockSystem() {
-            isLocked = true;
-            document.getElementById("lockScreen").classList.remove("hidden");
-            document.getElementById("unlockInput").value = "";
-        }
-
-        function unlockSystem() {
-            const pass = document.getElementById("unlockInput").value.toUpperCase();
-            if(pass === "ADMIN" || pass === "KHUSHAL") {
-                isLocked = false;
-                idleTime = 0;
-                document.getElementById("lockScreen").classList.add("hidden");
-            } else {
-                document.getElementById("unlockInput").style.boxShadow = "0 0 15px red";
-                setTimeout(() => { document.getElementById("unlockInput").style.boxShadow = "none"; }, 1000);
-            }
-        }
-
-        // --- 2. VIRTUAL FILE SYSTEM (VFS) LOGIC ---
-        let vfs = { files: [] };
-
-        function initVFS() {
-            const savedVFS = localStorage.getItem('adminVFS');
-            if(savedVFS) { vfs = JSON.parse(savedVFS); }
-            else { vfs.files = [{type: 'dir', name: 'logs'}, {type: 'file', name: 'readme.txt'}]; saveVFS(); }
-            renderVFS();
-        }
-
-        function saveVFS() { localStorage.setItem('adminVFS', JSON.stringify(vfs)); }
-
-        function renderVFS() {
-            const container = document.getElementById('vfsContainer');
-            container.innerHTML = "";
-            if(vfs.files.length === 0) { container.innerHTML = "<div style='color:#555; text-align:center;'>Directory is empty</div>"; return; }
-            
-            vfs.files.forEach((item, index) => {
-                const icon = item.type === 'dir' ? '📁' : '📄';
-                const color = item.type === 'dir' ? 'var(--yellow)' : 'var(--cyan)';
-                container.innerHTML += `<div class="vfs-item"><span class="vfs-icon">${icon}</span> <span style="color:${color}">${item.name}</span></div>`;
+        // --- DRAG AND DROP WINDOW MANAGER ---
+        function initDraggable() {
+            var el = document.getElementById('panelContainer');
+            Sortable.create(el, {
+                handle: '.drag-handle', // Only drag by the H3 headers
+                animation: 200,
+                ghostClass: 'sortable-ghost'
             });
         }
 
-        // --- BOOT SYSTEM ---
-        const bootMessages = ["Fetching Identity... [OK]", "Injecting Chart.js... [OK]", "Mounting Virtual File System... [OK]", "Initializing Idle Protocols... [DONE]", "System Admin recognized."];
-        function runBootSequence() {
-            document.getElementById("loginScreen").style.display = "none";
-            const bootScreen = document.getElementById("bootScreen"); bootScreen.classList.remove("hidden");
-            const logsBox = document.getElementById("bootLogs"); logsBox.innerHTML = "";
-            let delay = 0;
-            bootMessages.forEach((msg) => { setTimeout(() => { logsBox.innerHTML += `<div><span style="color:var(--magenta)">[${(Math.random() * 2).toFixed(4)}]</span> ${msg}</div>`; }, delay); delay += 150 + Math.random() * 200; });
-            setTimeout(() => { bootScreen.classList.add("hidden"); document.getElementById("mainContent").classList.remove("hidden"); startSystem(); }, delay + 500);
+        // --- GEOLOCATION RADAR ---
+        function initMap() {
+            // Set coordinates directly to Jaipur
+            var map = L.map('map').setView([26.9124, 75.7873], 12);
+            // Dark mode CartoDB tiles
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+
+            // Pulsing Radar Blip
+            var pulsingIcon = L.divIcon({ className: 'radar-blip', iconSize: [15, 15] });
+            L.marker([26.9124, 75.7873], {icon: pulsingIcon}).addTo(map);
         }
 
-        function processLogin() { const pass = document.getElementById("passInput").value.toUpperCase(); if(pass === "ADMIN" || pass === "KHUSHAL") { localStorage.setItem("hasAccess", "true"); runBootSequence(); } else { document.getElementById("errorMsg").style.display = "block"; } }
-        
-        function startSystem() { initParticles(); fetchGitHubData(); fetchNewsData(); startHUD(); setupCLI(); startTelemetry(); initScrollAnimations(); initChart(); }
-
-        // --- CLI UPDATED FOR VFS ---
-        function setupCLI() { const cli = document.getElementById('cliInput'); cli.addEventListener('keypress', function(e) { if(e.key === 'Enter') { executeCommand(cli.value.toLowerCase().trim()); cli.value = ''; resetIdleTimer(); } }); }
+        // --- CLI COMMANDS (UPDATED WITH /EXECUTE) ---
+        function setupCLI() { const cli = document.getElementById('cliInput'); cli.addEventListener('keypress', function(e) { if(e.key === 'Enter') { executeCommand(cli.value.trim()); cli.value = ''; resetIdleTimer(); } }); }
         
         function executeCommand(cmd) { 
             const status = document.getElementById('statusText'); 
             const parts = cmd.split(' ');
-            const command = parts[0];
+            const command = parts[0].toLowerCase();
             const arg = parts[1];
 
             if(command === '/help') { 
-                alert("COMMANDS:\n/play (toggle audio)\n/mkdir [name] (create folder)\n/touch [name] (create file)\n/rm [name] (delete item)"); 
+                alert("COMMANDS:\n/play (toggle audio)\n/mkdir [name] (create folder)\n/execute (run script)\n/rm [name] (delete item)"); 
             } 
             else if(command === '/play') { toggleAudio(); } 
             else if(command === '/mkdir' && arg) {
@@ -288,18 +269,44 @@
                 vfs.files.push({type: 'file', name: arg}); saveVFS(); renderVFS(); status.innerText = `>_ File created: ${arg}`;
             }
             else if(command === '/rm' && arg) {
-                const initialLength = vfs.files.length;
-                vfs.files = vfs.files.filter(item => item.name !== arg);
+                const initialLength = vfs.files.length; vfs.files = vfs.files.filter(item => item.name !== arg);
                 if(vfs.files.length < initialLength) { saveVFS(); renderVFS(); status.innerText = `>_ Item deleted: ${arg}`; }
                 else { status.innerText = `>_ Error: Item not found.`; }
+            }
+            // MACRO ENGINE
+            else if(command === '/execute') {
+                try {
+                    const code = document.getElementById('scratchpad').value;
+                    const macro = new Function(code);
+                    macro();
+                    status.innerText = ">_ Macro compiled and executed.";
+                } catch(err) {
+                    status.innerText = `>_ Macro Error: ${err.message}`;
+                }
             }
             else { status.innerText = ">_ Error: Command not found or missing argument."; } 
         }
 
-        // --- CAMERA, VOICE, CHART & GRAPHICS (Retained from Level 11) ---
-        async function initCamera() { const video = document.getElementById('secCam'); const btn = document.getElementById('camBtn'); const overlay = document.getElementById('camOverlay'); try { const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }); video.srcObject = stream; video.style.display = "block"; overlay.style.display = "block"; btn.style.display = "none"; } catch(err) { btn.innerText = "ACCESS DENIED"; btn.style.background = "#ff3e3e"; } }
+        let idleTime = 0; let isLocked = false;
+        function resetIdleTimer() { if(!isLocked) idleTime = 0; }
+        window.onload = function() { document.onmousemove = resetIdleTimer; document.onkeypress = resetIdleTimer; document.ontouchstart = resetIdleTimer; setInterval(checkIdle, 1000); initVFS(); if(localStorage.getItem("hasAccess") === "true") { runBootSequence(); } };
+        function checkIdle() { if(document.getElementById("mainContent").classList.contains("hidden")) return; idleTime++; if (idleTime >= 60 && !isLocked) { lockSystem(); } }
+        function lockSystem() { isLocked = true; document.getElementById("lockScreen").classList.remove("hidden"); document.getElementById("unlockInput").value = ""; }
+        function unlockSystem() { const pass = document.getElementById("unlockInput").value.toUpperCase(); if(pass === "ADMIN" || pass === "KHUSHAL") { isLocked = false; idleTime = 0; document.getElementById("lockScreen").classList.add("hidden"); } else { document.getElementById("unlockInput").style.boxShadow = "0 0 15px red"; setTimeout(() => { document.getElementById("unlockInput").style.boxShadow = "none"; }, 1000); } }
 
-        function startVoice() { const status = document.getElementById('voiceStatus'); const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SpeechRecognition) { alert("Voice A.I. not supported."); return; } const recognition = new SpeechRecognition(); recognition.continuous = false; recognition.interimResults = false; recognition.lang = 'en-US'; recognition.onstart = function() { status.style.display = "block"; status.innerText = "🎙️ A.I. Listening..."; status.style.color = "var(--yellow)"; }; recognition.onresult = function(event) { const transcript = event.results[0][0].transcript.toLowerCase(); status.innerText = ">_ A.I. Heard: " + transcript; status.style.color = "var(--cyan)"; setTimeout(() => { status.style.display = "none"; }, 4000); if(transcript.includes("play") || transcript.includes("music") || transcript.includes("audio")) { toggleAudio(); } else if(transcript.includes("protocol zero") || transcript.includes("self destruct")) { triggerSelfDestruct(); } else { document.getElementById('statusText').innerText = ">_ A.I.: Command unrecognized."; } }; recognition.start(); }
+        let vfs = { files: [] };
+        function initVFS() { const savedVFS = localStorage.getItem('adminVFS'); if(savedVFS) { vfs = JSON.parse(savedVFS); } else { vfs.files = [{type: 'dir', name: 'logs'}, {type: 'file', name: 'readme.txt'}]; saveVFS(); } renderVFS(); }
+        function saveVFS() { localStorage.setItem('adminVFS', JSON.stringify(vfs)); }
+        function renderVFS() { const container = document.getElementById('vfsContainer'); container.innerHTML = ""; if(vfs.files.length === 0) { container.innerHTML = "<div style='color:#555; text-align:center;'>Directory is empty</div>"; return; } vfs.files.forEach((item, index) => { const icon = item.type === 'dir' ? '📁' : '📄'; const color = item.type === 'dir' ? 'var(--yellow)' : 'var(--cyan)'; container.innerHTML += `<div class="vfs-item"><span class="vfs-icon">${icon}</span> <span style="color:${color}">${item.name}</span></div>`; }); }
+
+        const bootMessages = ["Fetching Identity... [OK]", "Injecting Physics Engine... [OK]", "Calibrating Geolocation... [DONE]", "System Admin recognized."];
+        function runBootSequence() { document.getElementById("loginScreen").style.display = "none"; const bootScreen = document.getElementById("bootScreen"); bootScreen.classList.remove("hidden"); const logsBox = document.getElementById("bootLogs"); logsBox.innerHTML = ""; let delay = 0; bootMessages.forEach((msg) => { setTimeout(() => { logsBox.innerHTML += `<div><span style="color:var(--magenta)">[${(Math.random() * 2).toFixed(4)}]</span> ${msg}</div>`; }, delay); delay += 150 + Math.random() * 200; }); setTimeout(() => { bootScreen.classList.add("hidden"); document.getElementById("mainContent").classList.remove("hidden"); startSystem(); }, delay + 500); }
+        function processLogin() { const pass = document.getElementById("passInput").value.toUpperCase(); if(pass === "ADMIN" || pass === "KHUSHAL") { localStorage.setItem("hasAccess", "true"); runBootSequence(); } else { document.getElementById("errorMsg").style.display = "block"; } }
+        
+        function startSystem() { initParticles(); fetchGitHubData(); fetchNewsData(); startHUD(); setupCLI(); startTelemetry(); initScrollAnimations(); initChart(); initDraggable(); setTimeout(initMap, 500); }
+
+        async function initCamera() { const video = document.getElementById('secCam'); const btn = document.getElementById('camBtn'); const overlay = document.getElementById('camOverlay'); try { const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }); video.srcObject = stream; video.style.display = "block"; overlay.style.display = "block"; btn.style.display = "none"; } catch(err) { btn.innerText = "ACCESS DENIED"; btn.style.background = "#ff3e3e"; } }
+        function startVoice() { const status = document.getElementById('voiceStatus'); const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SpeechRecognition) { alert("Voice A.I. not supported."); return; } const recognition = new SpeechRecognition(); recognition.continuous = false; recognition.interimResults = false; recognition.lang = 'en-US'; recognition.onstart = function() { status.style.display = "block"; status.innerText = "🎙️ A.I. Listening..."; status.style.color = "var(--yellow)"; }; recognition.onresult = function(event) { const transcript = event.results[0][0].transcript.toLowerCase(); status.innerText = ">_ A.I. Heard: " + transcript; status.style.color = "var(--cyan)"; setTimeout(() => { status.style.display = "none"; }, 4000); if(transcript.includes("play") || transcript.includes("music") || transcript.includes("audio")) { toggleAudio(); } else if(transcript.includes("clear") || transcript.includes("task")) { executeCommand("/clear"); } else if(transcript.includes("protocol zero") || transcript.includes("self destruct")) { triggerSelfDestruct(); } else { document.getElementById('statusText').innerText = ">_ A.I.: Command unrecognized."; } }; recognition.start(); }
 
         let trafficChart; function initChart() { const ctx = document.getElementById('trafficChart').getContext('2d'); const initData = Array.from({length: 20}, () => Math.floor(Math.random() * 100)); trafficChart = new Chart(ctx, { type: 'line', data: { labels: Array.from({length: 20}, () => ''), datasets: [{ label: 'Packets/sec', data: initData, borderColor: '#00f3ff', backgroundColor: 'rgba(0, 243, 255, 0.1)', borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, animation: false, scales: { x: { display: false }, y: { display: true, min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } } }, plugins: { legend: { display: false } } } }); setInterval(() => { const data = trafficChart.data.datasets[0].data; data.push(Math.floor(Math.random() * (100 - 20) + 20)); data.shift(); trafficChart.update(); }, 800); }
 
@@ -308,6 +315,9 @@
 
         function initParticles() { particlesJS("particles-js", { "particles": { "number": { "value": 60, "density": { "enable": true, "value_area": 800 } }, "color": { "value": ["#00f3ff", "#ff00ea"] }, "shape": { "type": "circle" }, "opacity": { "value": 0.5, "random": true }, "size": { "value": 3, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#00f3ff", "opacity": 0.4, "width": 1 }, "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false } }, "interactivity": { "detect_on": "window", "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" } } }, "retina_detect": true }); }
         function initScrollAnimations() { function reveal() { var reveals = document.querySelectorAll(".reveal"); for (var i = 0; i < reveals.length; i++) { var windowHeight = window.innerHeight; var elementTop = reveals[i].getBoundingClientRect().top; var elementVisible = 50; if (elementTop < windowHeight - elementVisible) { reveals[i].classList.add("active"); } else { reveals[i].classList.remove("active"); } } } window.addEventListener("scroll", reveal); reveal(); }
+
+        const scratchpad = document.getElementById('scratchpad'); scratchpad.addEventListener('input', () => { localStorage.setItem('adminScratchpad', scratchpad.value); });
+        function loadScratchpad() { const saved = localStorage.getItem('adminScratchpad'); if(saved) scratchpad.value = saved; }
 
         let isAudioPlaying = false; let audioCtx, analyser, source, dataArray; let visualizerInitialized = false;
         function initRealVisualizer() { const a = document.getElementById("myAudio"); const AudioContext = window.AudioContext || window.webkitAudioContext; audioCtx = new AudioContext(); analyser = audioCtx.createAnalyser(); analyser.fftSize = 64; analyser.smoothingTimeConstant = 0.85; source = audioCtx.createMediaElementSource(a); source.connect(analyser); analyser.connect(audioCtx.destination); const bufferLength = analyser.frequencyBinCount; dataArray = new Uint8Array(bufferLength); visualizerInitialized = true; drawRealVisualizer(); }
@@ -318,6 +328,11 @@
         function startTelemetry() { setInterval(() => { let temp = (Math.random() * (105 - 95) + 95).toFixed(0); document.getElementById('tempText').innerText = temp + " °C"; document.getElementById('tempBar').style.width = (temp / 130) * 100 + "%"; }, 800); }
 
         function triggerSelfDestruct() { document.body.classList.add('destruct-mode'); const overlay = document.createElement('div'); overlay.id = "destructOverlay"; document.body.appendChild(overlay); let count = 5; overlay.innerHTML = `SYSTEM PURGE IN<br><span style="color:#eaff00">${count}</span>`; let countdown = setInterval(() => { count--; overlay.innerHTML = `SYSTEM PURGE IN<br><span style="color:#eaff00">${count}</span>`; if(count <= 0) { clearInterval(countdown); document.body.innerHTML = `<div style="color:#00f3ff; padding:20px; font-family:monospace; font-size:1.5rem; display:flex; height:100vh; align-items:center; justify-content:center;">>_ SYSTEM WIPED.</div>`; document.body.classList.remove('destruct-mode'); document.body.style.background = "#000"; } }, 1000); }
+
+        function addTask() { let input = document.getElementById("taskInput"); if(input.value === '') return; let li = document.createElement("li"); li.innerHTML = `<span class="task-text" onclick="toggleTask(this)">${input.value}</span> <span class="delete-btn" onclick="this.parentElement.remove(); saveTasks();">X</span>`; document.getElementById("taskList").appendChild(li); input.value = ""; saveTasks(); }
+        function toggleTask(element) { element.parentElement.classList.toggle('completed'); if(element.parentElement.classList.contains('completed')) { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#ff00ea', '#00f3ff', '#eaff00'] }); } saveTasks(); }
+        function saveTasks() { localStorage.setItem("devTasks", document.getElementById("taskList").innerHTML); }
+        function loadTasks() { let saved = localStorage.getItem("devTasks"); if(saved) document.getElementById("taskList").innerHTML = saved; }
     </script>
 </body>
 </html>
