@@ -4,89 +4,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khushal Mourya | Hacker Space</title>
+    <title>Dr. Khushal | Mission 2026</title>
     <style>
-        body {
-            background-color: #050505;
-            color: #00ff41;
-            font-family: 'Courier New', monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
-
-        /* Neon Glow Effect */
-        .glow-text {
-            text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41;
-            animation: pulse 2s infinite alternate;
-        }
-
-        @keyframes pulse {
-            from { opacity: 0.8; }
-            to { opacity: 1; text-shadow: 0 0 20px #00ff41, 0 0 40px #00ff41; }
-        }
-
-        .container {
-            border: 2px solid #00ff41;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 0 25px rgba(0, 255, 65, 0.2);
-            background: rgba(0, 0, 0, 0.8);
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
-        }
-
-        img {
-            width: 100%;
-            border-radius: 10px;
-            border: 1px solid #00ff41;
-            margin: 20px 0;
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
-        }
-
-        /* Countdown Style */
-        #timer {
-            font-size: 1.2rem;
-            color: #ff3e3e;
-            border: 1px solid #ff3e3e;
-            padding: 10px;
-            margin-top: 15px;
-            display: inline-block;
-        }
+        body { background-color: #050505; color: #00ff41; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; text-align: center; }
+        .glow-text { text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41; animation: pulse 2s infinite alternate; }
+        @keyframes pulse { from { opacity: 0.8; } to { opacity: 1; text-shadow: 0 0 20px #00ff41, 0 0 40px #00ff41; } }
+        .container { border: 2px solid #00ff41; padding: 25px; border-radius: 15px; box-shadow: 0 0 25px rgba(0, 255, 65, 0.2); background: rgba(0, 0, 0, 0.9); max-width: 500px; width: 90%; }
+        img { width: 100%; border-radius: 10px; border: 1px solid #00ff41; margin: 20px 0; box-shadow: 0 0 15px rgba(0, 255, 65, 0.5); }
+        #timer { font-size: 1.2rem; color: #ff3e3e; border: 1px solid #ff3e3e; padding: 10px; margin-top: 15px; display: inline-block; }
+        
+        /* Music Button Style */
+        .music-btn { background: transparent; color: #00ff41; border: 2px solid #00ff41; padding: 12px 25px; margin-top: 20px; cursor: pointer; font-family: inherit; font-weight: bold; text-transform: uppercase; transition: 0.3s; border-radius: 5px; box-shadow: 0 0 10px #00ff41; }
+        .music-btn:hover { background: #00ff41; color: black; box-shadow: 0 0 20px #00ff41; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1 class="glow-text">KHUSHAL MOURYA</h1>
-        <p>>_ Access Level: Administrator</p>
+        <h1 class="glow-text">DR. KHUSHAL MOURYA</h1>
+        <p>>_ Status: Preparing for Surgery (NEET)</p>
         
-        <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=500" alt="Doctor" style="width:100%; max-width:500px; border:2px solid #00ff41; margin-top:20px;">
-        
+        <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=500" alt="Future Doctor">
 
-        <h3 style="color: white;">TARGET: NEET 2026</h3>
-        <div id="timer">Calculating time to Mission...</div>
+        <h3 style="color: white;">MISSION: NEET 2026</h3>
+        <div id="timer">Initializing...</div>
+
+        <audio id="myAudio" loop>
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        </audio>
+        <button class="music-btn" onclick="toggleMusic()" id="btnText">🎧 Start Mission Music</button>
     </div>
 
     <script>
-        // Countdown Logic
-        const targetDate = new Date("May 3, 2026 10:00:00").getTime();
+        // Music Logic
+        const audio = document.getElementById("myAudio");
+        const btn = document.getElementById("btnText");
+        function toggleMusic() {
+            if (audio.paused) { audio.play(); btn.innerHTML = "⏸ Pause Music"; } 
+            else { audio.pause(); btn.innerHTML = "🎧 Start Mission Music"; }
+        }
 
+        // Timer Logic
+        const targetDate = new Date("May 3, 2026 10:00:00").getTime();
         setInterval(function() {
             const now = new Date().getTime();
             const diff = targetDate - now;
-
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const secs = Math.floor((diff % (1000 * 60)) / 1000);
-
-            document.getElementById("timer").innerHTML = 
-                days + "d " + hours + "h " + mins + "m " + secs + "s Left";
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+            document.getElementById("timer").innerHTML = d + "d " + h + "h " + m + "m " + s + "s Left";
         }, 1000);
     </script>
 </body>
