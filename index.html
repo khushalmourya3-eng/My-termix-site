@@ -4,25 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Admin | Level 11 God-Tier</title>
+    <title>System Admin | Level 12 OS</title>
     
+    <link rel="manifest" href='data:application/manifest+json,{"name":"System Admin","short_name":"Admin OS","start_url":".","display":"standalone","background_color":"#050510","theme_color":"#00f3ff","icons":[{"src":"https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png","sizes":"512x512","type":"image/png"}]}'>
+
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
         html { scroll-behavior: smooth; }
         :root { --cyan: #00f3ff; --magenta: #ff00ea; --yellow: #eaff00; --glass-bg: rgba(10, 10, 20, 0.7); --glass-border: rgba(255, 255, 255, 0.1); }
 
-        body { margin: 0; padding: 0; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #050510; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        body { margin: 0; padding: 0; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #050510; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; user-select: none; }
         
         #particles-js { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background: radial-gradient(circle at 50% 50%, #1a0033, #050510 80%); }
 
         .rainbow-text { background: linear-gradient(90deg, var(--cyan), var(--magenta), var(--yellow), var(--cyan)); background-size: 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientMove 5s ease infinite; font-weight: bold; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
         @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
 
-        #loginScreen, #bootScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050510; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #loginScreen, #bootScreen, #lockScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050510; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
         #bootScreen { justify-content: flex-end; padding: 20px; box-sizing: border-box; font-family: 'Courier New', monospace; color: var(--cyan); }
+        #lockScreen { z-index: 10000; background: rgba(5, 5, 16, 0.9); }
         
-        .login-box { border: 1px solid var(--cyan); padding: 40px; text-align: center; border-radius: 20px; box-shadow: 0 0 30px rgba(0, 243, 255, 0.3); background: var(--glass-bg); backdrop-filter: blur(10px); width: 80%; max-width: 400px; }
+        .login-box { border: 1px solid var(--cyan); padding: 40px; text-align: center; border-radius: 20px; box-shadow: 0 0 30px rgba(0, 243, 255, 0.3); background: var(--glass-bg); width: 80%; max-width: 400px; }
         .login-input { background: rgba(0,0,0,0.5); color: var(--cyan); border: 1px solid var(--cyan); padding: 12px; margin: 20px 0; outline: none; text-align: center; font-family: inherit; font-size: 1.2rem; width: 80%; border-radius: 8px; transition: 0.3s; }
         .login-input:focus { box-shadow: 0 0 15px var(--cyan); }
         
@@ -37,9 +42,8 @@
         
         .btn { background: linear-gradient(45deg, var(--magenta), #7b00ff); color: white; border: none; padding: 12px 25px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: 0.3s; border-radius: 8px; box-shadow: 0 5px 20px rgba(255, 0, 234, 0.4); width: 100%; letter-spacing: 1px; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 0, 234, 0.6); }
-        #logoutBtn { background: transparent; color: #ff3e3e; border: 1px solid #ff3e3e; box-shadow: none; width: auto; font-size: 0.8rem; padding: 8px 15px; margin-top: 10px; }
 
-        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 15px; padding: 20px; margin-top: 25px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); text-align: left; transition: transform 0.3s, box-shadow 0.3s; }
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 15px; padding: 20px; margin-top: 25px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); text-align: left; transition: transform 0.3s, box-shadow 0.3s; }
         .glass-panel:hover { box-shadow: 0 12px 40px rgba(0, 243, 255, 0.15); border-color: rgba(0, 243, 255, 0.3); }
         .glass-panel h3 { text-align: center; margin-top: 0; color: #fff; font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
         
@@ -51,52 +55,38 @@
         .gh-stats { flex-grow: 1; margin-left: 15px; }
         .gh-name { font-size: 1.2rem; font-weight: bold; color: var(--cyan); }
         .gh-info { font-size: 0.85rem; color: #aaa; margin-top: 5px; }
-        .gh-info span { color: var(--yellow); font-weight: bold; }
 
-        .news-post { background: rgba(0,0,0,0.5); padding: 10px; margin-bottom: 8px; border-radius: 5px; border-left: 3px solid var(--cyan); font-size: 0.85rem; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .news-post { background: rgba(0,0,0,0.5); padding: 10px; margin-bottom: 8px; border-radius: 5px; border-left: 3px solid var(--cyan); font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .news-post a { color: #fff; text-decoration: none; }
-        .news-post:hover { background: rgba(0, 243, 255, 0.2); transform: translateX(5px); border-left-color: var(--magenta); }
 
-        .sys-info { font-size: 0.9rem; margin: 10px 0; color: #bbb; display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px; }
-        .sys-info span { color: var(--yellow); font-family: 'Courier New', monospace; }
+        /* VFS Styling */
+        .vfs-item { display: flex; align-items: center; padding: 8px; background: rgba(0,0,0,0.4); margin-bottom: 5px; border-radius: 5px; font-family: monospace; font-size: 0.9rem; border: 1px solid transparent; transition: 0.2s; }
+        .vfs-item:hover { border-color: var(--cyan); background: rgba(0, 243, 255, 0.1); }
+        .vfs-icon { font-size: 1.2rem; margin-right: 10px; }
 
         /* Security Cam Filter */
-        .sec-cam-container { position: relative; border: 1px solid var(--cyan); border-radius: 8px; overflow: hidden; background: #000; min-height: 180px; display: flex; justify-content: center; align-items: center; box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.2); }
+        .sec-cam-container { position: relative; border: 1px solid var(--cyan); border-radius: 8px; overflow: hidden; background: #000; min-height: 180px; display: flex; justify-content: center; align-items: center; }
         #secCam { width: 100%; filter: sepia(100%) hue-rotate(130deg) saturate(300%) contrast(1.5); display: none; object-fit: cover; }
-        .cam-overlay { position: absolute; top: 10px; left: 10px; color: var(--cyan); font-family: monospace; font-size: 0.8rem; font-weight: bold; text-shadow: 0 0 5px var(--cyan); z-index: 5; pointer-events: none; display: none; }
+        .cam-overlay { position: absolute; top: 10px; left: 10px; color: var(--cyan); font-family: monospace; font-size: 0.8rem; font-weight: bold; z-index: 5; display: none; }
         .rec-dot { display: inline-block; width: 8px; height: 8px; background: red; border-radius: 50%; animation: flash 1s infinite; margin-right: 5px; }
-        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+        @keyframes flash { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
         .t-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; color: #ccc; }
-        .t-bar-bg { width: 100%; background: rgba(0,0,0,0.5); height: 12px; border-radius: 6px; margin-bottom: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
-        .t-bar-fill { height: 100%; transition: width 0.3s ease-out; }
-        #tempBar { background: linear-gradient(90deg, #ff416c, #ff4b2b); }
+        .t-bar-bg { width: 100%; background: rgba(0,0,0,0.5); height: 12px; border-radius: 6px; margin-bottom: 15px; overflow: hidden; }
+        .t-bar-fill { height: 100%; transition: width 0.3s ease-out; background: linear-gradient(90deg, #ff416c, #ff4b2b); }
 
         #visualizer { width: 100%; height: 70px; background: rgba(0,0,0,0.4); border-radius: 8px; margin-top: 15px; border: 1px solid var(--glass-border); }
-        #scratchpad { width: 100%; height: 120px; background: rgba(0,0,0,0.4); color: var(--cyan); border: 1px solid var(--glass-border); border-radius: 8px; padding: 12px; font-family: 'Courier New', monospace; outline: none; resize: none; box-sizing: border-box; transition: 0.3s; }
         
-        .input-group { display: flex; gap: 10px; }
-        #taskInput { flex-grow: 1; padding: 12px; background: rgba(0,0,0,0.4); color: white; border: 1px solid var(--glass-border); border-radius: 8px; outline: none; }
-        #addBtn { width: 80px; padding: 12px; background: var(--magenta); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; }
-        ul { list-style-type: none; padding: 0; margin-top: 20px; }
-        li { padding: 12px 15px; background: rgba(0,0,0,0.3); margin-bottom: 8px; border-radius: 8px; cursor: pointer; transition: 0.3s; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--cyan); }
-        .completed { opacity: 0.6; border-left-color: #555; }
-        .completed .task-text { text-decoration: line-through; text-decoration-color: var(--magenta); text-decoration-thickness: 2px; }
-        .delete-btn { color: #ff3e3e; font-weight: bold; padding: 5px 10px; background: rgba(255,0,0,0.1); border-radius: 5px; }
-
         .cli-box { border: 1px solid var(--cyan); padding: 15px; background: rgba(0,0,0,0.7); border-radius: 10px; display: flex; align-items: center; box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.1); }
         .cli-prompt { font-family: 'Courier New', monospace; color: var(--cyan); font-weight: bold; margin-right: 15px; }
         #cliInput { background: transparent; border: none; color: white; font-family: 'Courier New', monospace; width: 100%; outline: none; font-size: 1rem; }
         
-        /* Voice Mic Button */
-        #voiceBtn { background: transparent; border: none; font-size: 1.5rem; cursor: pointer; margin-left: 10px; transition: 0.2s; text-shadow: 0 0 10px var(--cyan); }
-        #voiceBtn:hover { transform: scale(1.2); }
-        #voiceStatus { font-size: 0.8rem; color: var(--yellow); padding-bottom: 10px; text-align: center; width: 100%; display: none; font-family: monospace; }
-
-        .panic-btn { background: rgba(255, 0, 0, 0.1); border: 1px solid #ff3e3e; color: #ff3e3e; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 10px; width: 100%; transition: 0.3s; letter-spacing: 2px; }
-        @keyframes destructFlash { 0% { background-color: black; } 50% { background-color: #ff00ea; } 100% { background-color: black; } }
+        #voiceBtn { background: transparent; border: none; font-size: 1.5rem; cursor: pointer; margin-left: 10px; transition: 0.2s; }
+        #voiceStatus { font-size: 0.8rem; color: var(--yellow); padding-bottom: 10px; text-align: center; display: none; font-family: monospace; }
+        
+        .panic-btn { background: rgba(255, 0, 0, 0.1); border: 1px solid #ff3e3e; color: #ff3e3e; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 10px; width: 100%; margin-top: 25px; transition: 0.3s; letter-spacing: 2px; }
+        @keyframes destructFlash { 0%, 100% { background-color: black; } 50% { background-color: #ff00ea; } }
         .destruct-mode { animation: destructFlash 0.3s infinite; }
-        #destructOverlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,0,0,0.9); z-index: 10000; display:flex; justify-content:center; align-items:center; color:white; font-size: 4rem; font-weight:bold; text-align: center; }
     </style>
 </head>
 <body>
@@ -106,10 +96,18 @@
     <div id="loginScreen">
         <div class="login-box">
             <h2 class="rainbow-text" style="font-size: 2rem; margin-top: 0;">TERMINAL ACCESS</h2>
-            <p style="color: #aaa;">>_ Awaiting Authorization:</p>
             <input type="password" id="passInput" class="login-input" placeholder="Enter Password">
             <button class="btn" onclick="processLogin()">LOGIN</button>
             <p id="errorMsg" style="color: #ff3e3e; display: none; margin-top: 15px; font-weight: bold;">[!] ACCESS DENIED</p>
+        </div>
+    </div>
+
+    <div id="lockScreen" class="hidden">
+        <div class="login-box" style="border-color: #ff3e3e; box-shadow: 0 0 30px rgba(255, 0, 0, 0.4);">
+            <h2 style="color: #ff3e3e; font-family: monospace;">SYSTEM LOCKED</h2>
+            <p style="color: #aaa; font-size: 0.8rem;">Idle timeout exceeded (60s).</p>
+            <input type="password" id="unlockInput" class="login-input" placeholder="Verify Identity" style="border-color: #ff3e3e; color: #ff3e3e;">
+            <button class="btn" style="background: #ff3e3e;" onclick="unlockSystem()">UNLOCK</button>
         </div>
     </div>
 
@@ -126,8 +124,7 @@
         <div class="container" id="mainContainer">
             <h1 class="rainbow-text" style="font-size: 2.5rem; margin-bottom: 5px;">SYSTEM ADMIN</h1>
             <p id="statusText" style="color: var(--cyan); font-family: monospace; margin-top: 0;">>_ Status: Online</p>
-            <button id="logoutBtn" class="btn" onclick="logout()">[ Log Out ]</button>
-
+            
             <div class="glass-panel reveal">
                 <h3>🐙 DEVELOPER IDENTITY</h3>
                 <div class="gh-badge">
@@ -137,6 +134,13 @@
                         <div class="gh-info">Repos: <span id="gh-repos">--</span> | Followers: <span id="gh-followers">--</span></div>
                     </div>
                 </div>
+            </div>
+
+            <div class="glass-panel reveal">
+                <h3>🗂️ VIRTUAL DIRECTORY</h3>
+                <div style="font-size: 0.75rem; color: #aaa; margin-bottom: 10px; text-align: center;">Use CLI: <b style="color:var(--magenta)">/mkdir [name]</b> or <b style="color:var(--magenta)">/touch [name]</b> or <b style="color:var(--magenta)">/rm [name]</b></div>
+                <div id="vfsContainer" style="min-height: 80px; max-height: 200px; overflow-y: auto;">
+                    </div>
             </div>
 
             <div class="glass-panel reveal">
@@ -154,11 +158,6 @@
             </div>
 
             <div class="glass-panel reveal">
-                <h3>📝 Secure Scratchpad</h3>
-                <textarea id="scratchpad" placeholder="Draft your code, logic, or ideas..."></textarea>
-            </div>
-
-            <div class="glass-panel reveal">
                 <h3>🎵 Audio Terminal</h3>
                 <canvas id="visualizer"></canvas>
                 <button id="audioBtn" class="btn" style="margin-top: 15px; background: linear-gradient(45deg, #00f3ff, #0051ff);" onclick="toggleAudio()">▶ PLAY AUDIO</button>
@@ -166,20 +165,9 @@
 
             <div class="glass-panel reveal">
                 <h3>📈 SERVER TRAFFIC MATRIX</h3>
-                <div style="height: 150px; width: 100%;">
-                    <canvas id="trafficChart"></canvas>
-                </div>
+                <div style="height: 150px; width: 100%;"><canvas id="trafficChart"></canvas></div>
                 <div class="t-row" style="margin-top: 15px;"><span>CPU TEMP</span><span id="tempText" style="color: #ff416c">90 °C</span></div>
                 <div class="t-bar-bg"><div class="t-bar-fill" id="tempBar" style="width: 50%;"></div></div>
-            </div>
-
-            <div class="glass-panel reveal">
-                <h3>✅ Daily Targets</h3>
-                <div class="input-group">
-                    <input type="text" id="taskInput" placeholder="Add a new target...">
-                    <button id="addBtn" onclick="addTask()">ADD</button>
-                </div>
-                <ul id="taskList"></ul>
             </div>
 
             <audio id="myAudio" loop crossorigin="anonymous"><source src="music.mp3" type="audio/mpeg"></audio>
@@ -189,19 +177,84 @@
                 <div class="cli-box" style="width: 100%; border: 1px solid var(--cyan); margin: 0; display: flex;">
                     <span class="cli-prompt">root@admin:~#</span>
                     <input type="text" id="cliInput" placeholder="Type /help or use mic..." autocomplete="off">
-                    <button id="voiceBtn" onclick="startVoice()" title="Activate A.I.">🎙️</button>
+                    <button id="voiceBtn" onclick="startVoice()">🎙️</button>
                 </div>
             </div>
 
-            <div class="glass-panel reveal" style="background: transparent; border: none; box-shadow: none;">
-                <button class="panic-btn" onclick="triggerSelfDestruct()">⚠️ INITIATE PROTOCOL ZERO</button>
-            </div>
+            <button class="panic-btn" onclick="triggerSelfDestruct()">⚠️ INITIATE PROTOCOL ZERO</button>
         </div>
     </div>
 
     <script>
-        const bootMessages = ["Fetching Identity... [OK]", "Injecting Chart.js... [OK]", "Initializing A.I. Modules... [DONE]", "System Admin recognized."];
+        // --- 1. SECURITY IDLE LOCK LOGIC ---
+        let idleTime = 0;
+        let isLocked = false;
         
+        // Reset timer on any interaction
+        function resetIdleTimer() { if(!isLocked) idleTime = 0; }
+        window.onload = function() {
+            document.onmousemove = resetIdleTimer;
+            document.onkeypress = resetIdleTimer;
+            document.ontouchstart = resetIdleTimer; // For mobile taps
+            
+            setInterval(checkIdle, 1000); // Check every second
+            
+            initVFS();
+            if(localStorage.getItem("hasAccess") === "true") { runBootSequence(); }
+        };
+
+        function checkIdle() {
+            if(document.getElementById("mainContent").classList.contains("hidden")) return; // Don't run if on login/boot screen
+            idleTime++;
+            if (idleTime >= 60 && !isLocked) { // 60 seconds idle
+                lockSystem();
+            }
+        }
+
+        function lockSystem() {
+            isLocked = true;
+            document.getElementById("lockScreen").classList.remove("hidden");
+            document.getElementById("unlockInput").value = "";
+        }
+
+        function unlockSystem() {
+            const pass = document.getElementById("unlockInput").value.toUpperCase();
+            if(pass === "ADMIN" || pass === "KHUSHAL") {
+                isLocked = false;
+                idleTime = 0;
+                document.getElementById("lockScreen").classList.add("hidden");
+            } else {
+                document.getElementById("unlockInput").style.boxShadow = "0 0 15px red";
+                setTimeout(() => { document.getElementById("unlockInput").style.boxShadow = "none"; }, 1000);
+            }
+        }
+
+        // --- 2. VIRTUAL FILE SYSTEM (VFS) LOGIC ---
+        let vfs = { files: [] };
+
+        function initVFS() {
+            const savedVFS = localStorage.getItem('adminVFS');
+            if(savedVFS) { vfs = JSON.parse(savedVFS); }
+            else { vfs.files = [{type: 'dir', name: 'logs'}, {type: 'file', name: 'readme.txt'}]; saveVFS(); }
+            renderVFS();
+        }
+
+        function saveVFS() { localStorage.setItem('adminVFS', JSON.stringify(vfs)); }
+
+        function renderVFS() {
+            const container = document.getElementById('vfsContainer');
+            container.innerHTML = "";
+            if(vfs.files.length === 0) { container.innerHTML = "<div style='color:#555; text-align:center;'>Directory is empty</div>"; return; }
+            
+            vfs.files.forEach((item, index) => {
+                const icon = item.type === 'dir' ? '📁' : '📄';
+                const color = item.type === 'dir' ? 'var(--yellow)' : 'var(--cyan)';
+                container.innerHTML += `<div class="vfs-item"><span class="vfs-icon">${icon}</span> <span style="color:${color}">${item.name}</span></div>`;
+            });
+        }
+
+        // --- BOOT SYSTEM ---
+        const bootMessages = ["Fetching Identity... [OK]", "Injecting Chart.js... [OK]", "Mounting Virtual File System... [OK]", "Initializing Idle Protocols... [DONE]", "System Admin recognized."];
         function runBootSequence() {
             document.getElementById("loginScreen").style.display = "none";
             const bootScreen = document.getElementById("bootScreen"); bootScreen.classList.remove("hidden");
@@ -212,115 +265,59 @@
         }
 
         function processLogin() { const pass = document.getElementById("passInput").value.toUpperCase(); if(pass === "ADMIN" || pass === "KHUSHAL") { localStorage.setItem("hasAccess", "true"); runBootSequence(); } else { document.getElementById("errorMsg").style.display = "block"; } }
-        function logout() { localStorage.removeItem("hasAccess"); location.reload(); }
-
-        window.onload = function() { loadTasks(); loadScratchpad(); if(localStorage.getItem("hasAccess") === "true") { runBootSequence(); } };
         
         function startSystem() { initParticles(); fetchGitHubData(); fetchNewsData(); startHUD(); setupCLI(); startTelemetry(); initScrollAnimations(); initChart(); }
 
-        // --- NEW: WEBRTC SECURITY CAMERA ---
-        async function initCamera() {
-            const video = document.getElementById('secCam');
-            const btn = document.getElementById('camBtn');
-            const overlay = document.getElementById('camOverlay');
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                video.srcObject = stream;
-                video.style.display = "block";
-                overlay.style.display = "block";
-                btn.style.display = "none";
-            } catch(err) {
-                btn.innerText = "ACCESS DENIED / NO CAM";
-                btn.style.background = "#ff3e3e";
-                console.error("Camera error:", err);
+        // --- CLI UPDATED FOR VFS ---
+        function setupCLI() { const cli = document.getElementById('cliInput'); cli.addEventListener('keypress', function(e) { if(e.key === 'Enter') { executeCommand(cli.value.toLowerCase().trim()); cli.value = ''; resetIdleTimer(); } }); }
+        
+        function executeCommand(cmd) { 
+            const status = document.getElementById('statusText'); 
+            const parts = cmd.split(' ');
+            const command = parts[0];
+            const arg = parts[1];
+
+            if(command === '/help') { 
+                alert("COMMANDS:\n/play (toggle audio)\n/mkdir [name] (create folder)\n/touch [name] (create file)\n/rm [name] (delete item)"); 
+            } 
+            else if(command === '/play') { toggleAudio(); } 
+            else if(command === '/mkdir' && arg) {
+                vfs.files.push({type: 'dir', name: arg}); saveVFS(); renderVFS(); status.innerText = `>_ Directory created: ${arg}`;
             }
+            else if(command === '/touch' && arg) {
+                vfs.files.push({type: 'file', name: arg}); saveVFS(); renderVFS(); status.innerText = `>_ File created: ${arg}`;
+            }
+            else if(command === '/rm' && arg) {
+                const initialLength = vfs.files.length;
+                vfs.files = vfs.files.filter(item => item.name !== arg);
+                if(vfs.files.length < initialLength) { saveVFS(); renderVFS(); status.innerText = `>_ Item deleted: ${arg}`; }
+                else { status.innerText = `>_ Error: Item not found.`; }
+            }
+            else { status.innerText = ">_ Error: Command not found or missing argument."; } 
         }
 
-        // --- NEW: VOICE COMMAND A.I. ---
-        function startVoice() {
-            const status = document.getElementById('voiceStatus');
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            
-            if (!SpeechRecognition) { alert("Voice A.I. not supported in this browser."); return; }
-            
-            const recognition = new SpeechRecognition();
-            recognition.continuous = false; recognition.interimResults = false; recognition.lang = 'en-US';
-            
-            recognition.onstart = function() {
-                status.style.display = "block";
-                status.innerText = "🎙️ A.I. Listening... (Say 'play audio', 'clear tasks', or 'self destruct')";
-                status.style.color = "var(--yellow)";
-            };
-            
-            recognition.onresult = function(event) {
-                const transcript = event.results[0][0].transcript.toLowerCase();
-                status.innerText = ">_ A.I. Heard: " + transcript;
-                status.style.color = "var(--cyan)";
-                setTimeout(() => { status.style.display = "none"; }, 4000);
-                
-                // Logic Parser
-                if(transcript.includes("play") || transcript.includes("music") || transcript.includes("audio")) {
-                    toggleAudio();
-                } else if(transcript.includes("clear") || transcript.includes("task") || transcript.includes("wipe")) {
-                    executeCommand("/clear");
-                } else if(transcript.includes("protocol zero") || transcript.includes("self destruct") || transcript.includes("destroy")) {
-                    triggerSelfDestruct();
-                } else {
-                    document.getElementById('statusText').innerText = ">_ A.I.: Command unrecognized.";
-                }
-            };
-            recognition.onerror = function() { status.innerText = ">_ Voice Error. Try again."; setTimeout(() => { status.style.display = "none"; }, 3000); };
-            recognition.start();
-        }
+        // --- CAMERA, VOICE, CHART & GRAPHICS (Retained from Level 11) ---
+        async function initCamera() { const video = document.getElementById('secCam'); const btn = document.getElementById('camBtn'); const overlay = document.getElementById('camOverlay'); try { const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } }); video.srcObject = stream; video.style.display = "block"; overlay.style.display = "block"; btn.style.display = "none"; } catch(err) { btn.innerText = "ACCESS DENIED"; btn.style.background = "#ff3e3e"; } }
 
-        // --- NEW: CHART.JS SERVER MATRIX ---
-        let trafficChart;
-        function initChart() {
-            const ctx = document.getElementById('trafficChart').getContext('2d');
-            const initData = Array.from({length: 20}, () => Math.floor(Math.random() * 100));
-            trafficChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: Array.from({length: 20}, () => ''),
-                    datasets: [{ label: 'Packets/sec', data: initData, borderColor: '#00f3ff', backgroundColor: 'rgba(0, 243, 255, 0.1)', borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, animation: false, scales: { x: { display: false }, y: { display: true, min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } } }, plugins: { legend: { display: false } } }
-            });
+        function startVoice() { const status = document.getElementById('voiceStatus'); const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SpeechRecognition) { alert("Voice A.I. not supported."); return; } const recognition = new SpeechRecognition(); recognition.continuous = false; recognition.interimResults = false; recognition.lang = 'en-US'; recognition.onstart = function() { status.style.display = "block"; status.innerText = "🎙️ A.I. Listening..."; status.style.color = "var(--yellow)"; }; recognition.onresult = function(event) { const transcript = event.results[0][0].transcript.toLowerCase(); status.innerText = ">_ A.I. Heard: " + transcript; status.style.color = "var(--cyan)"; setTimeout(() => { status.style.display = "none"; }, 4000); if(transcript.includes("play") || transcript.includes("music") || transcript.includes("audio")) { toggleAudio(); } else if(transcript.includes("protocol zero") || transcript.includes("self destruct")) { triggerSelfDestruct(); } else { document.getElementById('statusText').innerText = ">_ A.I.: Command unrecognized."; } }; recognition.start(); }
 
-            setInterval(() => {
-                const data = trafficChart.data.datasets[0].data;
-                data.push(Math.floor(Math.random() * (100 - 20) + 20)); // Generate new packet data
-                data.shift(); // Remove oldest
-                trafficChart.update();
-            }, 800);
-        }
+        let trafficChart; function initChart() { const ctx = document.getElementById('trafficChart').getContext('2d'); const initData = Array.from({length: 20}, () => Math.floor(Math.random() * 100)); trafficChart = new Chart(ctx, { type: 'line', data: { labels: Array.from({length: 20}, () => ''), datasets: [{ label: 'Packets/sec', data: initData, borderColor: '#00f3ff', backgroundColor: 'rgba(0, 243, 255, 0.1)', borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, animation: false, scales: { x: { display: false }, y: { display: true, min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } } }, plugins: { legend: { display: false } } } }); setInterval(() => { const data = trafficChart.data.datasets[0].data; data.push(Math.floor(Math.random() * (100 - 20) + 20)); data.shift(); trafficChart.update(); }, 800); }
 
         function fetchGitHubData() { fetch('https://api.github.com/users/khushalmourya3-eng').then(res => res.json()).then(data => { document.getElementById('gh-avatar').src = data.avatar_url; document.getElementById('gh-name').innerText = data.name || data.login; document.getElementById('gh-repos').innerText = data.public_repos; document.getElementById('gh-followers').innerText = data.followers; }).catch(err => { document.getElementById('gh-name').innerText = "API Offline"; }); }
         function fetchNewsData() { fetch('https://dev.to/api/articles?tag=webdev&top=1&per_page=5').then(res => res.json()).then(data => { let feed = document.getElementById('newsFeed'); feed.innerHTML = ''; data.forEach(post => { feed.innerHTML += `<div class="news-post"><a href="${post.url}" target="_blank">> ${post.title}</a></div>`; }); }).catch(err => { document.getElementById('newsFeed').innerHTML = "Uplink Failed."; }); }
 
-        function initParticles() { particlesJS("particles-js", { "particles": { "number": { "value": 60, "density": { "enable": true, "value_area": 800 } }, "color": { "value": ["#00f3ff", "#ff00ea"] }, "shape": { "type": "circle" }, "opacity": { "value": 0.5, "random": true }, "size": { "value": 3, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#00f3ff", "opacity": 0.4, "width": 1 }, "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false } }, "interactivity": { "detect_on": "window", "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true }, "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 1 } }, "push": { "particles_nb": 4 } } }, "retina_detect": true }); }
+        function initParticles() { particlesJS("particles-js", { "particles": { "number": { "value": 60, "density": { "enable": true, "value_area": 800 } }, "color": { "value": ["#00f3ff", "#ff00ea"] }, "shape": { "type": "circle" }, "opacity": { "value": 0.5, "random": true }, "size": { "value": 3, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#00f3ff", "opacity": 0.4, "width": 1 }, "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false } }, "interactivity": { "detect_on": "window", "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" } } }, "retina_detect": true }); }
         function initScrollAnimations() { function reveal() { var reveals = document.querySelectorAll(".reveal"); for (var i = 0; i < reveals.length; i++) { var windowHeight = window.innerHeight; var elementTop = reveals[i].getBoundingClientRect().top; var elementVisible = 50; if (elementTop < windowHeight - elementVisible) { reveals[i].classList.add("active"); } else { reveals[i].classList.remove("active"); } } } window.addEventListener("scroll", reveal); reveal(); }
-        
-        const scratchpad = document.getElementById('scratchpad'); scratchpad.addEventListener('input', () => { localStorage.setItem('adminScratchpad', scratchpad.value); });
-        function loadScratchpad() { const saved = localStorage.getItem('adminScratchpad'); if(saved) scratchpad.value = saved; }
 
         let isAudioPlaying = false; let audioCtx, analyser, source, dataArray; let visualizerInitialized = false;
         function initRealVisualizer() { const a = document.getElementById("myAudio"); const AudioContext = window.AudioContext || window.webkitAudioContext; audioCtx = new AudioContext(); analyser = audioCtx.createAnalyser(); analyser.fftSize = 64; analyser.smoothingTimeConstant = 0.85; source = audioCtx.createMediaElementSource(a); source.connect(analyser); analyser.connect(audioCtx.destination); const bufferLength = analyser.frequencyBinCount; dataArray = new Uint8Array(bufferLength); visualizerInitialized = true; drawRealVisualizer(); }
         function drawRealVisualizer() { const canvas = document.getElementById('visualizer'); const ctx = canvas.getContext('2d'); requestAnimationFrame(drawRealVisualizer); canvas.width = canvas.parentElement.clientWidth - 40; canvas.height = 70; const bars = analyser.frequencyBinCount; const barWidth = canvas.width / bars - 2; let gradient = ctx.createLinearGradient(0, 0, canvas.width, 0); gradient.addColorStop(0, "#00f3ff"); gradient.addColorStop(0.5, "#ff00ea"); gradient.addColorStop(1, "#eaff00"); analyser.getByteFrequencyData(dataArray); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = gradient; for(let i = 0; i < bars; i++) { let barHeight = (dataArray[i] / 255) * (canvas.height - 10) + 5; if (!isAudioPlaying) barHeight = 5; ctx.beginPath(); ctx.roundRect(i * (barWidth + 2), canvas.height - barHeight, barWidth, barHeight, [3, 3, 0, 0]); ctx.fill(); } }
-        function toggleAudio() { const a = document.getElementById("myAudio"); const btn = document.getElementById("audioBtn"); const status = document.getElementById('statusText'); if(!visualizerInitialized) { initRealVisualizer(); } if (audioCtx.state === 'suspended') { audioCtx.resume(); } if(isAudioPlaying) { a.pause(); isAudioPlaying = false; btn.innerHTML = "▶ PLAY AUDIO"; status.innerText = ">_ Status: Audio Paused"; } else { a.play().catch(e => { console.log(e); status.innerText = ">_ Error: music.mp3 missing!"; }); isAudioPlaying = true; btn.innerHTML = "⏸ PAUSE AUDIO"; status.innerText = ">_ Status: Audio Active"; } }
+        function toggleAudio() { const a = document.getElementById("myAudio"); const btn = document.getElementById("audioBtn"); const status = document.getElementById('statusText'); if(!visualizerInitialized) { initRealVisualizer(); } if (audioCtx.state === 'suspended') { audioCtx.resume(); } if(isAudioPlaying) { a.pause(); isAudioPlaying = false; btn.innerHTML = "▶ PLAY AUDIO"; status.innerText = ">_ Status: Audio Paused"; } else { a.play().catch(e => { console.log(e); }); isAudioPlaying = true; btn.innerHTML = "⏸ PAUSE AUDIO"; status.innerText = ">_ Status: Audio Active"; } }
 
         function startHUD() { setInterval(() => { document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', { hour12: false }); }, 1000); if(navigator.getBattery) { navigator.getBattery().then(b => { function u() { document.getElementById('batData').innerText = Math.floor(b.level * 100) + (b.charging ? "% ⚡" : "%"); } u(); b.addEventListener('levelchange', u); b.addEventListener('chargingchange', u); }); } if(navigator.connection) { function u() { document.getElementById('netData').innerText = navigator.connection.effectiveType.toUpperCase(); } u(); navigator.connection.addEventListener('change', u); } fetch('https://api.open-meteo.com/v1/forecast?latitude=26.9124&longitude=75.7873&current_weather=true').then(res => res.json()).then(data => { document.getElementById('weatherData').innerText = `${data.current_weather.temperature}°C`; }).catch(() => { document.getElementById('weatherData').innerText = "ERR"; }); }
         function startTelemetry() { setInterval(() => { let temp = (Math.random() * (105 - 95) + 95).toFixed(0); document.getElementById('tempText').innerText = temp + " °C"; document.getElementById('tempBar').style.width = (temp / 130) * 100 + "%"; }, 800); }
 
-        function triggerSelfDestruct() { document.body.classList.add('destruct-mode'); const overlay = document.createElement('div'); overlay.id = "destructOverlay"; document.body.appendChild(overlay); let count = 5; overlay.innerHTML = `SYSTEM PURGE IN<br><span style="color:#eaff00">${count}</span>`; let countdown = setInterval(() => { count--; overlay.innerHTML = `SYSTEM PURGE IN<br><span style="color:#eaff00">${count}</span>`; if(count <= 0) { clearInterval(countdown); document.body.innerHTML = `<div style="color:#00f3ff; padding:20px; font-family:monospace; font-size:1.5rem; display:flex; height:100vh; align-items:center; justify-content:center;">>_ SYSTEM WIPED.<br>>_ NOTHING REMAINS.</div>`; document.body.classList.remove('destruct-mode'); document.body.style.background = "#000"; } }, 1000); }
-
-        function setupCLI() { const cli = document.getElementById('cliInput'); cli.addEventListener('keypress', function(e) { if(e.key === 'Enter') { executeCommand(cli.value.toLowerCase().trim()); cli.value = ''; } }); }
-        function executeCommand(cmd) { const status = document.getElementById('statusText'); if(cmd === '/help') { alert("COMMANDS:\n/play (toggle audio)\n/clear (wipe tasks)"); } else if(cmd === '/play') { toggleAudio(); } else if(cmd === '/clear') { document.getElementById("taskList").innerHTML = ""; saveTasks(); status.innerText = ">_ Status: Memory Wiped"; } else { status.innerText = ">_ Error: Command not found."; } }
-
-        function addTask() { let input = document.getElementById("taskInput"); if(input.value === '') return; let li = document.createElement("li"); li.innerHTML = `<span class="task-text" onclick="toggleTask(this)">${input.value}</span> <span class="delete-btn" onclick="this.parentElement.remove(); saveTasks();">X</span>`; document.getElementById("taskList").appendChild(li); input.value = ""; saveTasks(); }
-        function toggleTask(element) { element.parentElement.classList.toggle('completed'); if(element.parentElement.classList.contains('completed')) { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#ff00ea', '#00f3ff', '#eaff00'] }); } saveTasks(); }
-        function saveTasks() { localStorage.setItem("devTasks", document.getElementById("taskList").innerHTML); }
-        function loadTasks() { let saved = localStorage.getItem("devTasks"); if(saved) document.getElementById("taskList").innerHTML = saved; }
+        function triggerSelfDestruct() { document.body.classList.add('destruct-mode'); const overlay = document.createElement('div'); overlay.id = "destructOverlay"; document.body.appendChild(overlay); let count = 5; overlay.innerHTML = `SYSTEM PURGE IN<br><span style="color:#eaff00">${count}</span>`; let countdown = setInterval(() => { count--; overlay.innerHTML = `SYSTEM PURGE IN<br><span style="color:#eaff00">${count}</span>`; if(count <= 0) { clearInterval(countdown); document.body.innerHTML = `<div style="color:#00f3ff; padding:20px; font-family:monospace; font-size:1.5rem; display:flex; height:100vh; align-items:center; justify-content:center;">>_ SYSTEM WIPED.</div>`; document.body.classList.remove('destruct-mode'); document.body.style.background = "#000"; } }, 1000); }
     </script>
 </body>
 </html>
