@@ -4,288 +4,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin OS | Level 15 Sentinel</title>
-    
-    <link rel="manifest" href='data:application/manifest+json,{"name":"System Admin","short_name":"Admin OS","start_url":".","display":"standalone","background_color":"#050510","theme_color":"#00f3ff","icons":[{"src":"https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png","sizes":"512x512","type":"image/png"}]}'>
-
+    <title>Admin OS | Level 17 Ghost</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
     <style>
-        html { scroll-behavior: smooth; }
-        :root { 
-            --primary: #00f3ff; --secondary: #ff00ea; --accent: #eaff00; 
-            --glass-bg: rgba(10, 10, 20, 0.7); --glass-border: rgba(255, 255, 255, 0.1); 
-        }
-
-        /* THEME PRESETS */
+        :root { --primary: #00f3ff; --secondary: #ff00ea; --accent: #eaff00; --glass-bg: rgba(5, 5, 15, 0.9); --glass-border: rgba(255, 255, 255, 0.1); }
         body.theme-toxic { --primary: #00ff41; --secondary: #003b00; --accent: #adff2f; }
         body.theme-amber { --primary: #ffb100; --secondary: #5a2a00; --accent: #ff4500; }
-
-        body { margin: 0; padding: 0; color: #fff; font-family: 'Segoe UI', sans-serif; background: #050510; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; transition: all 0.5s ease; }
+        body { margin: 0; padding: 0; color: #fff; font-family: 'Courier New', monospace; background: #000; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        #particles-js { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; }
         
-        #particles-js { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background: #050510; }
-
+        /* Hacker Simulator Overlay */
+        #hackerMode { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 20000; padding: 20px; box-sizing: border-box; color: #00ff41; font-size: 1.1rem; overflow: hidden; display: none; pointer-events: none; }
+        
         .rainbow-text { background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--primary)); background-size: 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientMove 5s ease infinite; font-weight: bold; }
-        @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
-
-        #loginScreen, #bootScreen, #lockScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050510; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
-        #lockScreen { z-index: 10000; background: rgba(5, 5, 16, 0.9); }
+        @keyframes gradientMove { 0% {background-position: 0% 50%;} 100% {background-position: 100% 50%;} }
         
-        .login-box { border: 1px solid var(--primary); padding: 40px; text-align: center; border-radius: 20px; background: var(--glass-bg); width: 85%; max-width: 400px; }
-        .login-input { background: rgba(0,0,0,0.5); color: var(--primary); border: 1px solid var(--primary); padding: 12px; margin: 20px 0; outline: none; text-align: center; width: 80%; border-radius: 8px; font-size: 1.2rem; }
-
-        #mainContent { width: 100%; flex-direction: column; align-items: center; position: relative; }
-        .hidden { display: none !important; }
-
-        #hud { width: 95%; max-width: 600px; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 0 0 15px 15px; padding: 15px 0; text-align: center; position: sticky; top: 0; z-index: 50; display: flex; justify-content: space-around; font-size: 0.8rem; font-weight: bold; }
-        #hud i { color: var(--primary); font-style: normal; margin-right: 4px; }
-
-        .container { max-width: 600px; width: 90%; text-align: center; margin-bottom: 5vh; z-index: 1; }
-        .btn { background: linear-gradient(45deg, var(--primary), var(--secondary)); color: white; border: none; padding: 12px 25px; cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 8px; width: 100%; margin-top: 10px; }
-
-        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 15px; padding: 20px; margin-top: 25px; text-align: left; transition: 0.3s; }
-        .drag-handle { cursor: grab; text-align: center; margin-top: 0; color: #fff; font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        #hud { width: 95%; max-width: 600px; background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 0 0 15px 15px; padding: 10px 0; text-align: center; position: sticky; top: 0; z-index: 50; display: flex; justify-content: space-around; font-size: 0.7rem; }
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .drag-handle { cursor: grab; padding-bottom: 8px; border-bottom: 1px solid var(--glass-border); margin-bottom: 10px; font-size: 0.8rem; letter-spacing: 2px; color: var(--primary); }
+        .btn { background: rgba(255,255,255,0.05); color: var(--primary); border: 1px solid var(--primary); padding: 10px; cursor: pointer; border-radius: 5px; width: 100%; font-family: inherit; font-size: 0.8rem; transition: 0.2s; margin-top: 5px; }
+        .btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
         
-        /* Performance Monitor Styling */
-        .perf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .perf-item { background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; text-align: center; }
-        .perf-val { font-size: 1.2rem; font-family: monospace; color: var(--accent); }
-
-        .t-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; font-family: monospace; }
-        .t-bar-bg { width: 100%; background: rgba(0,0,0,0.5); height: 12px; border-radius: 6px; margin-bottom: 15px; overflow: hidden; }
-        .t-bar-fill { height: 100%; transition: width 0.3s ease-out; background: var(--primary); }
-
-        #visualizer { width: 100%; height: 70px; background: rgba(0,0,0,0.4); border-radius: 8px; border: 1px solid var(--glass-border); }
-        #chatLog { height: 140px; overflow-y: auto; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); font-family: monospace; font-size: 0.8rem; }
+        .cli-box { border: 1px solid var(--primary); padding: 10px; background: rgba(0,0,0,0.9); display: flex; align-items: center; border-radius: 8px; margin-top: 20px; width: 90%; max-width: 600px; }
+        #cliInput { background: transparent; border: none; color: #fff; flex-grow: 1; outline: none; font-family: inherit; }
         
-        #cliInput, #chatInput { background: rgba(0,0,0,0.4); color: white; border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px; outline: none; flex-grow: 1; font-family: monospace; }
-        .cli-box { border: 1px solid var(--primary); padding: 15px; background: rgba(0,0,0,0.7); border-radius: 10px; display: flex; align-items: center; }
-
-        /* Map & Cam */
-        .leaflet-tile { filter: invert(100%) hue-rotate(180deg) brightness(130%); }
-        .sec-cam-container { position: relative; border: 1px solid var(--primary); border-radius: 8px; overflow: hidden; background: #000; min-height: 180px; }
-        #secCam { width: 100%; filter: sepia(100%) hue-rotate(130deg) saturate(300%); display: none; }
+        #chatLog { height: 100px; overflow-y: auto; font-size: 0.75rem; text-align: left; border-bottom: 1px solid var(--glass-border); margin-bottom: 10px; color: #aaa; }
+        .leaflet-tile { filter: invert(100%) hue-rotate(180deg) brightness(120%) contrast(110%); }
     </style>
 </head>
 <body id="osBody">
-
+    <div id="hackerMode"></div>
     <div id="particles-js"></div>
 
     <div id="loginScreen">
-        <div class="login-box">
-            <h2 class="rainbow-text" style="font-size: 2rem;">Sentinel Access</h2>
-            <input type="password" id="passInput" class="login-input" placeholder="Enter PIN">
-            <button class="btn" onclick="processLogin()">Authorize</button>
+        <div class="glass-panel" style="width: 300px; text-align: center;">
+            <h2 class="rainbow-text">GHOST_LINK</h2>
+            <input type="password" id="passInput" style="background:transparent; border:1px solid var(--primary); color:var(--primary); padding:10px; width:80%; text-align:center;" placeholder="ACCESS_KEY">
+            <button class="btn" onclick="processLogin()">DECRYPT</button>
         </div>
     </div>
 
-    <div id="lockScreen" class="hidden">
-        <div class="login-box" style="border-color: var(--secondary);">
-            <h2 style="color: var(--secondary); font-family: monospace;">SECURED</h2>
-            <button class="btn" id="bioBtn" onclick="biometricUnlock()" style="margin-bottom: 10px;">☝️ BIOMETRIC UNLOCK</button>
-            <input type="password" id="unlockInput" class="login-input" placeholder="Manual Override">
-            <button class="btn" onclick="unlockSystem()">Manual Unlock</button>
-        </div>
-    </div>
-
-    <div id="bootScreen" class="hidden"><div id="bootLogs" style="font-family: monospace; font-size: 0.8rem;"></div></div>
-
-    <div id="mainContent" class="hidden">
+    <div id="mainContent" style="display:none; width: 100%; flex-direction: column; align-items: center;">
         <div id="hud">
-            <span><i>🔋</i><span id="batData">--%</span></span> 
-            <span><i>📡</i><span id="netData">--</span></span> 
-            <span><i>🌦️</i><span id="weatherData">...</span></span>
-            <span><i>⏱️</i><span id="clockData">00:00</span></span>
+            <span><i>PWR</i> <span id="batData">--%</span></span>
+            <span><i>ISS</i> <span id="issLoc">WAIT...</span></span>
+            <span><i>CLK</i> <span id="clockData">00:00</span></span>
         </div>
 
-        <div class="container">
-            <h1 class="rainbow-text" style="font-size: 2.2rem; margin-bottom: 5px;">ADMIN OS v15</h1>
+        <div style="max-width: 600px; width: 90%; margin-bottom: 5vh;">
+            <h1 class="rainbow-text" style="font-size: 1.5rem; text-align: center; margin-top: 20px;">GHOST_SHELL v17.0</h1>
             
             <div id="panelContainer">
-                
-                <div class="glass-panel" data-id="p-kernel">
-                    <h3 class="drag-handle">📟 KERNEL PERFORMANCE</h3>
-                    <div class="perf-grid">
-                        <div class="perf-item"><div>REFRESH</div><div id="perf-fps" class="perf-val">0 FPS</div></div>
-                        <div class="perf-item"><div>MEM USAGE</div><div id="perf-mem" class="perf-val">-- MB</div></div>
-                    </div>
+                <div class="glass-panel" data-id="p1">
+                    <div class="drag-handle">WAR_ROOM_MAP</div>
+                    <div id="map" style="height: 180px; width:100%; border-radius:8px;"></div>
                 </div>
 
-                <div class="glass-panel" data-id="p-theme">
-                    <h3 class="drag-handle">🎨 NEURAL THEMES</h3>
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button class="btn" onclick="switchTheme('default')" style="background: linear-gradient(45deg, #00f3ff, #ff00ea);">CYBER</button>
-                        <button class="btn" onclick="switchTheme('toxic')" style="background: #00ff41; color: black;">TOXIC</button>
-                        <button class="btn" onclick="switchTheme('amber')" style="background: #ffb100; color: black;">AMBER</button>
-                    </div>
+                <div class="glass-panel" data-id="p2">
+                    <div class="drag-handle">HACKER_CONSOLE</div>
+                    <button class="btn" onclick="toggleHackerMode()">INITIALIZE BRUTE_FORCE MODE</button>
+                    <p style="font-size: 0.7rem; color: #555; text-align: center; margin-top: 10px;">(Once active, type anything to "hack")</p>
                 </div>
 
-                <div class="glass-panel" data-id="p-crypto">
-                    <h3 class="drag-handle">📈 LIVE CRYPTO</h3>
-                    <div class="t-row"><span>BTC/USDT</span><span id="btcPrice" style="color:var(--primary)">Connecting...</span></div>
-                    <div class="t-row"><span>ETH/USDT</span><span id="ethPrice" style="color:var(--accent)">Connecting...</span></div>
-                </div>
-
-                <div class="glass-panel" data-id="p-chat">
-                    <h3 class="drag-handle">🧠 A.I. COMM-LINK</h3>
+                <div class="glass-panel" data-id="p3">
+                    <div class="drag-handle">SENTIENT_LOGS</div>
                     <div id="chatLog"></div>
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <input type="text" id="chatInput" placeholder="Query A.I...">
-                        <button id="chatBtn" onclick="sendChat()" style="width: 70px;" class="btn">SEND</button>
+                    <input type="text" id="chatInput" style="width:100%; background:transparent; border:1px solid var(--glass-border); color:#fff; padding:8px; box-sizing:border-box;" placeholder="Query system...">
+                </div>
+
+                <div class="glass-panel" data-id="p4">
+                    <div class="drag-handle">MATRIX_SHIFT</div>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn" onclick="switchTheme('toxic')">TOXIC</button>
+                        <button class="btn" onclick="switchTheme('amber')">AMBER</button>
+                        <button class="btn" onclick="switchTheme('default')">CYAN</button>
                     </div>
                 </div>
 
-                <div class="glass-panel" data-id="p-radar">
-                    <h3 class="drag-handle">🌍 SAT-RADAR</h3>
-                    <div id="map" style="height: 180px; width: 100%; border-radius: 8px;"></div>
-                </div>
-
-                <div class="glass-panel" data-id="p-vfs">
-                    <h3 class="drag-handle">🗂️ VIRTUAL DIR</h3>
-                    <div id="vfsContainer"></div>
-                </div>
-
-                <div class="glass-panel" data-id="p-traffic">
-                    <h3 class="drag-handle">📊 TRAFFIC</h3>
-                    <div style="height: 120px;"><canvas id="trafficChart"></canvas></div>
-                </div>
-
-                <div class="glass-panel" data-id="p-audio">
-                    <h3 class="drag-handle">🎵 AUDIO</h3>
-                    <canvas id="visualizer"></canvas>
-                    <button id="audioBtn" class="btn" onclick="toggleAudio()">▶ PLAY</button>
+                <div class="glass-panel" data-id="p5">
+                    <div class="drag-handle">GRID_AUDIO</div>
+                    <canvas id="visualizer" style="width:100%; height:40px;"></canvas>
+                    <button class="btn" onclick="toggleAudio()">TOGGLE PULSE</button>
                 </div>
             </div>
 
             <audio id="myAudio" loop crossorigin="anonymous"><source src="music.mp3" type="audio/mpeg"></audio>
 
-            <div style="margin-top: 30px; width: 100%;">
-                <div class="cli-box">
-                    <span style="color:var(--primary); font-family:monospace; margin-right: 10px;">#root></span>
-                    <input type="text" id="cliInput" placeholder="System command..." autocomplete="off">
-                    <button onclick="startVoice()" style="background:transparent; border:none; cursor:pointer;">🎙️</button>
-                </div>
+            <div class="cli-box">
+                <span style="color:var(--primary); margin-right:10px;">#root></span>
+                <input type="text" id="cliInput" placeholder="Enter command...">
             </div>
         </div>
     </div>
 
     <script>
-        // --- 1. PERFORMANCE MONITOR ---
-        let fpsCount = 0; let lastTime = performance.now();
-        function updatePerf() {
-            fpsCount++;
-            let now = performance.now();
-            if (now >= lastTime + 1000) {
-                document.getElementById('perf-fps').innerText = fpsCount + " FPS";
-                fpsCount = 0; lastTime = now;
-                if(window.performance && window.performance.memory) {
-                    let mem = Math.round(window.performance.memory.usedJSHeapSize / 1048576);
-                    document.getElementById('perf-mem').innerText = mem + " MB";
-                }
-            }
-            requestAnimationFrame(updatePerf);
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSfx(freq, type, dur) {
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+            osc.stop(audioCtx.currentTime + dur);
         }
 
-        // --- 2. BIOMETRIC SENTINEL ---
-        async function biometricUnlock() {
-            const btn = document.getElementById('bioBtn');
-            if (window.PublicKeyCredential) {
-                btn.innerText = "AUTHENTICATING...";
-                // Note: Real WebAuthn requires a challenge from a server. 
-                // This simulates the prompt call for the UI/UX experience.
-                setTimeout(() => { unlockSystem(true); }, 1500);
-            } else {
-                alert("Biometrics not supported on this browser.");
+        function processLogin() {
+            const p = document.getElementById('passInput').value.toUpperCase();
+            if(p === "ADMIN" || p === "KHUSHAL") {
+                playSfx(1000, 'square', 0.2);
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'flex';
+                startSystem();
             }
         }
 
-        // --- 3. DYNAMIC THEME ENGINE ---
+        function startSystem() {
+            initParticles(); initDraggable(); initMap(); startHUD(); setupCLI();
+            setInterval(updateISS, 4000);
+        }
+
         function switchTheme(t) {
-            const body = document.getElementById('osBody');
-            body.className = t === 'default' ? '' : 'theme-' + t;
-            localStorage.setItem('adminTheme', t);
-            // Refresh particles & chart colors
+            playSfx(500, 'sine', 0.1);
+            document.body.className = t === 'default' ? '' : 'theme-' + t;
             initParticles();
-            initChart();
         }
 
-        // --- CORE LOGIC ---
-        function runBootSequence() {
-            document.getElementById("loginScreen").style.display = "none";
-            const bootScreen = document.getElementById("bootScreen"); bootScreen.classList.remove("hidden");
-            const logs = ["Kernel initialized.", "Loading Biometric drivers...", "Mapping Jaipur coordinates...", "Sentinel Active."];
-            let delay = 0;
-            logs.forEach(msg => {
-                setTimeout(() => { document.getElementById("bootLogs").innerHTML += `<div>[OK] ${msg}</div>`; }, delay);
-                delay += 300;
-            });
-            setTimeout(() => { bootScreen.classList.add("hidden"); document.getElementById("mainContent").classList.remove("hidden"); startSystem(); }, delay + 500);
+        let map, issMarker;
+        function initMap() {
+            map = L.map('map', { zoomControl: false }).setView([26.9, 75.8], 2);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            issMarker = L.circleMarker([0,0], {color: 'red', radius: 10, fillOpacity: 0.8}).addTo(map);
         }
 
-        function startSystem() { 
-            initParticles(); initChart(); initCrypto(); initDraggable(); updatePerf();
-            setTimeout(initMap, 500); startHUD(); setupCLI(); initVFS();
-            const savedTheme = localStorage.getItem('adminTheme');
-            if(savedTheme) switchTheme(savedTheme);
+        async function updateISS() {
+            try {
+                const res = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
+                const data = await res.json();
+                issMarker.setLatLng([data.latitude, data.longitude]);
+                document.getElementById('issLoc').innerText = data.latitude.toFixed(1) + "N / " + data.longitude.toFixed(1) + "E";
+            } catch(e) {}
         }
 
-        // Re-use logic from L14
-        function initCrypto() {
-            const btcWs = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
-            btcWs.onmessage = (e) => { document.getElementById('btcPrice').innerText = '$' + parseFloat(JSON.parse(e.data).p).toFixed(2); };
-            const ethWs = new WebSocket('wss://stream.binance.com:9443/ws/ethusdt@trade');
-            ethWs.onmessage = (e) => { document.getElementById('ethPrice').innerText = '$' + parseFloat(JSON.parse(e.data).p).toFixed(2); };
+        // --- HACKER SIMULATOR LOGIC ---
+        let isHackerMode = false;
+        const kernelSource = `
+        void _init_kernel_module(struct module *mod) {
+            printk(KERN_INFO "SENTINEL: Initializing neural ghost interface...\\n");
+            mod->state = MODULE_STATE_LIVE;
+            if (!bypassing_firewall(mod->id)) {
+                return -EACCESS;
+            }
+            inject_payload(0x7F454C46);
         }
+        static int __init ghost_init(void) {
+            register_chrdev(GHOST_MAJOR, "ghost_shell", &ghost_fops);
+            return 0;
+        }
+        #define PORT 8080
+        int main(int argc, char const *argv[]) {
+            int sock = 0, valread;
+            struct sockaddr_in serv_addr;
+            char *hello = "Hello from the Void";
+            if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+                printf("\\n Socket creation error \\n");
+                return -1;
+            }
+        }
+        `.repeat(50);
+        
+        let charIndex = 0;
+        function toggleHackerMode() {
+            isHackerMode = !isHackerMode;
+            const el = document.getElementById('hackerMode');
+            el.style.display = isHackerMode ? 'block' : 'none';
+            if(isHackerMode) {
+                document.body.style.overflow = 'hidden';
+                el.innerHTML = ">_ INITIALIZING BRUTE FORCE OVERRIDE...<br>";
+                charIndex = 0;
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if(isHackerMode) {
+                const el = document.getElementById('hackerMode');
+                el.innerHTML += kernelSource.slice(charIndex, charIndex + 5).replace(/\n/g, '<br>');
+                charIndex += 5;
+                el.scrollTop = el.scrollHeight;
+                if(e.key === "Escape") toggleHackerMode();
+            }
+        });
+
+        // Tap for mobile hackers
+        document.addEventListener('touchstart', () => {
+            if(isHackerMode) {
+                const el = document.getElementById('hackerMode');
+                el.innerHTML += kernelSource.slice(charIndex, charIndex + 10).replace(/\n/g, '<br>');
+                charIndex += 10;
+                el.scrollTop = el.scrollHeight;
+            }
+        });
 
         function initParticles() {
-            const pColor = getComputedStyle(document.body).getPropertyValue('--primary').trim();
-            particlesJS("particles-js", { "particles": { "number": { "value": 50 }, "color": { "value": pColor }, "line_linked": { "color": pColor, "opacity": 0.3 }, "move": { "speed": 2 } }, "interactivity": { "events": { "onhover": { "enable": true, "mode": "grab" } } } });
+            const clr = getComputedStyle(document.body).getPropertyValue('--primary').trim();
+            particlesJS("particles-js", { "particles": { "number": { "value": 35 }, "color": { "value": clr }, "line_linked": { "color": clr, "opacity": 0.2 }, "move": { "speed": 1.5 } } });
         }
 
-        let trafficChart;
-        function initChart() {
-            const ctx = document.getElementById('trafficChart').getContext('2d');
-            const pColor = getComputedStyle(document.body).getPropertyValue('--primary').trim();
-            if(trafficChart) trafficChart.destroy();
-            trafficChart = new Chart(ctx, { type: 'line', data: { labels: Array(20).fill(''), datasets: [{ data: Array(20).fill(0), borderColor: pColor, borderWidth: 2, fill: true, backgroundColor: 'rgba(0,255,0,0.1)', pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, animation: false, scales: { x: { display: false }, y: { display: false } }, plugins: { legend: false } } });
-            setInterval(() => { let d = trafficChart.data.datasets[0].data; d.push(Math.floor(Math.random() * 100)); d.shift(); trafficChart.update(); }, 800);
-        }
+        function initDraggable() { Sortable.create(document.getElementById('panelContainer'), { handle: '.drag-handle', animation: 200 }); }
+        function startHUD() { setInterval(() => { document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', {hour12:false}); }, 1000); }
+        function setupCLI() { document.getElementById('cliInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') { playSfx(600, 'sine', 0.05); e.target.value = ''; } }); }
 
-        function initDraggable() { Sortable.create(document.getElementById('panelContainer'), { handle: '.drag-handle', animation: 250, store: { get: (s) => localStorage.getItem('adminLayout')?.split('|') || [], set: (s) => localStorage.setItem('adminLayout', s.toArray().join('|')) } }); }
-        
-        function processLogin() { const p = document.getElementById("passInput").value.toUpperCase(); if(p === "ADMIN" || p === "KHUSHAL") { localStorage.setItem("hasAccess", "true"); runBootSequence(); } }
-        function unlockSystem(auto=false) { 
-            const p = document.getElementById("unlockInput").value.toUpperCase(); 
-            if(auto || p === "ADMIN" || p === "KHUSHAL") { document.getElementById("lockScreen").classList.add("hidden"); idleTime = 0; isLocked = false; } 
-        }
-
-        let idleTime = 0; let isLocked = false;
-        function checkIdle() { idleTime++; if(idleTime >= 60 && !isLocked && !document.getElementById("mainContent").classList.contains("hidden")) { isLocked = true; document.getElementById("lockScreen").classList.remove("hidden"); } }
-        setInterval(checkIdle, 1000); document.onmousemove = document.onkeypress = document.ontouchstart = () => { if(!isLocked) idleTime = 0; };
-
-        function sendChat() {
-            const i = document.getElementById('chatInput'); const l = document.getElementById('chatLog'); const m = i.value.trim(); if(!m) return;
-            l.innerHTML += `<div><span style="color:var(--accent)">You:</span> ${m}</div>`; i.value = '';
-            setTimeout(() => { let r = m.toLowerCase().includes("admin") ? "Welcome Khushal. Memory optimized. WebSocket health at 100%." : "Data processed by Sentinel kernel."; l.innerHTML += `<div style="color:var(--primary)">>_ AI: ${r}</div>`; l.scrollTop = l.scrollHeight; }, 600);
-        }
-
-        function initMap() { var map = L.map('map', { zoomControl: false }).setView([26.9124, 75.7873], 12); L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); L.marker([26.9124, 75.7873]).addTo(map); }
-        function startHUD() { setInterval(() => { document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', { hour12: false }); }, 1000); }
-        function setupCLI() { document.getElementById('cliInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') { let c = e.target.value.toLowerCase(); if(c === '/play') toggleAudio(); else if(c === '/clear') localStorage.clear(); e.target.value = ''; } }); }
-        function initVFS() { document.getElementById('vfsContainer').innerHTML = "<div style='font-family:monospace; color:var(--primary); font-size:0.8rem;'>📁 logs<br>📄 sentinel_v15.sys</div>"; }
-
-        let isAudioPlaying = false; let audioCtx, analyser, source, dataArray;
+        let audioCtx2, analyser, source, dataArray, isAudioPlaying = false;
         function toggleAudio() {
-            const a = document.getElementById("myAudio"); if(!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); analyser = audioCtx.createAnalyser(); source = audioCtx.createMediaElementSource(a); source.connect(analyser); analyser.connect(audioCtx.destination); dataArray = new Uint8Array(analyser.frequencyBinCount); draw(); }
-            if(isAudioPlaying) { a.pause(); isAudioPlaying = false; } else { a.play(); isAudioPlaying = true; }
+            const a = document.getElementById("myAudio");
+            if(!audioCtx2) {
+                audioCtx2 = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx2.createAnalyser();
+                source = audioCtx2.createMediaElementSource(a);
+                source.connect(analyser); analyser.connect(audioCtx2.destination);
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+                renderViz();
+            }
+            if(isAudioPlaying) { a.pause(); isAudioPlaying = false; }
+            else { a.play(); isAudioPlaying = true; }
         }
-        function draw() { requestAnimationFrame(draw); if(!isAudioPlaying) return; const c = document.getElementById('visualizer'); const ctx = c.getContext('2d'); analyser.getByteFrequencyData(dataArray); ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--primary'); dataArray.forEach((v, i) => { ctx.fillRect(i*3, 70-(v/4), 2, v/4); }); }
+        function renderViz() {
+            requestAnimationFrame(renderViz); if(!isAudioPlaying) return;
+            const c = document.getElementById('visualizer'); const ctx = c.getContext('2d');
+            analyser.getByteFrequencyData(dataArray); ctx.clearRect(0,0,c.width,c.height);
+            ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--primary');
+            for(let i=0; i<40; i++) { ctx.fillRect(i*6, 40 - (dataArray[i]/8), 3, dataArray[i]/8); }
+        }
     </script>
 </body>
 </html>
