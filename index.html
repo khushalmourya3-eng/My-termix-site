@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin OS | Level 17 Ghost</title>
+    <title>Admin OS | Level 18 Singularity</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,29 +12,38 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        :root { --primary: #00f3ff; --secondary: #ff00ea; --accent: #eaff00; --glass-bg: rgba(5, 5, 15, 0.9); --glass-border: rgba(255, 255, 255, 0.1); }
+        :root { --primary: #00f3ff; --secondary: #ff00ea; --accent: #eaff00; --glass: rgba(10, 10, 25, 0.7); }
         body.theme-toxic { --primary: #00ff41; --secondary: #003b00; --accent: #adff2f; }
         body.theme-amber { --primary: #ffb100; --secondary: #5a2a00; --accent: #ff4500; }
-        body { margin: 0; padding: 0; color: #fff; font-family: 'Courier New', monospace; background: #000; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        #particles-js { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; }
         
-        /* Hacker Simulator Overlay */
-        #hackerMode { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 20000; padding: 20px; box-sizing: border-box; color: #00ff41; font-size: 1.1rem; overflow: hidden; display: none; pointer-events: none; }
+        body { margin: 0; padding: 0; color: #fff; font-family: 'Courier New', monospace; background: #020205; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; min-height: 100vh; transition: background 0.5s; }
         
-        .rainbow-text { background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--primary)); background-size: 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientMove 5s ease infinite; font-weight: bold; }
+        #particles-js { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none; }
+        
+        /* Kinetic Ripple Effect */
+        .ripple { position: fixed; border-radius: 50%; background: rgba(255, 255, 255, 0.4); transform: scale(0); animation: ripple-effect 0.6s linear; pointer-events: none; z-index: 9999; }
+        @keyframes ripple-effect { to { transform: scale(4); opacity: 0; } }
+
+        /* Hacker Overload Glitch */
+        .overload { animation: shake 0.1s infinite, chromatic 0.1s infinite; }
+        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -2px); } 100% { transform: translate(1px, 1px); } }
+        @keyframes chromatic { 0% { text-shadow: 2px 0 red, -2px 0 blue; } 100% { text-shadow: -2px 0 red, 2px 0 blue; } }
+
+        #hackerMode { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 20000; padding: 20px; color: var(--primary); font-size: 1rem; overflow: hidden; display: none; word-break: break-all; }
+
+        .rainbow-text { background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--primary)); background-size: 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientMove 3s linear infinite; font-weight: bold; letter-spacing: 2px; }
         @keyframes gradientMove { 0% {background-position: 0% 50%;} 100% {background-position: 100% 50%;} }
+
+        .glass-panel { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 20px; margin-top: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border-top: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
+        .drag-handle { cursor: grab; padding-bottom: 12px; border-bottom: 1px dashed var(--glass-border); margin-bottom: 12px; font-size: 0.75rem; color: var(--primary); text-transform: uppercase; font-weight: 900; }
+
+        .btn { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 12px; cursor: pointer; border-radius: 8px; width: 100%; font-family: inherit; font-weight: bold; transition: 0.3s; position: relative; overflow: hidden; }
+        .btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px var(--primary); }
+
+        .cli-box { border: 1px solid var(--primary); padding: 12px; background: #000; display: flex; align-items: center; border-radius: 10px; box-shadow: inset 0 0 10px var(--primary); width: 90%; max-width: 500px; margin-top: 20px; }
+        #cliInput { background: transparent; border: none; color: #fff; flex-grow: 1; outline: none; font-family: inherit; font-size: 1rem; }
         
-        #hud { width: 95%; max-width: 600px; background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 0 0 15px 15px; padding: 10px 0; text-align: center; position: sticky; top: 0; z-index: 50; display: flex; justify-content: space-around; font-size: 0.7rem; }
-        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-        .drag-handle { cursor: grab; padding-bottom: 8px; border-bottom: 1px solid var(--glass-border); margin-bottom: 10px; font-size: 0.8rem; letter-spacing: 2px; color: var(--primary); }
-        .btn { background: rgba(255,255,255,0.05); color: var(--primary); border: 1px solid var(--primary); padding: 10px; cursor: pointer; border-radius: 5px; width: 100%; font-family: inherit; font-size: 0.8rem; transition: 0.2s; margin-top: 5px; }
-        .btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
-        
-        .cli-box { border: 1px solid var(--primary); padding: 10px; background: rgba(0,0,0,0.9); display: flex; align-items: center; border-radius: 8px; margin-top: 20px; width: 90%; max-width: 600px; }
-        #cliInput { background: transparent; border: none; color: #fff; flex-grow: 1; outline: none; font-family: inherit; }
-        
-        #chatLog { height: 100px; overflow-y: auto; font-size: 0.75rem; text-align: left; border-bottom: 1px solid var(--glass-border); margin-bottom: 10px; color: #aaa; }
-        .leaflet-tile { filter: invert(100%) hue-rotate(180deg) brightness(120%) contrast(110%); }
+        .leaflet-tile { filter: invert(100%) hue-rotate(180deg) brightness(120%) contrast(120%); }
     </style>
 </head>
 <body id="osBody">
@@ -42,81 +51,82 @@
     <div id="particles-js"></div>
 
     <div id="loginScreen">
-        <div class="glass-panel" style="width: 300px; text-align: center;">
-            <h2 class="rainbow-text">GHOST_LINK</h2>
-            <input type="password" id="passInput" style="background:transparent; border:1px solid var(--primary); color:var(--primary); padding:10px; width:80%; text-align:center;" placeholder="ACCESS_KEY">
-            <button class="btn" onclick="processLogin()">DECRYPT</button>
+        <div class="glass-panel" style="width: 280px; text-align: center;">
+            <h2 class="rainbow-text">SYSTEM_LINK</h2>
+            <input type="password" id="passInput" style="background:rgba(255,255,255,0.05); border:1px solid var(--primary); color:#fff; padding:12px; width:80%; text-align:center; border-radius:8px;" placeholder="KEY_ID">
+            <button class="btn" style="margin-top:25px;" onclick="processLogin()">BOOT_OS</button>
         </div>
     </div>
 
     <div id="mainContent" style="display:none; width: 100%; flex-direction: column; align-items: center;">
-        <div id="hud">
-            <span><i>PWR</i> <span id="batData">--%</span></span>
-            <span><i>ISS</i> <span id="issLoc">WAIT...</span></span>
-            <span><i>CLK</i> <span id="clockData">00:00</span></span>
-        </div>
-
-        <div style="max-width: 600px; width: 90%; margin-bottom: 5vh;">
-            <h1 class="rainbow-text" style="font-size: 1.5rem; text-align: center; margin-top: 20px;">GHOST_SHELL v17.0</h1>
+        <div id="panelContainer" style="width: 90%; max-width: 500px;">
             
-            <div id="panelContainer">
-                <div class="glass-panel" data-id="p1">
-                    <div class="drag-handle">WAR_ROOM_MAP</div>
-                    <div id="map" style="height: 180px; width:100%; border-radius:8px;"></div>
-                </div>
+            <h1 class="rainbow-text" style="font-size: 1.6rem; text-align: center; margin: 30px 0;">SINGULARITY_OS v18</h1>
 
-                <div class="glass-panel" data-id="p2">
-                    <div class="drag-handle">HACKER_CONSOLE</div>
-                    <button class="btn" onclick="toggleHackerMode()">INITIALIZE BRUTE_FORCE MODE</button>
-                    <p style="font-size: 0.7rem; color: #555; text-align: center; margin-top: 10px;">(Once active, type anything to "hack")</p>
-                </div>
+            <div class="glass-panel">
+                <div class="drag-handle">ORBITAL_RADAR</div>
+                <div id="map" style="height: 220px; width:100%; border-radius:12px;"></div>
+            </div>
 
-                <div class="glass-panel" data-id="p3">
-                    <div class="drag-handle">SENTIENT_LOGS</div>
-                    <div id="chatLog"></div>
-                    <input type="text" id="chatInput" style="width:100%; background:transparent; border:1px solid var(--glass-border); color:#fff; padding:8px; box-sizing:border-box;" placeholder="Query system...">
-                </div>
+            <div class="glass-panel">
+                <div class="drag-handle">BRUTE_FORCE_TERMINAL</div>
+                <button class="btn" onclick="toggleHackerMode()">INITIALIZE OVERLOAD</button>
+            </div>
 
-                <div class="glass-panel" data-id="p4">
-                    <div class="drag-handle">MATRIX_SHIFT</div>
-                    <div style="display:flex; gap:5px;">
-                        <button class="btn" onclick="switchTheme('toxic')">TOXIC</button>
-                        <button class="btn" onclick="switchTheme('amber')">AMBER</button>
-                        <button class="btn" onclick="switchTheme('default')">CYAN</button>
-                    </div>
-                </div>
-
-                <div class="glass-panel" data-id="p5">
-                    <div class="drag-handle">GRID_AUDIO</div>
-                    <canvas id="visualizer" style="width:100%; height:40px;"></canvas>
-                    <button class="btn" onclick="toggleAudio()">TOGGLE PULSE</button>
+            <div class="glass-panel">
+                <div class="drag-handle">VISUAL_ENGINE</div>
+                <canvas id="visualizer" style="width:100%; height:50px;"></canvas>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button class="btn" onclick="switchTheme('toxic')">TOXIC</button>
+                    <button class="btn" onclick="switchTheme('amber')">AMBER</button>
+                    <button class="btn" onclick="switchTheme('default')">NEON</button>
                 </div>
             </div>
 
-            <audio id="myAudio" loop crossorigin="anonymous"><source src="music.mp3" type="audio/mpeg"></audio>
-
-            <div class="cli-box">
-                <span style="color:var(--primary); margin-right:10px;">#root></span>
-                <input type="text" id="cliInput" placeholder="Enter command...">
+            <div class="glass-panel">
+                <div class="drag-handle">CORE_AUDIO</div>
+                <button class="btn" onclick="toggleAudio()">SYNC PULSE</button>
             </div>
+
         </div>
+
+        <audio id="myAudio" loop crossorigin="anonymous"><source src="music.mp3" type="audio/mpeg"></audio>
+
+        <div class="cli-box">
+            <span style="color:var(--primary); margin-right:10px; font-weight:bold;">></span>
+            <input type="text" id="cliInput" placeholder="SYSTEM_CMD...">
+        </div>
+        <p style="font-size: 0.6rem; color: #444; margin: 20px 0;">SINGULARITY KERNEL ACTIVE</p>
     </div>
 
     <script>
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSfx(freq, type, dur) {
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
-            osc.stop(audioCtx.currentTime + dur);
+        function playSfx(f, t, d) {
+            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+            o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime);
+            g.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + d);
+            o.stop(audioCtx.currentTime + d);
         }
+
+        // --- KINETIC RIPPLE ---
+        window.addEventListener('mousedown', (e) => {
+            const rip = document.createElement('div');
+            rip.className = 'ripple';
+            rip.style.left = e.clientX + 'px';
+            rip.style.top = e.clientY + 'px';
+            rip.style.width = rip.style.height = '50px';
+            rip.style.marginLeft = rip.style.marginTop = '-25px';
+            document.body.appendChild(rip);
+            setTimeout(() => rip.remove(), 600);
+            playSfx(150, 'sine', 0.1);
+        });
 
         function processLogin() {
             const p = document.getElementById('passInput').value.toUpperCase();
             if(p === "ADMIN" || p === "KHUSHAL") {
-                playSfx(1000, 'square', 0.2);
+                playSfx(1200, 'square', 0.3);
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'flex';
                 startSystem();
@@ -124,21 +134,21 @@
         }
 
         function startSystem() {
-            initParticles(); initDraggable(); initMap(); startHUD(); setupCLI();
-            setInterval(updateISS, 4000);
+            initParticles(); initDraggable(); initMap(); setupCLI();
+            setInterval(updateISS, 3000);
         }
 
         function switchTheme(t) {
-            playSfx(500, 'sine', 0.1);
+            playSfx(600, 'triangle', 0.1);
             document.body.className = t === 'default' ? '' : 'theme-' + t;
             initParticles();
         }
 
         let map, issMarker;
         function initMap() {
-            map = L.map('map', { zoomControl: false }).setView([26.9, 75.8], 2);
+            map = L.map('map', { zoomControl: false, attributionControl: false }).setView([26.9, 75.8], 2);
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-            issMarker = L.circleMarker([0,0], {color: 'red', radius: 10, fillOpacity: 0.8}).addTo(map);
+            issMarker = L.circleMarker([0,0], {color: 'var(--secondary)', radius: 12, fillOpacity: 1}).addTo(map);
         }
 
         async function updateISS() {
@@ -146,79 +156,41 @@
                 const res = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
                 const data = await res.json();
                 issMarker.setLatLng([data.latitude, data.longitude]);
-                document.getElementById('issLoc').innerText = data.latitude.toFixed(1) + "N / " + data.longitude.toFixed(1) + "E";
+                map.panTo([data.latitude, data.longitude]);
             } catch(e) {}
         }
 
-        // --- HACKER SIMULATOR LOGIC ---
-        let isHackerMode = false;
-        const kernelSource = `
-        void _init_kernel_module(struct module *mod) {
-            printk(KERN_INFO "SENTINEL: Initializing neural ghost interface...\\n");
-            mod->state = MODULE_STATE_LIVE;
-            if (!bypassing_firewall(mod->id)) {
-                return -EACCESS;
-            }
-            inject_payload(0x7F454C46);
-        }
-        static int __init ghost_init(void) {
-            register_chrdev(GHOST_MAJOR, "ghost_shell", &ghost_fops);
-            return 0;
-        }
-        #define PORT 8080
-        int main(int argc, char const *argv[]) {
-            int sock = 0, valread;
-            struct sockaddr_in serv_addr;
-            char *hello = "Hello from the Void";
-            if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-                printf("\\n Socket creation error \\n");
-                return -1;
-            }
-        }
-        `.repeat(50);
-        
-        let charIndex = 0;
+        // --- OVERLOAD HACKER MODE ---
+        let isHackerMode = false, charIndex = 0;
+        const kernelSource = `/* KERNEL_OVERLOAD_DETECTED */ void inject_shell(){ uint32_t addr = 0xDEADC0DE; while(1){ volatile int *p = (int*)addr; *p = 0x90909090; bypass_auth(USER_ROOT); stream_packets(LOCAL_IP); } }`.repeat(100);
+
         function toggleHackerMode() {
             isHackerMode = !isHackerMode;
             const el = document.getElementById('hackerMode');
             el.style.display = isHackerMode ? 'block' : 'none';
-            if(isHackerMode) {
-                document.body.style.overflow = 'hidden';
-                el.innerHTML = ">_ INITIALIZING BRUTE FORCE OVERRIDE...<br>";
-                charIndex = 0;
-            } else {
-                document.body.style.overflow = 'auto';
-            }
+            if(isHackerMode) playSfx(50, 'sawtooth', 0.5);
         }
 
-        document.addEventListener('keydown', (e) => {
-            if(isHackerMode) {
-                const el = document.getElementById('hackerMode');
-                el.innerHTML += kernelSource.slice(charIndex, charIndex + 5).replace(/\n/g, '<br>');
-                charIndex += 5;
-                el.scrollTop = el.scrollHeight;
-                if(e.key === "Escape") toggleHackerMode();
-            }
-        });
+        function hack(amount) {
+            if(!isHackerMode) return;
+            const el = document.getElementById('hackerMode');
+            el.innerHTML += kernelSource.slice(charIndex, charIndex + amount).replace(/\n/g, '<br>');
+            charIndex += amount;
+            el.scrollTop = el.scrollHeight;
+            if(amount > 10) el.classList.add('overload');
+            setTimeout(() => el.classList.remove('overload'), 200);
+        }
 
-        // Tap for mobile hackers
-        document.addEventListener('touchstart', () => {
-            if(isHackerMode) {
-                const el = document.getElementById('hackerMode');
-                el.innerHTML += kernelSource.slice(charIndex, charIndex + 10).replace(/\n/g, '<br>');
-                charIndex += 10;
-                el.scrollTop = el.scrollHeight;
-            }
-        });
+        document.addEventListener('keydown', () => hack(5));
+        document.addEventListener('touchstart', () => hack(15));
 
         function initParticles() {
             const clr = getComputedStyle(document.body).getPropertyValue('--primary').trim();
-            particlesJS("particles-js", { "particles": { "number": { "value": 35 }, "color": { "value": clr }, "line_linked": { "color": clr, "opacity": 0.2 }, "move": { "speed": 1.5 } } });
+            particlesJS("particles-js", { "particles": { "number": { "value": 50 }, "color": { "value": clr }, "shape": {"type": "polygon", "polygon": {"nb_sides": 3}}, "line_linked": { "color": clr, "opacity": 0.3 }, "move": { "speed": 3, "out_mode": "bounce" } }, "interactivity": { "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" } } } });
         }
 
-        function initDraggable() { Sortable.create(document.getElementById('panelContainer'), { handle: '.drag-handle', animation: 200 }); }
-        function startHUD() { setInterval(() => { document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', {hour12:false}); }, 1000); }
-        function setupCLI() { document.getElementById('cliInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') { playSfx(600, 'sine', 0.05); e.target.value = ''; } }); }
+        function initDraggable() { Sortable.create(document.getElementById('panelContainer'), { handle: '.drag-handle', animation: 300 }); }
+        function setupCLI() { document.getElementById('cliInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') { playSfx(800, 'sine', 0.05); e.target.value = ''; } }); }
 
         let audioCtx2, analyser, source, dataArray, isAudioPlaying = false;
         function toggleAudio() {
@@ -239,7 +211,7 @@
             const c = document.getElementById('visualizer'); const ctx = c.getContext('2d');
             analyser.getByteFrequencyData(dataArray); ctx.clearRect(0,0,c.width,c.height);
             ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--primary');
-            for(let i=0; i<40; i++) { ctx.fillRect(i*6, 40 - (dataArray[i]/8), 3, dataArray[i]/8); }
+            for(let i=0; i<50; i++) { ctx.fillRect(i*10, 50 - (dataArray[i]/4), 4, dataArray[i]/4); }
         }
     </script>
 </body>
