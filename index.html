@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Admin | Level 10</title>
+    <title>System Admin | Level 11 God-Tier</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    
-    <style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <style>
         html { scroll-behavior: smooth; }
         :root { --cyan: #00f3ff; --magenta: #ff00ea; --yellow: #eaff00; --glass-bg: rgba(10, 10, 20, 0.7); --glass-border: rgba(255, 255, 255, 0.1); }
 
@@ -60,11 +60,16 @@
         .sys-info { font-size: 0.9rem; margin: 10px 0; color: #bbb; display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px; }
         .sys-info span { color: var(--yellow); font-family: 'Courier New', monospace; }
 
+        /* Security Cam Filter */
+        .sec-cam-container { position: relative; border: 1px solid var(--cyan); border-radius: 8px; overflow: hidden; background: #000; min-height: 180px; display: flex; justify-content: center; align-items: center; box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.2); }
+        #secCam { width: 100%; filter: sepia(100%) hue-rotate(130deg) saturate(300%) contrast(1.5); display: none; object-fit: cover; }
+        .cam-overlay { position: absolute; top: 10px; left: 10px; color: var(--cyan); font-family: monospace; font-size: 0.8rem; font-weight: bold; text-shadow: 0 0 5px var(--cyan); z-index: 5; pointer-events: none; display: none; }
+        .rec-dot { display: inline-block; width: 8px; height: 8px; background: red; border-radius: 50%; animation: flash 1s infinite; margin-right: 5px; }
+        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+
         .t-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; color: #ccc; }
         .t-bar-bg { width: 100%; background: rgba(0,0,0,0.5); height: 12px; border-radius: 6px; margin-bottom: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
         .t-bar-fill { height: 100%; transition: width 0.3s ease-out; }
-        #rpmBar { background: linear-gradient(90deg, #00d2ff, #3a7bd5); }
-        #boostBar { background: linear-gradient(90deg, #f2994a, #f2c94c); }
         #tempBar { background: linear-gradient(90deg, #ff416c, #ff4b2b); }
 
         #visualizer { width: 100%; height: 70px; background: rgba(0,0,0,0.4); border-radius: 8px; margin-top: 15px; border: 1px solid var(--glass-border); }
@@ -82,6 +87,11 @@
         .cli-box { border: 1px solid var(--cyan); padding: 15px; background: rgba(0,0,0,0.7); border-radius: 10px; display: flex; align-items: center; box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.1); }
         .cli-prompt { font-family: 'Courier New', monospace; color: var(--cyan); font-weight: bold; margin-right: 15px; }
         #cliInput { background: transparent; border: none; color: white; font-family: 'Courier New', monospace; width: 100%; outline: none; font-size: 1rem; }
+        
+        /* Voice Mic Button */
+        #voiceBtn { background: transparent; border: none; font-size: 1.5rem; cursor: pointer; margin-left: 10px; transition: 0.2s; text-shadow: 0 0 10px var(--cyan); }
+        #voiceBtn:hover { transform: scale(1.2); }
+        #voiceStatus { font-size: 0.8rem; color: var(--yellow); padding-bottom: 10px; text-align: center; width: 100%; display: none; font-family: monospace; }
 
         .panic-btn { background: rgba(255, 0, 0, 0.1); border: 1px solid #ff3e3e; color: #ff3e3e; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 10px; width: 100%; transition: 0.3s; letter-spacing: 2px; }
         @keyframes destructFlash { 0% { background-color: black; } 50% { background-color: #ff00ea; } 100% { background-color: black; } }
@@ -121,27 +131,26 @@
             <div class="glass-panel reveal">
                 <h3>🐙 DEVELOPER IDENTITY</h3>
                 <div class="gh-badge">
-                    <img id="gh-avatar" class="gh-avatar" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Avatar">
+                    <img id="gh-avatar" class="gh-avatar" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png">
                     <div class="gh-stats">
                         <div id="gh-name" class="gh-name">Loading...</div>
                         <div class="gh-info">Repos: <span id="gh-repos">--</span> | Followers: <span id="gh-followers">--</span></div>
-                        <div style="font-size: 0.75rem; color: #888; margin-top: 5px;">Connected to API</div>
                     </div>
                 </div>
             </div>
 
             <div class="glass-panel reveal">
                 <h3>🌐 GLOBAL TECH UPLINK</h3>
-                <div id="newsFeed" style="margin-top: 15px;">
-                    <div style="color: #888; text-align: center;">Establishing connection...</div>
-                </div>
+                <div id="newsFeed" style="margin-top: 15px;"></div>
             </div>
 
             <div class="glass-panel reveal">
-                <h3>🔍 System Fingerprint</h3>
-                <div class="sys-info">Logical Cores: <span id="fp-cores">...</span></div>
-                <div class="sys-info">Resolution: <span id="fp-res">...</span></div>
-                <div class="sys-info">Engine: <span id="fp-engine">...</span></div>
+                <h3>📷 LOCAL SECURITY FEED</h3>
+                <div class="sec-cam-container">
+                    <div id="camOverlay" class="cam-overlay"><span class="rec-dot"></span>REC / SECTOR 7G</div>
+                    <video id="secCam" autoplay playsinline></video>
+                    <button id="camBtn" class="btn" onclick="initCamera()" style="position: absolute; width: auto; z-index: 10; font-size: 0.8rem;">CONNECT FEED</button>
+                </div>
             </div>
 
             <div class="glass-panel reveal">
@@ -156,12 +165,11 @@
             </div>
 
             <div class="glass-panel reveal">
-                <h3>🏎️ M4 Telemetry</h3>
-                <div class="t-row"><span>ENGINE RPM</span><span id="rpmText" style="color: #00d2ff">0</span></div>
-                <div class="t-bar-bg"><div class="t-bar-fill" id="rpmBar" style="width: 0%;"></div></div>
-                <div class="t-row"><span>TURBO BOOST</span><span id="boostText" style="color: #f2c94c">0.0 PSI</span></div>
-                <div class="t-bar-bg"><div class="t-bar-fill" id="boostBar" style="width: 0%;"></div></div>
-                <div class="t-row"><span>OIL TEMP</span><span id="tempText" style="color: #ff416c">90 °C</span></div>
+                <h3>📈 SERVER TRAFFIC MATRIX</h3>
+                <div style="height: 150px; width: 100%;">
+                    <canvas id="trafficChart"></canvas>
+                </div>
+                <div class="t-row" style="margin-top: 15px;"><span>CPU TEMP</span><span id="tempText" style="color: #ff416c">90 °C</span></div>
                 <div class="t-bar-bg"><div class="t-bar-fill" id="tempBar" style="width: 50%;"></div></div>
             </div>
 
@@ -176,10 +184,12 @@
 
             <audio id="myAudio" loop crossorigin="anonymous"><source src="music.mp3" type="audio/mpeg"></audio>
 
-            <div class="glass-panel reveal cli-box" style="margin-top: 30px; padding: 0;">
-                <div class="cli-box" style="width: 100%; border: none; margin: 0; box-shadow: none;">
+            <div class="glass-panel reveal" style="margin-top: 30px; padding: 0; background: transparent; border: none; box-shadow: none;">
+                <div id="voiceStatus">Listening for command...</div>
+                <div class="cli-box" style="width: 100%; border: 1px solid var(--cyan); margin: 0; display: flex;">
                     <span class="cli-prompt">root@admin:~#</span>
-                    <input type="text" id="cliInput" placeholder="Type /help..." autocomplete="off">
+                    <input type="text" id="cliInput" placeholder="Type /help or use mic..." autocomplete="off">
+                    <button id="voiceBtn" onclick="startVoice()" title="Activate A.I.">🎙️</button>
                 </div>
             </div>
 
@@ -190,7 +200,7 @@
     </div>
 
     <script>
-        const bootMessages = ["Fetching GitHub Identity... [OK]", "Establishing News Uplink... [OK]", "Igniting Particle Engine... [DONE]", "System Admin recognized."];
+        const bootMessages = ["Fetching Identity... [OK]", "Injecting Chart.js... [OK]", "Initializing A.I. Modules... [DONE]", "System Admin recognized."];
         
         function runBootSequence() {
             document.getElementById("loginScreen").style.display = "none";
@@ -206,116 +216,101 @@
 
         window.onload = function() { loadTasks(); loadScratchpad(); if(localStorage.getItem("hasAccess") === "true") { runBootSequence(); } };
         
-        // --- BOOT SYSTEM (NOTE: Visualizer is NOT started here anymore, it waits for user click) ---
-        function startSystem() { initParticles(); fetchGitHubData(); fetchNewsData(); startHUD(); setupCLI(); startTelemetry(); scanFingerprint(); initScrollAnimations(); }
+        function startSystem() { initParticles(); fetchGitHubData(); fetchNewsData(); startHUD(); setupCLI(); startTelemetry(); initScrollAnimations(); initChart(); }
 
-        function fetchGitHubData() {
-            fetch('https://api.github.com/users/khushalmourya3-eng')
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('gh-avatar').src = data.avatar_url;
-                document.getElementById('gh-name').innerText = data.name || data.login;
-                document.getElementById('gh-repos').innerText = data.public_repos;
-                document.getElementById('gh-followers').innerText = data.followers;
-            }).catch(err => { document.getElementById('gh-name').innerText = "API Offline"; });
+        // --- NEW: WEBRTC SECURITY CAMERA ---
+        async function initCamera() {
+            const video = document.getElementById('secCam');
+            const btn = document.getElementById('camBtn');
+            const overlay = document.getElementById('camOverlay');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                video.srcObject = stream;
+                video.style.display = "block";
+                overlay.style.display = "block";
+                btn.style.display = "none";
+            } catch(err) {
+                btn.innerText = "ACCESS DENIED / NO CAM";
+                btn.style.background = "#ff3e3e";
+                console.error("Camera error:", err);
+            }
         }
 
-        function fetchNewsData() {
-            fetch('https://dev.to/api/articles?tag=webdev&top=1&per_page=5')
-            .then(res => res.json())
-            .then(data => {
-                let feed = document.getElementById('newsFeed'); feed.innerHTML = '';
-                data.forEach(post => {
-                    feed.innerHTML += `<div class="news-post"><a href="${post.url}" target="_blank">> ${post.title}</a></div>`;
-                });
-            }).catch(err => { document.getElementById('newsFeed').innerHTML = "Uplink Failed. Check Network."; });
+        // --- NEW: VOICE COMMAND A.I. ---
+        function startVoice() {
+            const status = document.getElementById('voiceStatus');
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) { alert("Voice A.I. not supported in this browser."); return; }
+            
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false; recognition.interimResults = false; recognition.lang = 'en-US';
+            
+            recognition.onstart = function() {
+                status.style.display = "block";
+                status.innerText = "🎙️ A.I. Listening... (Say 'play audio', 'clear tasks', or 'self destruct')";
+                status.style.color = "var(--yellow)";
+            };
+            
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                status.innerText = ">_ A.I. Heard: " + transcript;
+                status.style.color = "var(--cyan)";
+                setTimeout(() => { status.style.display = "none"; }, 4000);
+                
+                // Logic Parser
+                if(transcript.includes("play") || transcript.includes("music") || transcript.includes("audio")) {
+                    toggleAudio();
+                } else if(transcript.includes("clear") || transcript.includes("task") || transcript.includes("wipe")) {
+                    executeCommand("/clear");
+                } else if(transcript.includes("protocol zero") || transcript.includes("self destruct") || transcript.includes("destroy")) {
+                    triggerSelfDestruct();
+                } else {
+                    document.getElementById('statusText').innerText = ">_ A.I.: Command unrecognized.";
+                }
+            };
+            recognition.onerror = function() { status.innerText = ">_ Voice Error. Try again."; setTimeout(() => { status.style.display = "none"; }, 3000); };
+            recognition.start();
         }
+
+        // --- NEW: CHART.JS SERVER MATRIX ---
+        let trafficChart;
+        function initChart() {
+            const ctx = document.getElementById('trafficChart').getContext('2d');
+            const initData = Array.from({length: 20}, () => Math.floor(Math.random() * 100));
+            trafficChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 20}, () => ''),
+                    datasets: [{ label: 'Packets/sec', data: initData, borderColor: '#00f3ff', backgroundColor: 'rgba(0, 243, 255, 0.1)', borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, animation: false, scales: { x: { display: false }, y: { display: true, min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } } }, plugins: { legend: { display: false } } }
+            });
+
+            setInterval(() => {
+                const data = trafficChart.data.datasets[0].data;
+                data.push(Math.floor(Math.random() * (100 - 20) + 20)); // Generate new packet data
+                data.shift(); // Remove oldest
+                trafficChart.update();
+            }, 800);
+        }
+
+        function fetchGitHubData() { fetch('https://api.github.com/users/khushalmourya3-eng').then(res => res.json()).then(data => { document.getElementById('gh-avatar').src = data.avatar_url; document.getElementById('gh-name').innerText = data.name || data.login; document.getElementById('gh-repos').innerText = data.public_repos; document.getElementById('gh-followers').innerText = data.followers; }).catch(err => { document.getElementById('gh-name').innerText = "API Offline"; }); }
+        function fetchNewsData() { fetch('https://dev.to/api/articles?tag=webdev&top=1&per_page=5').then(res => res.json()).then(data => { let feed = document.getElementById('newsFeed'); feed.innerHTML = ''; data.forEach(post => { feed.innerHTML += `<div class="news-post"><a href="${post.url}" target="_blank">> ${post.title}</a></div>`; }); }).catch(err => { document.getElementById('newsFeed').innerHTML = "Uplink Failed."; }); }
 
         function initParticles() { particlesJS("particles-js", { "particles": { "number": { "value": 60, "density": { "enable": true, "value_area": 800 } }, "color": { "value": ["#00f3ff", "#ff00ea"] }, "shape": { "type": "circle" }, "opacity": { "value": 0.5, "random": true }, "size": { "value": 3, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#00f3ff", "opacity": 0.4, "width": 1 }, "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false } }, "interactivity": { "detect_on": "window", "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true }, "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 1 } }, "push": { "particles_nb": 4 } } }, "retina_detect": true }); }
-
         function initScrollAnimations() { function reveal() { var reveals = document.querySelectorAll(".reveal"); for (var i = 0; i < reveals.length; i++) { var windowHeight = window.innerHeight; var elementTop = reveals[i].getBoundingClientRect().top; var elementVisible = 50; if (elementTop < windowHeight - elementVisible) { reveals[i].classList.add("active"); } else { reveals[i].classList.remove("active"); } } } window.addEventListener("scroll", reveal); reveal(); }
-        
-        function scanFingerprint() { document.getElementById('fp-cores').innerText = navigator.hardwareConcurrency || "N/A"; document.getElementById('fp-res').innerText = `${window.screen.width} x ${window.screen.height}`; let engine = "Unknown"; if(navigator.userAgent.includes("Chrome")) engine = "Blink"; else if(navigator.userAgent.includes("Firefox")) engine = "Gecko"; else if(navigator.userAgent.includes("Safari")) engine = "WebKit"; document.getElementById('fp-engine').innerText = engine; }
         
         const scratchpad = document.getElementById('scratchpad'); scratchpad.addEventListener('input', () => { localStorage.setItem('adminScratchpad', scratchpad.value); });
         function loadScratchpad() { const saved = localStorage.getItem('adminScratchpad'); if(saved) scratchpad.value = saved; }
 
-        // --- REAL-TIME AUDIO VISUALIZER (Web Audio API) ---
-        let isAudioPlaying = false;
-        let audioCtx, analyser, source, dataArray;
-        let visualizerInitialized = false;
+        let isAudioPlaying = false; let audioCtx, analyser, source, dataArray; let visualizerInitialized = false;
+        function initRealVisualizer() { const a = document.getElementById("myAudio"); const AudioContext = window.AudioContext || window.webkitAudioContext; audioCtx = new AudioContext(); analyser = audioCtx.createAnalyser(); analyser.fftSize = 64; analyser.smoothingTimeConstant = 0.85; source = audioCtx.createMediaElementSource(a); source.connect(analyser); analyser.connect(audioCtx.destination); const bufferLength = analyser.frequencyBinCount; dataArray = new Uint8Array(bufferLength); visualizerInitialized = true; drawRealVisualizer(); }
+        function drawRealVisualizer() { const canvas = document.getElementById('visualizer'); const ctx = canvas.getContext('2d'); requestAnimationFrame(drawRealVisualizer); canvas.width = canvas.parentElement.clientWidth - 40; canvas.height = 70; const bars = analyser.frequencyBinCount; const barWidth = canvas.width / bars - 2; let gradient = ctx.createLinearGradient(0, 0, canvas.width, 0); gradient.addColorStop(0, "#00f3ff"); gradient.addColorStop(0.5, "#ff00ea"); gradient.addColorStop(1, "#eaff00"); analyser.getByteFrequencyData(dataArray); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = gradient; for(let i = 0; i < bars; i++) { let barHeight = (dataArray[i] / 255) * (canvas.height - 10) + 5; if (!isAudioPlaying) barHeight = 5; ctx.beginPath(); ctx.roundRect(i * (barWidth + 2), canvas.height - barHeight, barWidth, barHeight, [3, 3, 0, 0]); ctx.fill(); } }
+        function toggleAudio() { const a = document.getElementById("myAudio"); const btn = document.getElementById("audioBtn"); const status = document.getElementById('statusText'); if(!visualizerInitialized) { initRealVisualizer(); } if (audioCtx.state === 'suspended') { audioCtx.resume(); } if(isAudioPlaying) { a.pause(); isAudioPlaying = false; btn.innerHTML = "▶ PLAY AUDIO"; status.innerText = ">_ Status: Audio Paused"; } else { a.play().catch(e => { console.log(e); status.innerText = ">_ Error: music.mp3 missing!"; }); isAudioPlaying = true; btn.innerHTML = "⏸ PAUSE AUDIO"; status.innerText = ">_ Status: Audio Active"; } }
 
-        function initRealVisualizer() {
-            const a = document.getElementById("myAudio");
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
-            analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 64; 
-            analyser.smoothingTimeConstant = 0.85; 
-            source = audioCtx.createMediaElementSource(a);
-            source.connect(analyser);
-            analyser.connect(audioCtx.destination);
-            const bufferLength = analyser.frequencyBinCount;
-            dataArray = new Uint8Array(bufferLength);
-            visualizerInitialized = true;
-            drawRealVisualizer();
-        }
-
-        function drawRealVisualizer() {
-            const canvas = document.getElementById('visualizer'); 
-            const ctx = canvas.getContext('2d'); 
-            requestAnimationFrame(drawRealVisualizer);
-            canvas.width = canvas.parentElement.clientWidth - 40; 
-            canvas.height = 70; 
-            const bars = analyser.frequencyBinCount; 
-            const barWidth = canvas.width / bars - 2; 
-            let gradient = ctx.createLinearGradient(0, 0, canvas.width, 0); 
-            gradient.addColorStop(0, "#00f3ff"); 
-            gradient.addColorStop(0.5, "#ff00ea"); 
-            gradient.addColorStop(1, "#eaff00");
-
-            analyser.getByteFrequencyData(dataArray);
-            ctx.clearRect(0, 0, canvas.width, canvas.height); 
-            ctx.fillStyle = gradient; 
-            
-            for(let i = 0; i < bars; i++) { 
-                let barHeight = (dataArray[i] / 255) * (canvas.height - 10) + 5; 
-                if (!isAudioPlaying) barHeight = 5; 
-                ctx.beginPath(); 
-                ctx.roundRect(i * (barWidth + 2), canvas.height - barHeight, barWidth, barHeight, [3, 3, 0, 0]); 
-                ctx.fill(); 
-            }
-        }
-
-        function toggleAudio() { 
-            const a = document.getElementById("myAudio"); 
-            const btn = document.getElementById("audioBtn"); 
-            const status = document.getElementById('statusText'); 
-            
-            if(!visualizerInitialized) { initRealVisualizer(); }
-            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-
-            if(isAudioPlaying) { 
-                a.pause(); 
-                isAudioPlaying = false; 
-                btn.innerHTML = "▶ PLAY AUDIO"; 
-                status.innerText = ">_ Status: Audio Paused"; 
-            } else { 
-                a.play().catch(e => { console.log("Audio Error:", e); status.innerText = ">_ Error: music.mp3 missing!"; }); 
-                isAudioPlaying = true; 
-                btn.innerHTML = "⏸ PAUSE AUDIO"; 
-                status.innerText = ">_ Status: Audio Active"; 
-            } 
-        }
-
-        function startHUD() {
-            setInterval(() => { document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', { hour12: false }); }, 1000);
-            if(navigator.getBattery) { navigator.getBattery().then(b => { function u() { document.getElementById('batData').innerText = Math.floor(b.level * 100) + (b.charging ? "% ⚡" : "%"); } u(); b.addEventListener('levelchange', u); b.addEventListener('chargingchange', u); }); }
-            if(navigator.connection) { function u() { document.getElementById('netData').innerText = navigator.connection.effectiveType.toUpperCase(); } u(); navigator.connection.addEventListener('change', u); }
-            fetch('https://api.open-meteo.com/v1/forecast?latitude=26.9124&longitude=75.7873&current_weather=true').then(res => res.json()).then(data => { document.getElementById('weatherData').innerText = `${data.current_weather.temperature}°C`; }).catch(() => { document.getElementById('weatherData').innerText = "ERR"; });
-        }
-
-        function startTelemetry() { setInterval(() => { let rpm = Math.floor(Math.random() * (3500 - 1500) + 1500); if(Math.random() > 0.8) rpm = Math.floor(Math.random() * (7200 - 4500) + 4500); document.getElementById('rpmText').innerText = rpm; document.getElementById('rpmBar').style.width = (rpm / 7500) * 100 + "%"; let boost = (rpm > 3000) ? (Math.random() * (18.5 - 10.0) + 10.0).toFixed(1) : (Math.random() * 2.0).toFixed(1); document.getElementById('boostText').innerText = boost + " PSI"; document.getElementById('boostBar').style.width = (boost / 20) * 100 + "%"; let temp = (Math.random() * (105 - 95) + 95).toFixed(0); document.getElementById('tempText').innerText = temp + " °C"; document.getElementById('tempBar').style.width = (temp / 130) * 100 + "%"; }, 800); }
+        function startHUD() { setInterval(() => { document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', { hour12: false }); }, 1000); if(navigator.getBattery) { navigator.getBattery().then(b => { function u() { document.getElementById('batData').innerText = Math.floor(b.level * 100) + (b.charging ? "% ⚡" : "%"); } u(); b.addEventListener('levelchange', u); b.addEventListener('chargingchange', u); }); } if(navigator.connection) { function u() { document.getElementById('netData').innerText = navigator.connection.effectiveType.toUpperCase(); } u(); navigator.connection.addEventListener('change', u); } fetch('https://api.open-meteo.com/v1/forecast?latitude=26.9124&longitude=75.7873&current_weather=true').then(res => res.json()).then(data => { document.getElementById('weatherData').innerText = `${data.current_weather.temperature}°C`; }).catch(() => { document.getElementById('weatherData').innerText = "ERR"; }); }
+        function startTelemetry() { setInterval(() => { let temp = (Math.random() * (105 - 95) + 95).toFixed(0); document.getElementById('tempText').innerText = temp + " °C"; document.getElementById('tempBar').style.width = (temp / 130) * 100 + "%"; }, 800); }
 
         function triggerSelfDestruct() { document.body.classList.add('destruct-mode'); const overlay = document.createElement('div'); overlay.id = "destructOverlay"; document.body.appendChild(overlay); let count = 5; overlay.innerHTML = `SYSTEM PURGE IN<br><span style="color:#eaff00">${count}</span>`; let countdown = setInterval(() => { count--; overlay.innerHTML = `SYSTEM PURGE IN<br><span style="color:#eaff00">${count}</span>`; if(count <= 0) { clearInterval(countdown); document.body.innerHTML = `<div style="color:#00f3ff; padding:20px; font-family:monospace; font-size:1.5rem; display:flex; height:100vh; align-items:center; justify-content:center;">>_ SYSTEM WIPED.<br>>_ NOTHING REMAINS.</div>`; document.body.classList.remove('destruct-mode'); document.body.style.background = "#000"; } }, 1000); }
 
