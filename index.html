@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Admin | Level 13 OS</title>
+    <title>System Admin | Level 13.1 OS</title>
     
     <link rel="manifest" href='data:application/manifest+json,{"name":"System Admin","short_name":"Admin OS","start_url":".","display":"standalone","background_color":"#050510","theme_color":"#00f3ff","icons":[{"src":"https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png","sizes":"512x512","type":"image/png"}]}'>
 
@@ -69,10 +69,11 @@
         .vfs-item { display: flex; align-items: center; padding: 8px; background: rgba(0,0,0,0.4); margin-bottom: 5px; border-radius: 5px; font-family: monospace; font-size: 0.9rem; border: 1px solid transparent; transition: 0.2s; }
         .vfs-item:hover { border-color: var(--cyan); background: rgba(0, 243, 255, 0.1); }
         
-        /* Map Customization */
+        /* UPDATED: Brighter Hacker Map Filter */
         .leaflet-container { background: #050510; }
-        .radar-blip { background-color: var(--cyan); border-radius: 50%; box-shadow: 0 0 15px var(--cyan); animation: radarPulse 2s infinite; }
-        @keyframes radarPulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
+        .leaflet-tile { filter: invert(100%) hue-rotate(180deg) brightness(130%) contrast(120%); }
+        .radar-blip { background-color: var(--cyan); border-radius: 50%; border: 2px solid white; box-shadow: 0 0 25px 8px var(--cyan); animation: radarPulse 1.5s ease-out infinite; }
+        @keyframes radarPulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(4); opacity: 0; } }
 
         .sec-cam-container { position: relative; border: 1px solid var(--cyan); border-radius: 8px; overflow: hidden; background: #000; min-height: 180px; display: flex; justify-content: center; align-items: center; }
         #secCam { width: 100%; filter: sepia(100%) hue-rotate(130deg) saturate(300%) contrast(1.5); display: none; object-fit: cover; }
@@ -225,65 +226,39 @@
     </div>
 
     <script>
-        // --- DRAG AND DROP WINDOW MANAGER ---
+        // --- UPDATED: Smooth Drag Manager ---
         function initDraggable() {
             var el = document.getElementById('panelContainer');
             Sortable.create(el, {
-                handle: '.drag-handle', // Only drag by the H3 headers
-                animation: 200,
+                handle: '.drag-handle',
+                animation: 300,
+                delay: 150, // Prevents accidental dragging when scrolling
+                delayOnTouchOnly: true, // Only applies the delay on mobile screens
                 ghostClass: 'sortable-ghost'
             });
         }
 
-        // --- GEOLOCATION RADAR ---
+        // --- UPDATED: High Contrast Cyberpunk Map ---
         function initMap() {
-            // Set coordinates directly to Jaipur
-            var map = L.map('map').setView([26.9124, 75.7873], 12);
-            // Dark mode CartoDB tiles
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap'
+            var map = L.map('map', { zoomControl: false }).setView([26.9124, 75.7873], 12);
+            // Uses standard open street map, but our CSS flips it to neon dark mode!
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OSM'
             }).addTo(map);
 
-            // Pulsing Radar Blip
-            var pulsingIcon = L.divIcon({ className: 'radar-blip', iconSize: [15, 15] });
+            var pulsingIcon = L.divIcon({ className: 'radar-blip', iconSize: [20, 20] });
             L.marker([26.9124, 75.7873], {icon: pulsingIcon}).addTo(map);
         }
 
-        // --- CLI COMMANDS (UPDATED WITH /EXECUTE) ---
         function setupCLI() { const cli = document.getElementById('cliInput'); cli.addEventListener('keypress', function(e) { if(e.key === 'Enter') { executeCommand(cli.value.trim()); cli.value = ''; resetIdleTimer(); } }); }
-        
         function executeCommand(cmd) { 
-            const status = document.getElementById('statusText'); 
-            const parts = cmd.split(' ');
-            const command = parts[0].toLowerCase();
-            const arg = parts[1];
-
-            if(command === '/help') { 
-                alert("COMMANDS:\n/play (toggle audio)\n/mkdir [name] (create folder)\n/execute (run script)\n/rm [name] (delete item)"); 
-            } 
+            const status = document.getElementById('statusText'); const parts = cmd.split(' '); const command = parts[0].toLowerCase(); const arg = parts[1];
+            if(command === '/help') { alert("COMMANDS:\n/play (toggle audio)\n/mkdir [name] (create folder)\n/execute (run script)\n/rm [name] (delete item)"); } 
             else if(command === '/play') { toggleAudio(); } 
-            else if(command === '/mkdir' && arg) {
-                vfs.files.push({type: 'dir', name: arg}); saveVFS(); renderVFS(); status.innerText = `>_ Directory created: ${arg}`;
-            }
-            else if(command === '/touch' && arg) {
-                vfs.files.push({type: 'file', name: arg}); saveVFS(); renderVFS(); status.innerText = `>_ File created: ${arg}`;
-            }
-            else if(command === '/rm' && arg) {
-                const initialLength = vfs.files.length; vfs.files = vfs.files.filter(item => item.name !== arg);
-                if(vfs.files.length < initialLength) { saveVFS(); renderVFS(); status.innerText = `>_ Item deleted: ${arg}`; }
-                else { status.innerText = `>_ Error: Item not found.`; }
-            }
-            // MACRO ENGINE
-            else if(command === '/execute') {
-                try {
-                    const code = document.getElementById('scratchpad').value;
-                    const macro = new Function(code);
-                    macro();
-                    status.innerText = ">_ Macro compiled and executed.";
-                } catch(err) {
-                    status.innerText = `>_ Macro Error: ${err.message}`;
-                }
-            }
+            else if(command === '/mkdir' && arg) { vfs.files.push({type: 'dir', name: arg}); saveVFS(); renderVFS(); status.innerText = `>_ Directory created: ${arg}`; }
+            else if(command === '/touch' && arg) { vfs.files.push({type: 'file', name: arg}); saveVFS(); renderVFS(); status.innerText = `>_ File created: ${arg}`; }
+            else if(command === '/rm' && arg) { const initialLength = vfs.files.length; vfs.files = vfs.files.filter(item => item.name !== arg); if(vfs.files.length < initialLength) { saveVFS(); renderVFS(); status.innerText = `>_ Item deleted: ${arg}`; } else { status.innerText = `>_ Error: Item not found.`; } }
+            else if(command === '/execute') { try { const code = document.getElementById('scratchpad').value; const macro = new Function(code); macro(); status.innerText = ">_ Macro compiled and executed."; } catch(err) { status.innerText = `>_ Macro Error: ${err.message}`; } }
             else { status.innerText = ">_ Error: Command not found or missing argument."; } 
         }
 
@@ -336,3 +311,4 @@
     </script>
 </body>
 </html>
+/
