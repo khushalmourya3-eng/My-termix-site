@@ -5,9 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control Room | Authorized Access</title>
-    
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
     <style>
         :root { --main-color: #00ff41; --bg-blur: rgba(0, 0, 0, 0.85); }
         .theme-red { --main-color: #ff3e3e; }
@@ -20,7 +18,6 @@
         .login-box { border: 2px solid var(--main-color); padding: 30px; text-align: center; border-radius: 10px; box-shadow: 0 0 20px var(--main-color); background: rgba(0,0,0,0.9); width: 80%; max-width: 400px; }
         .login-input { background: black; color: var(--main-color); border: 1px solid var(--main-color); padding: 10px; margin: 15px 0; outline: none; text-align: center; font-family: inherit; font-size: 1.2rem; width: 80%; }
         
-        /* THE NEW BOOT SCREEN */
         #bootScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: black; color: var(--main-color); font-family: 'Courier New', monospace; z-index: 9998; padding: 20px; box-sizing: border-box; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
         #bootLogs { font-size: 0.85rem; text-align: left; line-height: 1.4; text-shadow: 0 0 5px var(--main-color); }
         
@@ -28,8 +25,8 @@
         .hidden { display: none !important; }
         .flex-col { display: flex; }
 
-        #hud { width: 100%; background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--main-color); padding: 10px 0; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 10px var(--main-color); font-size: 0.9rem;}
-        #hud span { margin: 0 10px; }
+        #hud { width: 100%; background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--main-color); padding: 10px 0; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 10px var(--main-color); font-size: 0.85rem;}
+        #hud span { margin: 0 8px; }
 
         .container { border: 2px solid var(--main-color); padding: 25px; border-radius: 15px; box-shadow: 0 0 30px rgba(0, 255, 65, 0.2); background: var(--bg-blur); max-width: 500px; width: 90%; text-align: center; margin-top: 3vh; margin-bottom: 5vh; z-index: 1; backdrop-filter: blur(5px); transition: all 0.5s; }
         .glow-text { text-shadow: 0 0 10px var(--main-color), 0 0 20px var(--main-color); animation: pulse 2s infinite alternate; }
@@ -42,10 +39,12 @@
         
         #logoutBtn { position: absolute; top: 50px; right: 10px; background: transparent; color: #ff3e3e; border: 1px solid #ff3e3e; padding: 5px 10px; cursor: pointer; font-family: inherit; border-radius: 3px; z-index: 10; }
 
-        .pomodoro-box { border: 1px dashed var(--main-color); padding: 15px; margin-top: 25px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); }
-        #pomo-time { font-size: 2.5rem; font-weight: bold; text-shadow: 0 0 15px var(--main-color); margin: 10px 0; }
-        
-        #quoteBox { border-left: 3px solid var(--main-color); padding: 10px; margin-top: 15px; background: rgba(255, 255, 255, 0.05); font-style: italic; font-size: 0.9rem; text-align: left; }
+        /* BMW Telemetry Box */
+        .telemetry-box { border: 1px solid var(--main-color); padding: 15px; margin-top: 20px; border-radius: 10px; background: rgba(0, 0, 0, 0.6); text-align: left; }
+        .telemetry-box h3 { text-align: center; margin-top: 0; color: white; font-size: 1rem; }
+        .t-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.85rem; }
+        .t-bar-bg { width: 100%; background: #222; height: 10px; border-radius: 5px; margin-bottom: 10px; overflow: hidden; }
+        .t-bar-fill { height: 100%; background: var(--main-color); transition: width 0.2s; box-shadow: 0 0 10px var(--main-color); }
 
         .todo-box { border: 1px solid var(--main-color); padding: 15px; margin-top: 20px; border-radius: 10px; background: rgba(0, 0, 0, 0.6); text-align: left; }
         .todo-box h3 { text-align: center; margin-top: 0; color: white; }
@@ -59,6 +58,15 @@
         .cli-box { border: 1px solid var(--main-color); padding: 10px; margin-top: 20px; background: black; text-align: left; border-radius: 5px; display: flex; align-items: center; }
         .cli-prompt { font-weight: bold; margin-right: 10px; }
         #cliInput { background: transparent; border: none; color: var(--main-color); font-family: inherit; width: 100%; outline: none; font-size: 1rem; }
+
+        /* Panic Button */
+        .panic-btn { background: #110000; border: 2px solid #ff3e3e; color: #ff3e3e; padding: 15px; font-weight: bold; cursor: pointer; border-radius: 5px; width: 100%; margin-top: 25px; transition: 0.2s; box-shadow: 0 0 10px #ff3e3e; font-family: inherit; }
+        .panic-btn:hover { background: #ff3e3e; color: black; box-shadow: 0 0 30px #ff3e3e; }
+
+        /* Flashing Animation for Self Destruct */
+        @keyframes destructFlash { 0% { background-color: black; } 50% { background-color: #330000; } 100% { background-color: black; } }
+        .destruct-mode { animation: destructFlash 0.5s infinite; }
+        #destructOverlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,0,0,0.8); z-index: 10000; display:flex; justify-content:center; align-items:center; color:white; font-size: 5rem; font-weight:bold; }
     </style>
 </head>
 <body>
@@ -73,14 +81,13 @@
         </div>
     </div>
 
-    <div id="bootScreen" class="hidden">
-        <div id="bootLogs"></div>
-    </div>
+    <div id="bootScreen" class="hidden"><div id="bootLogs"></div></div>
 
     <div id="mainContent" class="hidden flex-col">
         <div id="hud">
             <span>🔋 <span id="batData">--%</span></span> | 
             <span>📡 <span id="netData">--</span></span> | 
+            <span>🌦️ <span id="weatherData">Loading...</span></span> |
             <span>⏱️ <span id="clockData">00:00</span></span>
         </div>
 
@@ -93,7 +100,17 @@
             
             <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500" alt="Hacker Setup">
 
-            <div id="quoteBox">Fetching live data from server...</div>
+            <div class="telemetry-box">
+                <h3>🏎️ M4 COMPETITION TELEMETRY</h3>
+                <div class="t-row"><span>ENGINE RPM</span><span id="rpmText">0</span></div>
+                <div class="t-bar-bg"><div class="t-bar-fill" id="rpmBar" style="width: 0%;"></div></div>
+                
+                <div class="t-row"><span>TURBO BOOST (PSI)</span><span id="boostText">0.0</span></div>
+                <div class="t-bar-bg"><div class="t-bar-fill" id="boostBar" style="width: 0%;"></div></div>
+                
+                <div class="t-row"><span>OIL TEMP (°C)</span><span id="tempText">90</span></div>
+                <div class="t-bar-bg"><div class="t-bar-fill" id="tempBar" style="width: 50%;"></div></div>
+            </div>
 
             <div class="todo-box">
                 <h3>✅ DAILY TARGETS</h3>
@@ -102,156 +119,148 @@
                 <ul id="taskList"></ul>
             </div>
 
-            <div class="pomodoro-box">
-                <h3 style="color: white; margin: 0;">⚡ FOCUS MODE</h3>
-                <div id="pomo-time">25:00</div>
-                <button class="btn" onclick="startPomodoro()" id="pomo-btn">▶ Start 25m Sprint</button>
-            </div>
-
             <audio id="myAudio" loop><source src="music.mp3" type="audio/mpeg"></audio>
 
             <div class="cli-box">
                 <span class="cli-prompt">root@system:~#</span>
                 <input type="text" id="cliInput" placeholder="Type /help and press Enter..." autocomplete="off">
             </div>
+
+            <button class="panic-btn" onclick="triggerSelfDestruct()">⚠️ INITIATE PROTOCOL ZERO</button>
         </div>
     </div>
 
     <script>
         // --- BOOT SEQUENCE LOGIC ---
-        const bootMessages = [
-            "Mounting core filesystems... [OK]",
-            "Loading local user data... [OK]",
-            "Initializing hardware interface...",
-            "Checking battery ACPI node... [SUCCESS]",
-            "Pinging network daemon... [ONLINE]",
-            "Loading cryptographic modules... [OK]",
-            "Decrypting master vault... [OK]",
-            "Bypassing external firewalls... [DONE]",
-            "Compiling visual matrix...",
-            "System Admin recognized. Welcome back."
-        ];
-
+        const bootMessages = ["Mounting core filesystems... [OK]", "Loading local user data... [OK]", "Initializing hardware interface...", "Pinging network daemon... [ONLINE]", "Fetching atmospheric data... [OK]", "Calibrating M4 Engine Sensors... [SUCCESS]", "System Admin recognized. Welcome back."];
         function runBootSequence() {
             document.getElementById("loginScreen").style.display = "none";
             const bootScreen = document.getElementById("bootScreen");
             bootScreen.classList.remove("hidden");
             const logsBox = document.getElementById("bootLogs");
             logsBox.innerHTML = "";
-
             let delay = 0;
             bootMessages.forEach((msg, index) => {
-                setTimeout(() => {
-                    const timeStamp = `[${(Math.random() * 2).toFixed(4)}]`;
-                    logsBox.innerHTML += `<div>${timeStamp} ${msg}</div>`;
-                }, delay);
-                delay += 150 + Math.random() * 250; // Random fast delay between 150ms-400ms
+                setTimeout(() => { logsBox.innerHTML += `<div>[${(Math.random() * 2).toFixed(4)}] ${msg}</div>`; }, delay);
+                delay += 150 + Math.random() * 250;
             });
-
-            // Finish boot and launch system
-            setTimeout(() => {
-                bootScreen.classList.add("hidden");
-                document.getElementById("mainContent").classList.remove("hidden");
-                startSystem();
-            }, delay + 600);
+            setTimeout(() => { bootScreen.classList.add("hidden"); document.getElementById("mainContent").classList.remove("hidden"); startSystem(); }, delay + 600);
         }
 
-        // --- LOGIN MEMORY ---
         function processLogin() {
             const pass = document.getElementById("passInput").value.toUpperCase();
-            if(pass === "ADMIN" || pass === "KHUSHAL") {
-                localStorage.setItem("hasAccess", "true"); 
-                runBootSequence();
-            } else { document.getElementById("errorMsg").style.display = "block"; }
+            if(pass === "ADMIN" || pass === "KHUSHAL") { localStorage.setItem("hasAccess", "true"); runBootSequence(); } 
+            else { document.getElementById("errorMsg").style.display = "block"; }
         }
         function logout() { localStorage.removeItem("hasAccess"); location.reload(); }
 
         window.onload = function() {
             loadTasks(); loadTheme();
-            if(localStorage.getItem("hasAccess") === "true") {
-                runBootSequence(); // Run the cool boot sequence even if remembered!
-            }
+            if(localStorage.getItem("hasAccess") === "true") { runBootSequence(); }
         };
 
-        // --- CORE SYSTEM BOOT ---
-        function startSystem() { startMatrix(); fetchQuote(); startHUD(); setupCLI(); }
+        function startSystem() { startMatrix(); startHUD(); setupCLI(); startTelemetry(); }
 
-        // --- HARDWARE HUD API ---
+        // --- HARDWARE & WEATHER HUD ---
         function startHUD() {
             setInterval(() => { document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', { hour12: false }); }, 1000);
-            if(navigator.getBattery) {
-                navigator.getBattery().then(battery => {
-                    function updateBat() { document.getElementById('batData').innerText = Math.floor(battery.level * 100) + (battery.charging ? "% ⚡" : "%"); }
-                    updateBat(); battery.addEventListener('levelchange', updateBat); battery.addEventListener('chargingchange', updateBat);
-                });
-            } else { document.getElementById('batData').innerText = "N/A"; }
-            if(navigator.connection) {
-                function updateNet() { document.getElementById('netData').innerText = navigator.connection.effectiveType.toUpperCase(); }
-                updateNet(); navigator.connection.addEventListener('change', updateNet);
-            } else { document.getElementById('netData').innerText = "WIFI"; }
+            if(navigator.getBattery) { navigator.getBattery().then(b => { function u() { document.getElementById('batData').innerText = Math.floor(b.level * 100) + (b.charging ? "% ⚡" : "%"); } u(); b.addEventListener('levelchange', u); b.addEventListener('chargingchange', u); }); }
+            if(navigator.connection) { function u() { document.getElementById('netData').innerText = navigator.connection.effectiveType.toUpperCase(); } u(); navigator.connection.addEventListener('change', u); }
+            
+            // Open-Meteo API Fetch for Jaipur coordinates
+            fetch('https://api.open-meteo.com/v1/forecast?latitude=26.9124&longitude=75.7873&current_weather=true')
+                .then(res => res.json())
+                .then(data => { document.getElementById('weatherData').innerText = `${data.current_weather.temperature}°C`; })
+                .catch(() => { document.getElementById('weatherData').innerText = "ERR"; });
         }
 
-        // --- INTERACTIVE CLI ---
+        // --- BMW M4 TELEMETRY SIMULATION ---
+        function startTelemetry() {
+            setInterval(() => {
+                // RPM Fluctuates between 1000 and 7200
+                let rpm = Math.floor(Math.random() * (3500 - 1500) + 1500); 
+                // Random rev spikes
+                if(Math.random() > 0.8) rpm = Math.floor(Math.random() * (7200 - 4500) + 4500);
+                let rpmPercent = (rpm / 7500) * 100;
+                document.getElementById('rpmText').innerText = rpm;
+                document.getElementById('rpmBar').style.width = rpmPercent + "%";
+
+                // Boost PSI based on RPM
+                let boost = (rpm > 3000) ? (Math.random() * (18.5 - 10.0) + 10.0).toFixed(1) : (Math.random() * 2.0).toFixed(1);
+                let boostPercent = (boost / 20) * 100;
+                document.getElementById('boostText').innerText = boost;
+                document.getElementById('boostBar').style.width = boostPercent + "%";
+
+                // Oil Temp slow climb/fluctuation
+                let temp = (Math.random() * (105 - 95) + 95).toFixed(0);
+                document.getElementById('tempText').innerText = temp;
+                document.getElementById('tempBar').style.width = (temp / 130) * 100 + "%";
+            }, 800);
+        }
+
+        // --- SELF DESTRUCT PROTOCOL ---
+        function triggerSelfDestruct() {
+            document.body.classList.add('destruct-mode');
+            const overlay = document.createElement('div');
+            overlay.id = "destructOverlay";
+            document.body.appendChild(overlay);
+            
+            let count = 5;
+            overlay.innerText = `DESTRUCT IN ${count}...`;
+            
+            let countdown = setInterval(() => {
+                count--;
+                overlay.innerText = `DESTRUCT IN ${count}...`;
+                if(count <= 0) {
+                    clearInterval(countdown);
+                    // The Wipe
+                    document.body.innerHTML = `<div style="color:#00ff41; padding:20px; font-family:'Courier New', monospace; font-size:1.5rem;">>_ SYSTEM DESTROYED.<br>>_ REBOOT REQUIRED.</div>`;
+                    document.body.classList.remove('destruct-mode');
+                    document.body.style.backgroundColor = "black";
+                }
+            }, 1000);
+        }
+
+        // --- CLI & TASKS ---
         function setupCLI() {
             const cli = document.getElementById('cliInput');
-            cli.addEventListener('keypress', function(e) {
-                if(e.key === 'Enter') {
-                    executeCommand(cli.value.toLowerCase().trim());
-                    cli.value = '';
-                }
-            });
+            cli.addEventListener('keypress', function(e) { if(e.key === 'Enter') { executeCommand(cli.value.toLowerCase().trim()); cli.value = ''; } });
         }
         function executeCommand(cmd) {
             const status = document.getElementById('statusText');
-            if(cmd === '/help') { alert("COMMANDS:\n/theme red\n/theme green\n/theme blue\n/play (toggle music)\n/clear (wipe tasks)\n/hack (run exploit)"); } 
+            if(cmd === '/help') { alert("COMMANDS:\n/theme red\n/theme green\n/theme blue\n/play (toggle music)\n/clear (wipe tasks)"); } 
             else if(cmd === '/theme red') { setTheme('theme-red'); status.innerText = ">_ Status: EMERGENCY OVERRIDE"; } 
             else if(cmd === '/theme blue') { setTheme('theme-blue'); status.innerText = ">_ Status: CYBERPUNK MODE"; } 
             else if(cmd === '/theme green') { setTheme(''); status.innerText = ">_ Status: Online"; } 
-            else if(cmd === '/play') { toggleMusic(); status.innerText = ">_ Status: Audio Active"; } 
+            else if(cmd === '/play') { const a = document.getElementById("myAudio"); if(a.paused) a.play(); else a.pause(); status.innerText = ">_ Status: Audio Toggled"; } 
             else if(cmd === '/clear') { document.getElementById("taskList").innerHTML = ""; saveTasks(); status.innerText = ">_ Status: Memory Wiped"; } 
-            else if(cmd === '/hack') {
-                status.innerText = ">_ INJECTING PAYLOAD... ACCESS GRANTED";
-                document.getElementById('mainContainer').style.borderColor = "white";
-                setTimeout(() => { document.getElementById('mainContainer').style.borderColor = "var(--main-color)"; status.innerText = ">_ Status: Online"; }, 3000);
-            } else { status.innerText = ">_ Error: Command not found. Type /help"; }
+            else { status.innerText = ">_ Error: Command not found. Type /help"; }
         }
 
-        // --- THEME SWITCHER ---
         function setTheme(themeClass) { document.body.className = themeClass; localStorage.setItem('sysTheme', themeClass); updateMatrixColor(); }
         function loadTheme() { const savedTheme = localStorage.getItem('sysTheme'); if(savedTheme) document.body.className = savedTheme; }
 
-        // --- MATRIX BACKGROUND ---
         let drops = [];
         function startMatrix() {
-            const canvas = document.getElementById('matrix'); const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*';
-            const fontSize = 14; const columns = canvas.width / fontSize;
+            const canvas = document.getElementById('matrix'); const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*'; const fontSize = 14; const columns = canvas.width / fontSize;
             for(let x = 0; x < columns; x++) drops[x] = 1;
             setInterval(() => {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                const compStyles = window.getComputedStyle(document.body);
-                ctx.fillStyle = compStyles.getPropertyValue('--main-color').trim() || '#0F0';
+                const compStyles = window.getComputedStyle(document.body); ctx.fillStyle = compStyles.getPropertyValue('--main-color').trim() || '#0F0';
                 ctx.font = fontSize + 'px monospace';
                 for(let i = 0; i < drops.length; i++) {
                     ctx.fillText(letters.charAt(Math.floor(Math.random() * letters.length)), i * fontSize, drops[i] * fontSize);
-                    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                    drops[i]++;
+                    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++;
                 }
             }, 33);
         }
         function updateMatrixColor() { drops = drops.map(() => 0); }
 
-        // --- API, TASKS, POMODORO ---
-        function fetchQuote() { fetch('https://dummyjson.com/quotes/random').then(res => res.json()).then(data => { document.getElementById("quoteBox").innerHTML = `"${data.quote}" <br><br><b>- ${data.author}</b>`; }).catch(err => { document.getElementById("quoteBox").innerHTML = `"Offline Mode."`; }); }
         function addTask() { let input = document.getElementById("taskInput"); if(input.value === '') return; let li = document.createElement("li"); li.innerHTML = `<span class="task-text" onclick="toggleTask(this)">${input.value}</span> <span class="delete-btn" onclick="this.parentElement.remove(); saveTasks();">X</span>`; document.getElementById("taskList").appendChild(li); input.value = ""; saveTasks(); }
         function toggleTask(element) { element.parentElement.classList.toggle('completed'); if(element.parentElement.classList.contains('completed')) { const compColor = window.getComputedStyle(document.body).getPropertyValue('--main-color').trim(); confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: [compColor, '#ffffff'] }); } saveTasks(); }
         function saveTasks() { localStorage.setItem("devTasks", document.getElementById("taskList").innerHTML); }
         function loadTasks() { let saved = localStorage.getItem("devTasks"); if(saved) document.getElementById("taskList").innerHTML = saved; }
-
-        let pomoInterval;
-        function startPomodoro() { clearInterval(pomoInterval); let timeLeft = 25 * 60; const display = document.getElementById('pomo-time'); const btn = document.getElementById('pomo-btn'); btn.innerHTML = "⏸ Focus Mode Active..."; pomoInterval = setInterval(() => { let m = Math.floor(timeLeft / 60); let s = timeLeft % 60; display.innerHTML = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s); if (timeLeft <= 0) { clearInterval(pomoInterval); display.innerHTML = "00:00"; btn.innerHTML = "▶ Restart Sprint"; alert("Mission Complete!"); } timeLeft--; }, 1000); }
-        function toggleMusic() { const audio = document.getElementById("myAudio"); if (audio.paused) { audio.play(); } else { audio.pause(); } }
     </script>
 </body>
 </html>
