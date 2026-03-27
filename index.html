@@ -7,33 +7,15 @@
     <title>System Admin | Cyberpunk</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* Modern Smooth Scrolling */
         html { scroll-behavior: smooth; }
-        
-        /* Vibrant Color Palette */
-        :root { 
-            --cyan: #00f3ff;
-            --magenta: #ff00ea;
-            --yellow: #eaff00;
-            --glass-bg: rgba(20, 20, 35, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.15);
-        }
+        :root { --cyan: #00f3ff; --magenta: #ff00ea; --yellow: #eaff00; --glass-bg: rgba(20, 20, 35, 0.65); --glass-border: rgba(255, 255, 255, 0.15); }
 
         body { margin: 0; padding: 0; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #050510; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
         
-        /* Dynamic Animated Background */
         canvas.bg-canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; opacity: 0.6; }
         .bg-gradient { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at 50% 50%, rgba(255, 0, 234, 0.1), rgba(0, 243, 255, 0.05), #050510 80%); z-index: -1; }
 
-        /* Rainbow Text Animation */
-        .rainbow-text {
-            background: linear-gradient(90deg, var(--cyan), var(--magenta), var(--yellow), var(--cyan));
-            background-size: 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradientMove 5s ease infinite;
-            font-weight: bold; text-shadow: 0 0 20px rgba(255,255,255,0.2);
-        }
+        .rainbow-text { background: linear-gradient(90deg, var(--cyan), var(--magenta), var(--yellow), var(--cyan)); background-size: 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientMove 5s ease infinite; font-weight: bold; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
         @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
 
         #loginScreen, #bootScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050510; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -47,13 +29,11 @@
         .hidden { display: none !important; }
         .flex-col { display: flex; }
 
-        /* Glassmorphism HUD */
         #hud { width: 95%; max-width: 600px; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 0 0 15px 15px; padding: 15px 0; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 50; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-size: 0.9rem; margin-bottom: 20px; display: flex; justify-content: space-around; flex-wrap: wrap; }
         #hud span { color: #ddd; }
         #hud i { color: var(--cyan); font-style: normal; margin-right: 5px; }
 
         .container { max-width: 600px; width: 90%; text-align: center; margin-bottom: 5vh; z-index: 1; }
-        
         img { width: 100%; border-radius: 15px; border: 2px solid transparent; background-image: linear-gradient(#050510, #050510), linear-gradient(to right, var(--cyan), var(--magenta)); background-origin: border-box; background-clip: content-box, border-box; margin: 15px 0; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
         
         .btn { background: linear-gradient(45deg, var(--magenta), #7b00ff); color: white; border: none; padding: 12px 25px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: 0.3s; border-radius: 8px; box-shadow: 0 5px 20px rgba(255, 0, 234, 0.4); width: 100%; letter-spacing: 1px; }
@@ -61,19 +41,16 @@
         #logoutBtn { background: transparent; color: #ff3e3e; border: 1px solid #ff3e3e; box-shadow: none; width: auto; font-size: 0.8rem; padding: 8px 15px; margin-top: 10px; }
         #logoutBtn:hover { background: #ff3e3e; color: black; }
 
-        /* Glass Panels with Scroll Reveal */
         .glass-panel { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 15px; padding: 20px; margin-top: 25px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); text-align: left; transition: transform 0.3s, box-shadow 0.3s; }
         .glass-panel:hover { box-shadow: 0 12px 40px rgba(0, 243, 255, 0.15); border-color: rgba(0, 243, 255, 0.3); }
         .glass-panel h3 { text-align: center; margin-top: 0; color: #fff; font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
         
-        /* Scroll Reveal Animation Classes */
         .reveal { opacity: 0; transform: translateY(40px); transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
         .sys-info { font-size: 0.9rem; margin: 10px 0; color: #bbb; display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px; }
         .sys-info span { color: var(--yellow); font-family: 'Courier New', monospace; }
 
-        /* Colorful Telemetry */
         .t-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; color: #ccc; }
         .t-bar-bg { width: 100%; background: rgba(0,0,0,0.5); height: 12px; border-radius: 6px; margin-bottom: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
         .t-bar-fill { height: 100%; transition: width 0.3s ease-out; }
@@ -85,7 +62,6 @@
         #scratchpad { width: 100%; height: 120px; background: rgba(0,0,0,0.4); color: var(--cyan); border: 1px solid var(--glass-border); border-radius: 8px; padding: 12px; font-family: 'Courier New', monospace; outline: none; resize: none; box-sizing: border-box; transition: 0.3s; }
         #scratchpad:focus { border-color: var(--cyan); box-shadow: 0 0 15px rgba(0, 243, 255, 0.2); }
 
-        /* Rainbow Todo List */
         .input-group { display: flex; gap: 10px; }
         #taskInput { flex-grow: 1; padding: 12px; background: rgba(0,0,0,0.4); color: white; border: 1px solid var(--glass-border); border-radius: 8px; outline: none; transition: 0.3s; }
         #taskInput:focus { border-color: var(--magenta); }
@@ -159,7 +135,9 @@
             <div class="glass-panel reveal">
                 <h3>🎵 Audio Terminal</h3>
                 <canvas id="visualizer"></canvas>
-                <div style="font-size: 0.8rem; margin-top: 10px; text-align: center; color: #888;">Type <b style="color:var(--magenta)">/play</b> in terminal to toggle</div>
+                
+                <button id="audioBtn" class="btn" style="margin-top: 15px; background: linear-gradient(45deg, #00f3ff, #0051ff);" onclick="toggleAudio()">▶ PLAY AUDIO</button>
+                <div style="font-size: 0.8rem; margin-top: 10px; text-align: center; color: #888;">Or type <b style="color:var(--magenta)">/play</b> in terminal below</div>
             </div>
 
             <div class="glass-panel reveal">
@@ -197,17 +175,13 @@
     </div>
 
     <script>
-        // --- BOOT SEQUENCE ---
         const bootMessages = ["Mounting neural net... [OK]", "Injecting custom CSS payloads... [OK]", "Initializing glassmorphism... [DONE]", "Bypassing visual constraints... [ONLINE]", "System Admin recognized. Welcome to the Grid."];
         function runBootSequence() {
             document.getElementById("loginScreen").style.display = "none";
             const bootScreen = document.getElementById("bootScreen"); bootScreen.classList.remove("hidden");
             const logsBox = document.getElementById("bootLogs"); logsBox.innerHTML = "";
             let delay = 0;
-            bootMessages.forEach((msg) => {
-                setTimeout(() => { logsBox.innerHTML += `<div><span style="color:var(--magenta)">[${(Math.random() * 2).toFixed(4)}]</span> ${msg}</div>`; }, delay);
-                delay += 100 + Math.random() * 200;
-            });
+            bootMessages.forEach((msg) => { setTimeout(() => { logsBox.innerHTML += `<div><span style="color:var(--magenta)">[${(Math.random() * 2).toFixed(4)}]</span> ${msg}</div>`; }, delay); delay += 100 + Math.random() * 200; });
             setTimeout(() => { bootScreen.classList.add("hidden"); document.getElementById("mainContent").classList.remove("hidden"); startSystem(); }, delay + 500);
         }
 
@@ -218,33 +192,23 @@
         }
         function logout() { localStorage.removeItem("hasAccess"); location.reload(); }
 
-        window.onload = function() {
-            loadTasks(); loadScratchpad();
-            if(localStorage.getItem("hasAccess") === "true") { runBootSequence(); }
-        };
+        window.onload = function() { loadTasks(); loadScratchpad(); if(localStorage.getItem("hasAccess") === "true") { runBootSequence(); } };
+        function startSystem() { startMatrix(); startHUD(); setupCLI(); startTelemetry(); scanFingerprint(); startVisualizer(); initScrollAnimations(); }
 
-        // --- CORE STARTUP ---
-        function startSystem() { 
-            startMatrix(); startHUD(); setupCLI(); startTelemetry(); scanFingerprint(); startVisualizer(); initScrollAnimations(); 
-        }
-
-        // --- SMOOTH SCROLL OBSERVER ---
         function initScrollAnimations() {
             function reveal() {
                 var reveals = document.querySelectorAll(".reveal");
                 for (var i = 0; i < reveals.length; i++) {
                     var windowHeight = window.innerHeight;
                     var elementTop = reveals[i].getBoundingClientRect().top;
-                    var elementVisible = 50; // trigger point
+                    var elementVisible = 50; 
                     if (elementTop < windowHeight - elementVisible) { reveals[i].classList.add("active"); } 
-                    else { reveals[i].classList.remove("active"); } // removes active class when scrolling up
+                    else { reveals[i].classList.remove("active"); } 
                 }
             }
-            window.addEventListener("scroll", reveal);
-            reveal(); // Trigger immediately for elements already in view
+            window.addEventListener("scroll", reveal); reveal(); 
         }
 
-        // --- DEVICE FINGERPRINT ---
         function scanFingerprint() {
             document.getElementById('fp-cores').innerText = navigator.hardwareConcurrency || "N/A";
             document.getElementById('fp-res').innerText = `${window.screen.width} x ${window.screen.height}`;
@@ -255,45 +219,53 @@
             document.getElementById('fp-engine').innerText = engine;
         }
 
-        // --- SCRATCHPAD ---
         const scratchpad = document.getElementById('scratchpad');
         scratchpad.addEventListener('input', () => { localStorage.setItem('adminScratchpad', scratchpad.value); });
         function loadScratchpad() { const saved = localStorage.getItem('adminScratchpad'); if(saved) scratchpad.value = saved; }
 
-        // --- RAINBOW VISUALIZER ---
         let isAudioPlaying = false;
         function startVisualizer() {
             const canvas = document.getElementById('visualizer'); const ctx = canvas.getContext('2d');
             canvas.width = canvas.parentElement.clientWidth - 40; canvas.height = 70;
             const bars = 30; const barWidth = canvas.width / bars - 2;
-            
-            // Create vibrant gradient
             let gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
             gradient.addColorStop(0, "#00f3ff"); gradient.addColorStop(0.5, "#ff00ea"); gradient.addColorStop(1, "#eaff00");
 
             setInterval(() => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = gradient;
+                ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = gradient;
                 for(let i = 0; i < bars; i++) {
                     let height = isAudioPlaying ? Math.random() * 55 + 5 : 5;
-                    ctx.beginPath();
-                    ctx.roundRect(i * (barWidth + 2), canvas.height - height, barWidth, height, [3, 3, 0, 0]);
-                    ctx.fill();
+                    ctx.beginPath(); ctx.roundRect(i * (barWidth + 2), canvas.height - height, barWidth, height, [3, 3, 0, 0]); ctx.fill();
                 }
             }, 80);
         }
 
-        // --- HUD ---
+        // --- NEW AUDIO TOGGLE FUNCTION ---
+        function toggleAudio() {
+            const a = document.getElementById("myAudio"); 
+            const btn = document.getElementById("audioBtn");
+            const status = document.getElementById('statusText');
+            
+            if(isAudioPlaying) { 
+                a.pause(); 
+                isAudioPlaying = false; 
+                btn.innerHTML = "▶ PLAY AUDIO";
+                status.innerText = ">_ Status: Audio Paused"; 
+            } else { 
+                a.play().catch(e => console.log("Simulating Audio")); 
+                isAudioPlaying = true; 
+                btn.innerHTML = "⏸ PAUSE AUDIO";
+                status.innerText = ">_ Status: Audio Active"; 
+            }
+        }
+
         function startHUD() {
             setInterval(() => { document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', { hour12: false }); }, 1000);
             if(navigator.getBattery) { navigator.getBattery().then(b => { function u() { document.getElementById('batData').innerText = Math.floor(b.level * 100) + (b.charging ? "% ⚡" : "%"); } u(); b.addEventListener('levelchange', u); b.addEventListener('chargingchange', u); }); }
             if(navigator.connection) { function u() { document.getElementById('netData').innerText = navigator.connection.effectiveType.toUpperCase(); } u(); navigator.connection.addEventListener('change', u); }
-            fetch('https://api.open-meteo.com/v1/forecast?latitude=26.9124&longitude=75.7873&current_weather=true')
-                .then(res => res.json()).then(data => { document.getElementById('weatherData').innerText = `${data.current_weather.temperature}°C`; })
-                .catch(() => { document.getElementById('weatherData').innerText = "ERR"; });
+            fetch('https://api.open-meteo.com/v1/forecast?latitude=26.9124&longitude=75.7873&current_weather=true').then(res => res.json()).then(data => { document.getElementById('weatherData').innerText = `${data.current_weather.temperature}°C`; }).catch(() => { document.getElementById('weatherData').innerText = "ERR"; });
         }
 
-        // --- TELEMETRY ---
         function startTelemetry() {
             setInterval(() => {
                 let rpm = Math.floor(Math.random() * (3500 - 1500) + 1500); if(Math.random() > 0.8) rpm = Math.floor(Math.random() * (7200 - 4500) + 4500);
@@ -305,7 +277,6 @@
             }, 800);
         }
 
-        // --- PROTOCOL ZERO ---
         function triggerSelfDestruct() {
             document.body.classList.add('destruct-mode');
             const overlay = document.createElement('div'); overlay.id = "destructOverlay"; document.body.appendChild(overlay);
@@ -320,30 +291,24 @@
             }, 1000);
         }
 
-        // --- CLI ---
         function setupCLI() { const cli = document.getElementById('cliInput'); cli.addEventListener('keypress', function(e) { if(e.key === 'Enter') { executeCommand(cli.value.toLowerCase().trim()); cli.value = ''; } }); }
+        
+        // --- CLI COMMAND LOGIC UPDATED ---
         function executeCommand(cmd) {
             const status = document.getElementById('statusText');
             if(cmd === '/help') { alert("COMMANDS:\n/play (toggle audio visualizer)\n/clear (wipe tasks)"); } 
-            else if(cmd === '/play') { 
-                const a = document.getElementById("myAudio"); 
-                if(isAudioPlaying) { a.pause(); isAudioPlaying = false; status.innerText = ">_ Status: Audio Paused"; } 
-                else { a.play().catch(e => console.log("Simulating Audio")); isAudioPlaying = true; status.innerText = ">_ Status: Audio Active"; } 
-            } 
+            else if(cmd === '/play') { toggleAudio(); } // Points to the same function as the button!
             else if(cmd === '/clear') { document.getElementById("taskList").innerHTML = ""; saveTasks(); status.innerText = ">_ Status: Memory Wiped"; } 
             else { status.innerText = ">_ Error: Command not found."; }
         }
 
-        // --- CYBERPUNK MATRIX BACKGROUND ---
         function startMatrix() {
             const canvas = document.getElementById('matrix'); const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight;
             const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*'; const fontSize = 16; const columns = canvas.width / fontSize;
             let drops = []; for(let x = 0; x < columns; x++) drops[x] = 1;
-            const colors = ['#00f3ff', '#ff00ea', '#eaff00', '#00ff41']; // Cyberpunk palette
-            
+            const colors = ['#00f3ff', '#ff00ea', '#eaff00', '#00ff41']; 
             setInterval(() => {
-                ctx.fillStyle = 'rgba(5, 5, 16, 0.1)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.font = fontSize + 'px monospace';
+                ctx.fillStyle = 'rgba(5, 5, 16, 0.1)'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.font = fontSize + 'px monospace';
                 for(let i = 0; i < drops.length; i++) {
                     ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
                     ctx.fillText(letters.charAt(Math.floor(Math.random() * letters.length)), i * fontSize, drops[i] * fontSize);
@@ -352,7 +317,6 @@
             }, 35);
         }
 
-        // --- TASKS ---
         function addTask() { let input = document.getElementById("taskInput"); if(input.value === '') return; let li = document.createElement("li"); li.innerHTML = `<span class="task-text" onclick="toggleTask(this)">${input.value}</span> <span class="delete-btn" onclick="this.parentElement.remove(); saveTasks();">X</span>`; document.getElementById("taskList").appendChild(li); input.value = ""; saveTasks(); }
         function toggleTask(element) { element.parentElement.classList.toggle('completed'); if(element.parentElement.classList.contains('completed')) { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#ff00ea', '#00f3ff', '#eaff00'] }); } saveTasks(); }
         function saveTasks() { localStorage.setItem("devTasks", document.getElementById("taskList").innerHTML); }
