@@ -1,4 +1,5 @@
-.<!DOCTYPE html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -13,7 +14,6 @@
 
         body { margin: 0; padding: 0; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #050510; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
         
-        /* Interactive Background */
         #particles-js { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background: radial-gradient(circle at 50% 50%, #1a0033, #050510 80%); }
 
         .rainbow-text { background: linear-gradient(90deg, var(--cyan), var(--magenta), var(--yellow), var(--cyan)); background-size: 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientMove 5s ease infinite; font-weight: bold; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
@@ -46,7 +46,6 @@
         .reveal { opacity: 0; transform: translateY(40px); transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
-        /* GitHub Badge Styles */
         .gh-badge { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
         .gh-avatar { width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--cyan); box-shadow: 0 0 15px var(--cyan); }
         .gh-stats { flex-grow: 1; margin-left: 15px; }
@@ -54,10 +53,10 @@
         .gh-info { font-size: 0.85rem; color: #aaa; margin-top: 5px; }
         .gh-info span { color: var(--yellow); font-weight: bold; }
 
-        /* Reddit Feed Styles */
-        .reddit-post { background: rgba(0,0,0,0.5); padding: 10px; margin-bottom: 8px; border-radius: 5px; border-left: 3px solid #ff4500; font-size: 0.85rem; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .reddit-post a { color: #fff; text-decoration: none; }
-        .reddit-post:hover { background: rgba(255,69,0,0.2); transform: translateX(5px); }
+        /* News Feed Styles */
+        .news-post { background: rgba(0,0,0,0.5); padding: 10px; margin-bottom: 8px; border-radius: 5px; border-left: 3px solid var(--cyan); font-size: 0.85rem; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .news-post a { color: #fff; text-decoration: none; }
+        .news-post:hover { background: rgba(0, 243, 255, 0.2); transform: translateX(5px); border-left-color: var(--magenta); }
 
         .sys-info { font-size: 0.9rem; margin: 10px 0; color: #bbb; display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px; }
         .sys-info span { color: var(--yellow); font-family: 'Courier New', monospace; }
@@ -133,8 +132,8 @@
             </div>
 
             <div class="glass-panel reveal">
-                <h3>🌐 GLOBAL UPLINK (r/webdev)</h3>
-                <div id="redditFeed" style="margin-top: 15px;">
+                <h3>🌐 GLOBAL TECH UPLINK</h3>
+                <div id="newsFeed" style="margin-top: 15px;">
                     <div style="color: #888; text-align: center;">Establishing connection...</div>
                 </div>
             </div>
@@ -192,8 +191,7 @@
     </div>
 
     <script>
-        // --- BOOT SEQUENCE ---
-        const bootMessages = ["Fetching GitHub Identity... [OK]", "Establishing Reddit Uplink... [OK]", "Igniting Particle Engine... [DONE]", "System Admin recognized."];
+        const bootMessages = ["Fetching GitHub Identity... [OK]", "Establishing News Uplink... [OK]", "Igniting Particle Engine... [DONE]", "System Admin recognized."];
         function runBootSequence() {
             document.getElementById("loginScreen").style.display = "none";
             const bootScreen = document.getElementById("bootScreen"); bootScreen.classList.remove("hidden");
@@ -208,9 +206,8 @@
 
         window.onload = function() { loadTasks(); loadScratchpad(); if(localStorage.getItem("hasAccess") === "true") { runBootSequence(); } };
         
-        function startSystem() { initParticles(); fetchGitHubData(); fetchRedditData(); startHUD(); setupCLI(); startTelemetry(); scanFingerprint(); startVisualizer(); initScrollAnimations(); }
+        function startSystem() { initParticles(); fetchGitHubData(); fetchNewsData(); startHUD(); setupCLI(); startTelemetry(); scanFingerprint(); startVisualizer(); initScrollAnimations(); }
 
-        // --- 1. GITHUB API FETCH ---
         function fetchGitHubData() {
             fetch('https://api.github.com/users/khushalmourya3-eng')
             .then(res => res.json())
@@ -222,40 +219,19 @@
             }).catch(err => { document.getElementById('gh-name').innerText = "API Offline"; });
         }
 
-        // --- 2. REDDIT API FETCH ---
-        function fetchRedditData() {
-            fetch('https://www.reddit.com/r/webdev/hot.json?limit=5')
+        // --- NEW: DEV.TO API FETCH (Bypasses CORS issues!) ---
+        function fetchNewsData() {
+            fetch('https://dev.to/api/articles?tag=webdev&top=1&per_page=5')
             .then(res => res.json())
             .then(data => {
-                let feed = document.getElementById('redditFeed'); feed.innerHTML = '';
-                data.data.children.forEach(post => {
-                    if(!post.data.stickied) { // Ignore pinned posts
-                        feed.innerHTML += `<div class="reddit-post"><a href="https://reddit.com${post.data.permalink}" target="_blank">> ${post.data.title}</a></div>`;
-                    }
+                let feed = document.getElementById('newsFeed'); feed.innerHTML = '';
+                data.forEach(post => {
+                    feed.innerHTML += `<div class="news-post"><a href="${post.url}" target="_blank">> ${post.title}</a></div>`;
                 });
-            }).catch(err => { document.getElementById('redditFeed').innerHTML = "Uplink Failed. Check Network."; });
+            }).catch(err => { document.getElementById('newsFeed').innerHTML = "Uplink Failed. Check Network."; });
         }
 
-        // --- 3. PARTICLES.JS ENGINE ---
-        function initParticles() {
-            particlesJS("particles-js", {
-                "particles": {
-                    "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
-                    "color": { "value": ["#00f3ff", "#ff00ea"] },
-                    "shape": { "type": "circle" },
-                    "opacity": { "value": 0.5, "random": true },
-                    "size": { "value": 3, "random": true },
-                    "line_linked": { "enable": true, "distance": 150, "color": "#00f3ff", "opacity": 0.4, "width": 1 },
-                    "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
-                },
-                "interactivity": {
-                    "detect_on": "window",
-                    "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
-                    "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 1 } }, "push": { "particles_nb": 4 } }
-                },
-                "retina_detect": true
-            });
-        }
+        function initParticles() { particlesJS("particles-js", { "particles": { "number": { "value": 60, "density": { "enable": true, "value_area": 800 } }, "color": { "value": ["#00f3ff", "#ff00ea"] }, "shape": { "type": "circle" }, "opacity": { "value": 0.5, "random": true }, "size": { "value": 3, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#00f3ff", "opacity": 0.4, "width": 1 }, "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false } }, "interactivity": { "detect_on": "window", "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true }, "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 1 } }, "push": { "particles_nb": 4 } } }, "retina_detect": true }); }
 
         function initScrollAnimations() { function reveal() { var reveals = document.querySelectorAll(".reveal"); for (var i = 0; i < reveals.length; i++) { var windowHeight = window.innerHeight; var elementTop = reveals[i].getBoundingClientRect().top; var elementVisible = 50; if (elementTop < windowHeight - elementVisible) { reveals[i].classList.add("active"); } else { reveals[i].classList.remove("active"); } } } window.addEventListener("scroll", reveal); reveal(); }
         function scanFingerprint() { document.getElementById('fp-cores').innerText = navigator.hardwareConcurrency || "N/A"; document.getElementById('fp-res').innerText = `${window.screen.width} x ${window.screen.height}`; let engine = "Unknown"; if(navigator.userAgent.includes("Chrome")) engine = "Blink"; else if(navigator.userAgent.includes("Firefox")) engine = "Gecko"; else if(navigator.userAgent.includes("Safari")) engine = "WebKit"; document.getElementById('fp-engine').innerText = engine; }
@@ -264,12 +240,7 @@
         function loadScratchpad() { const saved = localStorage.getItem('adminScratchpad'); if(saved) scratchpad.value = saved; }
 
         let isAudioPlaying = false;
-        function startVisualizer() {
-            const canvas = document.getElementById('visualizer'); const ctx = canvas.getContext('2d'); canvas.width = canvas.parentElement.clientWidth - 40; canvas.height = 70; const bars = 30; const barWidth = canvas.width / bars - 2;
-            let gradient = ctx.createLinearGradient(0, 0, canvas.width, 0); gradient.addColorStop(0, "#00f3ff"); gradient.addColorStop(0.5, "#ff00ea"); gradient.addColorStop(1, "#eaff00");
-            setInterval(() => { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = gradient; for(let i = 0; i < bars; i++) { let height = isAudioPlaying ? Math.random() * 55 + 5 : 5; ctx.beginPath(); ctx.roundRect(i * (barWidth + 2), canvas.height - height, barWidth, height, [3, 3, 0, 0]); ctx.fill(); } }, 80);
-        }
-
+        function startVisualizer() { const canvas = document.getElementById('visualizer'); const ctx = canvas.getContext('2d'); canvas.width = canvas.parentElement.clientWidth - 40; canvas.height = 70; const bars = 30; const barWidth = canvas.width / bars - 2; let gradient = ctx.createLinearGradient(0, 0, canvas.width, 0); gradient.addColorStop(0, "#00f3ff"); gradient.addColorStop(0.5, "#ff00ea"); gradient.addColorStop(1, "#eaff00"); setInterval(() => { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = gradient; for(let i = 0; i < bars; i++) { let height = isAudioPlaying ? Math.random() * 55 + 5 : 5; ctx.beginPath(); ctx.roundRect(i * (barWidth + 2), canvas.height - height, barWidth, height, [3, 3, 0, 0]); ctx.fill(); } }, 80); }
         function toggleAudio() { const a = document.getElementById("myAudio"); const btn = document.getElementById("audioBtn"); const status = document.getElementById('statusText'); if(isAudioPlaying) { a.pause(); isAudioPlaying = false; btn.innerHTML = "▶ PLAY AUDIO"; status.innerText = ">_ Status: Audio Paused"; } else { a.play().catch(e=>console.log("Simulating")); isAudioPlaying = true; btn.innerHTML = "⏸ PAUSE AUDIO"; status.innerText = ">_ Status: Audio Active"; } }
 
         function startHUD() {
