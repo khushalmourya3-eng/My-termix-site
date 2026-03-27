@@ -9,11 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
-        /* Dynamic Theme Variables */
-        :root {
-            --main-color: #00ff41; /* Default Matrix Green */
-            --bg-blur: rgba(0, 0, 0, 0.85);
-        }
+        :root { --main-color: #00ff41; --bg-blur: rgba(0, 0, 0, 0.85); }
         .theme-red { --main-color: #ff3e3e; }
         .theme-blue { --main-color: #00d2ff; }
 
@@ -24,11 +20,14 @@
         .login-box { border: 2px solid var(--main-color); padding: 30px; text-align: center; border-radius: 10px; box-shadow: 0 0 20px var(--main-color); background: rgba(0,0,0,0.9); width: 80%; max-width: 400px; }
         .login-input { background: black; color: var(--main-color); border: 1px solid var(--main-color); padding: 10px; margin: 15px 0; outline: none; text-align: center; font-family: inherit; font-size: 1.2rem; width: 80%; }
         
+        /* THE NEW BOOT SCREEN */
+        #bootScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: black; color: var(--main-color); font-family: 'Courier New', monospace; z-index: 9998; padding: 20px; box-sizing: border-box; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
+        #bootLogs { font-size: 0.85rem; text-align: left; line-height: 1.4; text-shadow: 0 0 5px var(--main-color); }
+        
         #mainContent { width: 100%; flex-direction: column; align-items: center; position: relative; }
         .hidden { display: none !important; }
         .flex-col { display: flex; }
 
-        /* Live HUD Panel */
         #hud { width: 100%; background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--main-color); padding: 10px 0; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 10px var(--main-color); font-size: 0.9rem;}
         #hud span { margin: 0 10px; }
 
@@ -57,7 +56,6 @@
         .completed { text-decoration: line-through; opacity: 0.5; }
         .delete-btn { color: #ff3e3e; font-weight: bold; cursor: pointer; padding-left: 10px; }
 
-        /* Interactive CLI */
         .cli-box { border: 1px solid var(--main-color); padding: 10px; margin-top: 20px; background: black; text-align: left; border-radius: 5px; display: flex; align-items: center; }
         .cli-prompt { font-weight: bold; margin-right: 10px; }
         #cliInput { background: transparent; border: none; color: var(--main-color); font-family: inherit; width: 100%; outline: none; font-size: 1rem; }
@@ -75,8 +73,11 @@
         </div>
     </div>
 
+    <div id="bootScreen" class="hidden">
+        <div id="bootLogs"></div>
+    </div>
+
     <div id="mainContent" class="hidden flex-col">
-        
         <div id="hud">
             <span>🔋 <span id="batData">--%</span></span> | 
             <span>📡 <span id="netData">--</span></span> | 
@@ -113,51 +114,77 @@
                 <span class="cli-prompt">root@system:~#</span>
                 <input type="text" id="cliInput" placeholder="Type /help and press Enter..." autocomplete="off">
             </div>
-
         </div>
     </div>
 
     <script>
+        // --- BOOT SEQUENCE LOGIC ---
+        const bootMessages = [
+            "Mounting core filesystems... [OK]",
+            "Loading local user data... [OK]",
+            "Initializing hardware interface...",
+            "Checking battery ACPI node... [SUCCESS]",
+            "Pinging network daemon... [ONLINE]",
+            "Loading cryptographic modules... [OK]",
+            "Decrypting master vault... [OK]",
+            "Bypassing external firewalls... [DONE]",
+            "Compiling visual matrix...",
+            "System Admin recognized. Welcome back."
+        ];
+
+        function runBootSequence() {
+            document.getElementById("loginScreen").style.display = "none";
+            const bootScreen = document.getElementById("bootScreen");
+            bootScreen.classList.remove("hidden");
+            const logsBox = document.getElementById("bootLogs");
+            logsBox.innerHTML = "";
+
+            let delay = 0;
+            bootMessages.forEach((msg, index) => {
+                setTimeout(() => {
+                    const timeStamp = `[${(Math.random() * 2).toFixed(4)}]`;
+                    logsBox.innerHTML += `<div>${timeStamp} ${msg}</div>`;
+                }, delay);
+                delay += 150 + Math.random() * 250; // Random fast delay between 150ms-400ms
+            });
+
+            // Finish boot and launch system
+            setTimeout(() => {
+                bootScreen.classList.add("hidden");
+                document.getElementById("mainContent").classList.remove("hidden");
+                startSystem();
+            }, delay + 600);
+        }
+
         // --- LOGIN MEMORY ---
         function processLogin() {
             const pass = document.getElementById("passInput").value.toUpperCase();
             if(pass === "ADMIN" || pass === "KHUSHAL") {
-                localStorage.setItem("hasAccess", "true"); grantAccess();
+                localStorage.setItem("hasAccess", "true"); 
+                runBootSequence();
             } else { document.getElementById("errorMsg").style.display = "block"; }
-        }
-        function grantAccess() {
-            document.getElementById("loginScreen").style.display = "none";
-            document.getElementById("mainContent").classList.remove("hidden");
-            startSystem();
         }
         function logout() { localStorage.removeItem("hasAccess"); location.reload(); }
 
         window.onload = function() {
             loadTasks(); loadTheme();
-            if(localStorage.getItem("hasAccess") === "true") grantAccess();
+            if(localStorage.getItem("hasAccess") === "true") {
+                runBootSequence(); // Run the cool boot sequence even if remembered!
+            }
         };
 
         // --- CORE SYSTEM BOOT ---
-        function startSystem() {
-            startMatrix(); fetchQuote(); startHUD(); setupCLI();
-        }
+        function startSystem() { startMatrix(); fetchQuote(); startHUD(); setupCLI(); }
 
         // --- HARDWARE HUD API ---
         function startHUD() {
-            // Clock
-            setInterval(() => {
-                document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', { hour12: false });
-            }, 1000);
-
-            // Battery API
+            setInterval(() => { document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', { hour12: false }); }, 1000);
             if(navigator.getBattery) {
                 navigator.getBattery().then(battery => {
                     function updateBat() { document.getElementById('batData').innerText = Math.floor(battery.level * 100) + (battery.charging ? "% ⚡" : "%"); }
                     updateBat(); battery.addEventListener('levelchange', updateBat); battery.addEventListener('chargingchange', updateBat);
                 });
             } else { document.getElementById('batData').innerText = "N/A"; }
-
-            // Network API
             if(navigator.connection) {
                 function updateNet() { document.getElementById('netData').innerText = navigator.connection.effectiveType.toUpperCase(); }
                 updateNet(); navigator.connection.addEventListener('change', updateNet);
@@ -169,46 +196,29 @@
             const cli = document.getElementById('cliInput');
             cli.addEventListener('keypress', function(e) {
                 if(e.key === 'Enter') {
-                    const cmd = cli.value.toLowerCase().trim();
-                    executeCommand(cmd);
-                    cli.value = ''; // clear input
+                    executeCommand(cli.value.toLowerCase().trim());
+                    cli.value = '';
                 }
             });
         }
-
         function executeCommand(cmd) {
             const status = document.getElementById('statusText');
-            if(cmd === '/help') {
-                alert("COMMANDS:\n/theme red\n/theme green\n/theme blue\n/play (toggle music)\n/clear (wipe tasks)\n/hack (run exploit)");
-            } else if(cmd === '/theme red') {
-                setTheme('theme-red'); status.innerText = ">_ Status: EMERGENCY OVERRIDE";
-            } else if(cmd === '/theme blue') {
-                setTheme('theme-blue'); status.innerText = ">_ Status: CYBERPUNK MODE";
-            } else if(cmd === '/theme green') {
-                setTheme(''); status.innerText = ">_ Status: Online";
-            } else if(cmd === '/play') {
-                toggleMusic(); status.innerText = ">_ Status: Audio Active";
-            } else if(cmd === '/clear') {
-                document.getElementById("taskList").innerHTML = ""; saveTasks(); status.innerText = ">_ Status: Memory Wiped";
-            } else if(cmd === '/hack') {
+            if(cmd === '/help') { alert("COMMANDS:\n/theme red\n/theme green\n/theme blue\n/play (toggle music)\n/clear (wipe tasks)\n/hack (run exploit)"); } 
+            else if(cmd === '/theme red') { setTheme('theme-red'); status.innerText = ">_ Status: EMERGENCY OVERRIDE"; } 
+            else if(cmd === '/theme blue') { setTheme('theme-blue'); status.innerText = ">_ Status: CYBERPUNK MODE"; } 
+            else if(cmd === '/theme green') { setTheme(''); status.innerText = ">_ Status: Online"; } 
+            else if(cmd === '/play') { toggleMusic(); status.innerText = ">_ Status: Audio Active"; } 
+            else if(cmd === '/clear') { document.getElementById("taskList").innerHTML = ""; saveTasks(); status.innerText = ">_ Status: Memory Wiped"; } 
+            else if(cmd === '/hack') {
                 status.innerText = ">_ INJECTING PAYLOAD... ACCESS GRANTED";
                 document.getElementById('mainContainer').style.borderColor = "white";
                 setTimeout(() => { document.getElementById('mainContainer').style.borderColor = "var(--main-color)"; status.innerText = ">_ Status: Online"; }, 3000);
-            } else {
-                status.innerText = ">_ Error: Command not found. Type /help";
-            }
+            } else { status.innerText = ">_ Error: Command not found. Type /help"; }
         }
 
         // --- THEME SWITCHER ---
-        function setTheme(themeClass) {
-            document.body.className = themeClass;
-            localStorage.setItem('sysTheme', themeClass);
-            updateMatrixColor();
-        }
-        function loadTheme() {
-            const savedTheme = localStorage.getItem('sysTheme');
-            if(savedTheme) document.body.className = savedTheme;
-        }
+        function setTheme(themeClass) { document.body.className = themeClass; localStorage.setItem('sysTheme', themeClass); updateMatrixColor(); }
+        function loadTheme() { const savedTheme = localStorage.getItem('sysTheme'); if(savedTheme) document.body.className = savedTheme; }
 
         // --- MATRIX BACKGROUND ---
         let drops = [];
@@ -220,7 +230,6 @@
             for(let x = 0; x < columns; x++) drops[x] = 1;
             setInterval(() => {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                // Get current dynamic color
                 const compStyles = window.getComputedStyle(document.body);
                 ctx.fillStyle = compStyles.getPropertyValue('--main-color').trim() || '#0F0';
                 ctx.font = fontSize + 'px monospace';
@@ -231,11 +240,10 @@
                 }
             }, 33);
         }
-        function updateMatrixColor() { drops = drops.map(() => 0); /* reset drops to apply new color instantly */ }
+        function updateMatrixColor() { drops = drops.map(() => 0); }
 
         // --- API, TASKS, POMODORO ---
         function fetchQuote() { fetch('https://dummyjson.com/quotes/random').then(res => res.json()).then(data => { document.getElementById("quoteBox").innerHTML = `"${data.quote}" <br><br><b>- ${data.author}</b>`; }).catch(err => { document.getElementById("quoteBox").innerHTML = `"Offline Mode."`; }); }
-        
         function addTask() { let input = document.getElementById("taskInput"); if(input.value === '') return; let li = document.createElement("li"); li.innerHTML = `<span class="task-text" onclick="toggleTask(this)">${input.value}</span> <span class="delete-btn" onclick="this.parentElement.remove(); saveTasks();">X</span>`; document.getElementById("taskList").appendChild(li); input.value = ""; saveTasks(); }
         function toggleTask(element) { element.parentElement.classList.toggle('completed'); if(element.parentElement.classList.contains('completed')) { const compColor = window.getComputedStyle(document.body).getPropertyValue('--main-color').trim(); confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: [compColor, '#ffffff'] }); } saveTasks(); }
         function saveTasks() { localStorage.setItem("devTasks", document.getElementById("taskList").innerHTML); }
@@ -243,7 +251,6 @@
 
         let pomoInterval;
         function startPomodoro() { clearInterval(pomoInterval); let timeLeft = 25 * 60; const display = document.getElementById('pomo-time'); const btn = document.getElementById('pomo-btn'); btn.innerHTML = "⏸ Focus Mode Active..."; pomoInterval = setInterval(() => { let m = Math.floor(timeLeft / 60); let s = timeLeft % 60; display.innerHTML = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s); if (timeLeft <= 0) { clearInterval(pomoInterval); display.innerHTML = "00:00"; btn.innerHTML = "▶ Restart Sprint"; alert("Mission Complete!"); } timeLeft--; }, 1000); }
-        
         function toggleMusic() { const audio = document.getElementById("myAudio"); if (audio.paused) { audio.play(); } else { audio.pause(); } }
     </script>
 </body>
