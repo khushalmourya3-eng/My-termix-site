@@ -1,108 +1,92 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khushal's Terminal</title>
+    <title>Khushal Mourya | Hacker Space</title>
     <style>
         body {
-            background-color: #0a0a0a;
+            background-color: #050505;
             color: #00ff41;
             font-family: 'Courier New', monospace;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             min-height: 100vh;
             margin: 0;
-            text-align: center;
             padding: 20px;
         }
 
-        .terminal-box {
+        /* Neon Glow Effect */
+        .glow-text {
+            text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41;
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { opacity: 0.8; }
+            to { opacity: 1; text-shadow: 0 0 20px #00ff41, 0 0 40px #00ff41; }
+        }
+
+        .container {
             border: 2px solid #00ff41;
-            padding: 30px;
-            box-shadow: 0 0 20px #00ff41;
-            border-radius: 10px;
-            background: rgba(0, 255, 65, 0.05);
-            max-width: 600px;
-        }
-
-        h1 {
-            font-size: 2rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-
-        .typing {
-            width: 0;
-            overflow: hidden;
-            white-space: nowrap;
-            border-right: 3px solid #00ff41;
-            margin: 20px auto;
-            animation: typing 3.5s steps(30) forwards, blink .75s step-end infinite;
-        }
-
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
-        }
-
-        @keyframes blink {
-            from, to { border-color: transparent }
-            50% { border-color: #00ff41 }
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.2);
+            background: rgba(0, 0, 0, 0.8);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
         }
 
         img {
             width: 100%;
-            max-width: 450px;
-            border: 2px solid #00ff41;
-            margin-top: 25px;
-            border-radius: 5px;
+            border-radius: 10px;
+            border: 1px solid #00ff41;
+            margin: 20px 0;
             box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
         }
 
-        .neet-box {
-            margin-top: 30px;
-            font-weight: bold;
-            color: #ff3e3e; /* Red color for motivation */
-            border: 1px dashed #ff3e3e;
+        /* Countdown Style */
+        #timer {
+            font-size: 1.2rem;
+            color: #ff3e3e;
+            border: 1px solid #ff3e3e;
             padding: 10px;
-        }
-
-        button {
-            background: transparent;
-            color: #00ff41;
-            border: 1px solid #00ff41;
-            padding: 10px 20px;
-            margin-top: 20px;
-            cursor: pointer;
-            font-family: inherit;
-        }
-
-        button:hover {
-            background: #00ff41;
-            color: black;
+            margin-top: 15px;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
 
-    <div class="terminal-box">
-        <h1>System Active: Khushal</h1>
-        <div class="typing">Full access granted to the server...</div>
+    <div class="container">
+        <h1 class="glow-text">KHUSHAL MOURYA</h1>
+        <p>>_ Access Level: Administrator</p>
         
-       <img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800" alt="BMW M4" style="width:95%; max-width:500px; border:2px solid #00ff41; margin-top:20px; border-radius: 10px; box-shadow: 0 0 25px #00ff41;">
+        <img src="https://images.unsplash.com/photo-1617814076367-b759c7d826c4?w=800" alt="BMW M4">
 
-      
-
-        <div class="neet-box">
-            MISSION: NEET 2026 🩺💉
-        </div>
-
-        <button onclick="alert('Stay Focused, Khushal!')">Execute Motivation</button>
+        <h3 style="color: white;">TARGET: NEET 2026</h3>
+        <div id="timer">Calculating time to Mission...</div>
     </div>
 
+    <script>
+        // Countdown Logic
+        const targetDate = new Date("May 3, 2026 10:00:00").getTime();
+
+        setInterval(function() {
+            const now = new Date().getTime();
+            const diff = targetDate - now;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById("timer").innerHTML = 
+                days + "d " + hours + "h " + mins + "m " + secs + "s Left";
+        }, 1000);
+    </script>
 </body>
 </html>
