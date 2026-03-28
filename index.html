@@ -12,191 +12,125 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <style>
-        :root { 
-            --cyan: #00ffcc; 
-            --red: #ff003c; 
-            --green: #00ff41; 
-            --bg: #050505;
-        }
-        
+        :root { --cyan: #00ffcc; --red: #ff003c; --green: #00ff41; --bg: #050505; }
         * { box-sizing: border-box; }
-        
-        body { 
-            margin: 0; padding: 0; background: var(--bg); color: var(--cyan); 
-            font-family: 'Courier New', Courier, monospace; overflow-x: hidden; 
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-        }
-
+        body { margin: 0; padding: 0; background: var(--bg); color: var(--cyan); font-family: 'Courier New', Courier, monospace; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         #particles-js { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; opacity: 0.4; }
-
-        /* Hacker Grid Lines */
-        .grid-bg {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
-            background-image: 
-                linear-gradient(rgba(0, 255, 204, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 204, 0.05) 1px, transparent 1px);
-            background-size: 30px 30px; pointer-events: none;
-        }
-
-        /* Glitch Text Effect */
+        .grid-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background-image: linear-gradient(rgba(0, 255, 204, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 204, 0.05) 1px, transparent 1px); background-size: 30px 30px; pointer-events: none; }
         .glitch { font-weight: bold; text-shadow: 2px 0 var(--red), -2px 0 blue; animation: glitch-anim 2s infinite; letter-spacing: 2px; }
-        @keyframes glitch-anim { 
-            0% { text-shadow: 2px 0 var(--red), -2px 0 blue; } 
-            20% { text-shadow: -2px 0 var(--red), 2px 0 blue; }
-            40% { text-shadow: 2px 0 var(--red), -2px 0 blue; }
-            100% { text-shadow: 2px 0 var(--red), -2px 0 blue; }
-        }
-
-        /* Top Status Bar */
-        #hud { 
-            width: 100%; background: #000; border-bottom: 1px solid var(--cyan); 
-            padding: 10px 20px; display: flex; justify-content: space-between; 
-            font-size: 0.8rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
-        }
+        @keyframes glitch-anim { 0%, 100% { text-shadow: 2px 0 var(--red), -2px 0 blue; } 50% { text-shadow: -2px 0 var(--red), 2px 0 blue; } }
+        #hud { width: 100%; background: #000; border-bottom: 1px solid var(--cyan); padding: 10px 20px; display: flex; justify-content: space-between; font-size: 0.8rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 0 15px rgba(0, 255, 204, 0.2); }
         #hud span { color: var(--green); }
-
-        /* Clean Terminal Panels */
         #panelContainer { width: 95%; max-width: 700px; margin-top: 20px; }
-        
-        .term-panel { 
-            background: rgba(0, 0, 0, 0.8); border: 1px solid var(--cyan); 
-            margin-bottom: 20px; padding: 15px; position: relative;
-            box-shadow: 0 0 10px rgba(0, 255, 204, 0.1); transition: 0.2s;
-        }
+        .term-panel { background: rgba(0, 0, 0, 0.8); border: 1px solid var(--cyan); margin-bottom: 20px; padding: 15px; position: relative; box-shadow: 0 0 10px rgba(0, 255, 204, 0.1); transition: 0.2s; }
         .term-panel:hover { box-shadow: 0 0 20px rgba(0, 255, 204, 0.3); border-color: var(--green); }
-
-        .drag-handle { 
-            cursor: grab; font-size: 0.8rem; border-bottom: 1px dashed var(--cyan); 
-            padding-bottom: 5px; margin-bottom: 15px; display: flex; justify-content: space-between;
-        }
+        .drag-handle { cursor: grab; font-size: 0.8rem; border-bottom: 1px dashed var(--cyan); padding-bottom: 5px; margin-bottom: 15px; display: flex; justify-content: space-between; }
         .drag-handle::before { content: "[ MODULE_ACTIVE ]"; color: var(--green); }
-
-        /* Buttons & Inputs */
-        .btn { 
-            background: transparent; color: var(--cyan); border: 1px solid var(--cyan); 
-            padding: 10px; cursor: pointer; width: 100%; font-family: inherit; font-weight: bold; 
-            text-transform: uppercase; transition: 0.2s; margin-top: 10px;
-        }
+        .btn { background: transparent; color: var(--cyan); border: 1px solid var(--cyan); padding: 10px; cursor: pointer; width: 100%; font-family: inherit; font-weight: bold; text-transform: uppercase; transition: 0.2s; margin-top: 10px; }
         .btn:hover { background: var(--cyan); color: #000; box-shadow: 0 0 15px var(--cyan); }
         .btn-red { border-color: var(--red); color: var(--red); }
         .btn-red:hover { background: var(--red); color: #000; box-shadow: 0 0 15px var(--red); }
-
         .data-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; }
         .data-val { color: var(--green); }
-
-        /* CLI Box */
-        .cli-box { 
-            border: 1px solid var(--cyan); padding: 15px; background: #000; 
-            display: flex; align-items: center; width: 95%; max-width: 700px; 
-            margin-bottom: 30px; box-shadow: inset 0 0 10px rgba(0, 255, 204, 0.2);
-        }
+        .cli-box { border: 1px solid var(--cyan); padding: 15px; background: #000; display: flex; align-items: center; width: 95%; max-width: 700px; margin-bottom: 30px; box-shadow: inset 0 0 10px rgba(0, 255, 204, 0.2); }
         #cliInput { background: transparent; border: none; color: var(--green); flex-grow: 1; outline: none; font-family: inherit; font-size: 1rem; }
-        
-        /* Map specific */
         .leaflet-tile { filter: invert(100%) hue-rotate(180deg) brightness(150%) contrast(150%) grayscale(80%); }
         .radar-blip { background: var(--red); border-radius: 50%; box-shadow: 0 0 15px var(--red); animation: pulse 1s infinite; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
-
-        /* Boot Screen */
-        #bootScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; padding: 20px; }
-        #bootText { font-size: 1rem; color: var(--green); line-height: 1.5; }
-        .cursor { display: inline-block; width: 10px; height: 15px; background: var(--green); animation: blink 0.8s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
     </style>
 </head>
 <body>
     <div class="grid-bg"></div>
     <div id="particles-js"></div>
 
-    <div id="bootScreen">
-        <div id="bootText"></div><div class="cursor"></div>
-    </div>
-
-    <div id="mainContent" style="display:none; width: 100%; flex-direction: column; align-items: center;">
+    <div id="mainContent" style="width: 100%; flex-direction: column; align-items: center; display: flex;">
         
         <div id="hud">
-            <div>SYS_MEM: <span id="perf-mem">--</span></div>
+            <div>MEM: <span id="perf-mem">--</span></div>
+            <div id="weatherData" style="color: var(--cyan);">UPLINKING WEATHER...</div>
             <div class="glitch" style="color: var(--red);">ROOT_ACCESS</div>
             <div id="clockData">00:00:00</div>
         </div>
 
-        <h1 class="glitch" style="font-size: 2rem; margin: 30px 0; letter-spacing: 5px;">LEGEND_OS // 21</h1>
+        <h1 class="glitch" style="font-size: 2rem; margin: 30px 0; letter-spacing: 5px;">LEGEND_OS // 22</h1>
 
         <div id="panelContainer">
             
             <div class="term-panel">
+                <div class="drag-handle">CCTV_HIJACK_CAM_01</div>
+                <div style="position: relative; width: 100%; border: 1px solid var(--cyan); background: #000; min-height: 150px; display: flex; justify-content: center; align-items: center;">
+                    <video id="cctvFeed" autoplay playsinline style="width: 100%; filter: sepia(100%) hue-rotate(90deg) contrast(150%) brightness(0.8); display: none;"></video>
+                    <div id="camOverlay" style="position: absolute; top: 10px; right: 10px; color: red; font-weight: bold; animation: blink 1s infinite; display: none;">🔴 REC</div>
+                    <div id="camTarget" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: rgba(0, 255, 65, 0.5); font-size: 3rem; display: none;">+</div>
+                    <button id="camBtn" class="btn btn-red" style="width: 80%;" onclick="startCCTV()">INITIALIZE CAM UPLINK</button>
+                </div>
+            </div>
+
+            <div class="term-panel">
                 <div class="drag-handle">SAT_TRACKER_ISS</div>
                 <div id="map" style="height: 200px; width:100%; border: 1px solid var(--cyan);"></div>
-                <div style="font-size: 0.7rem; color: #555; margin-top: 5px; text-align: right;">TARGET: INTERNATIONAL SPACE STATION</div>
             </div>
 
             <div class="term-panel">
                 <div class="drag-handle">CRYPTO_UPLINK</div>
                 <div class="data-row"><span>BTC_USDT_LIVE</span> <span id="btcPrice" class="data-val">CONNECTING...</span></div>
-                <div class="data-row"><span>ETH_USDT_LIVE</span> <span id="ethPrice" class="data-val">CONNECTING...</span></div>
-                <div style="height: 80px; margin-top: 15px;"><canvas id="trafficChart"></canvas></div>
+                <div style="height: 60px; margin-top: 15px;"><canvas id="trafficChart"></canvas></div>
             </div>
 
             <div class="term-panel">
                 <div class="drag-handle">SYSTEM_LOGS</div>
-                <div id="chatLog" style="height: 100px; overflow-y: auto; font-size: 0.8rem; margin-bottom: 10px; border-bottom: 1px dashed #333; padding-bottom: 5px;">
-                    <div style="color: var(--cyan);">> Root system initialized.</div>
+                <div id="chatLog" style="height: 150px; overflow-y: auto; font-size: 0.8rem; margin-bottom: 10px; border-bottom: 1px dashed #333; padding-bottom: 5px;">
+                    <div style="color: var(--cyan);">> Root system initialized. Run '/scan' for network sweep.</div>
                 </div>
-                <button class="btn btn-red" onclick="runBreach()">EXECUTE BREACH PROTOCOL</button>
             </div>
 
         </div>
 
         <div class="cli-box">
             <span style="color:var(--red); margin-right:10px; font-weight:bold;">root@legend:~#</span>
-            <input type="text" id="cliInput" placeholder="_">
+            <input type="text" id="cliInput" placeholder="Enter command (try /scan)">
         </div>
         
     </div>
 
     <script>
-        // --- BOOT SEQUENCE TYPEWRITER ---
-        const bootLines = [
-            "Initiating core protocol...",
-            "Bypassing mainframe firewalls...",
-            "Decrypting RSA-2048 keys...",
-            "Establishing secure connection to Jaipur node...",
-            "ACCESS GRANTED."
-        ];
-        
-        let lineIdx = 0; let charIdx = 0;
-        const bootEl = document.getElementById("bootText");
-        
-        function typeBoot() {
-            if (lineIdx < bootLines.length) {
-                if (charIdx < bootLines[lineIdx].length) {
-                    bootEl.innerHTML += bootLines[lineIdx].charAt(charIdx);
-                    charIdx++;
-                    setTimeout(typeBoot, 20); // Typing speed
-                } else {
-                    bootEl.innerHTML += "<br>";
-                    lineIdx++;
-                    charIdx = 0;
-                    setTimeout(typeBoot, 300); // Pause between lines
-                }
-            } else {
-                setTimeout(() => {
-                    document.getElementById("bootScreen").style.display = "none";
-                    document.getElementById("mainContent").style.display = "flex";
-                    startSystem();
-                }, 800);
-            }
-        }
-        
-        // Start boot sequence on load
-        window.onload = () => { setTimeout(typeBoot, 500); };
-
-        function startSystem() {
+        window.onload = () => {
             initParticles(); initDraggable(); initMap(); setupCLI(); initCrypto(); initChart();
-            setInterval(updateClock, 1000);
-            setInterval(updateISS, 3000);
-            setInterval(updateMem, 2000);
+            updateWeather();
+            setInterval(updateClock, 1000); setInterval(updateISS, 3000); setInterval(updateMem, 2000);
+            setInterval(updateWeather, 600000); // Update weather every 10 mins
+        }
+
+        // --- REAL WEATHER API ---
+        async function updateWeather() {
+            try {
+                // Fetching real-time weather data
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=26.9196&longitude=75.7878&current_weather=true');
+                const data = await res.json();
+                const temp = data.current_weather.temperature;
+                const wind = data.current_weather.windspeed;
+                document.getElementById('weatherData').innerHTML = `<span style="color:var(--red)">TMP:</span> ${temp}°C | <span style="color:var(--red)">WND:</span> ${wind} KM/H`;
+            } catch(e) { document.getElementById('weatherData').innerText = `UPLINK_FAILED`; }
+        }
+
+        // --- CCTV HIJACK SCRIPT ---
+        async function startCCTV() {
+            const btn = document.getElementById('camBtn');
+            const vid = document.getElementById('cctvFeed');
+            btn.innerText = "BYPASSING FIREWALL...";
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                vid.srcObject = stream;
+                vid.style.display = "block";
+                document.getElementById('camOverlay').style.display = "block";
+                document.getElementById('camTarget').style.display = "block";
+                btn.style.display = "none";
+                logToConsole("CCTV Feed hijacked successfully.", false);
+            } catch(err) {
+                btn.innerText = "ACCESS DENIED";
+                logToConsole("ERROR: Camera firewall blocked access. Grant permission.", false);
+            }
         }
 
         // --- MAP ENGINE ---
@@ -206,7 +140,6 @@
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
             issMarker = L.circleMarker([0,0], { className: 'radar-blip', radius: 6 }).addTo(map);
         }
-
         async function updateISS() {
             try {
                 const res = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
@@ -220,8 +153,6 @@
         function initCrypto() {
             const btcWs = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
             btcWs.onmessage = (e) => { document.getElementById('btcPrice').innerText = "$" + parseFloat(JSON.parse(e.data).p).toFixed(2); };
-            const ethWs = new WebSocket('wss://stream.binance.com:9443/ws/ethusdt@trade');
-            ethWs.onmessage = (e) => { document.getElementById('ethPrice').innerText = "$" + parseFloat(JSON.parse(e.data).p).toFixed(2); };
         }
 
         // --- CHART ENGINE ---
@@ -241,12 +172,8 @@
         function updateMem() { if(window.performance && window.performance.memory) { document.getElementById('perf-mem').innerText = Math.round(window.performance.memory.usedJSHeapSize/1048576) + "MB"; } }
         
         function initParticles() {
-            particlesJS("particles-js", { 
-                "particles": { "number": { "value": 80 }, "color": { "value": "#00ffcc" }, "shape": { "type": "edge" }, "opacity": { "value": 0.5 }, "size": { "value": 2 }, "line_linked": { "enable": true, "distance": 150, "color": "#00ffcc", "opacity": 0.3, "width": 1 }, "move": { "enable": true, "speed": 1 } }, 
-                "interactivity": { "events": { "onhover": { "enable": true, "mode": "repulse" } } } 
-            });
+            particlesJS("particles-js", { "particles": { "number": { "value": 80 }, "color": { "value": "#00ffcc" }, "shape": { "type": "edge" }, "opacity": { "value": 0.5 }, "size": { "value": 2 }, "line_linked": { "enable": true, "distance": 150, "color": "#00ffcc", "opacity": 0.3, "width": 1 }, "move": { "enable": true, "speed": 1 } }, "interactivity": { "events": { "onhover": { "enable": true, "mode": "repulse" } } } });
         }
-
         function initDraggable() { Sortable.create(document.getElementById('panelContainer'), { handle: '.drag-handle', animation: 200 }); }
 
         function logToConsole(msg, isUser=false) {
@@ -257,6 +184,7 @@
             log.scrollTop = log.scrollHeight;
         }
 
+        // --- THE HACKER CLI (NMAP SCANNER) ---
         function setupCLI() { 
             const cli = document.getElementById('cliInput');
             cli.addEventListener('keypress', (e) => { 
@@ -265,24 +193,29 @@
                     if(!val) return;
                     logToConsole(val, true);
                     
-                    setTimeout(() => {
-                        if(val.toLowerCase() === 'clear') { document.getElementById('chatLog').innerHTML = ''; }
-                        else if(val.toLowerCase() === 'status') { logToConsole("All systems optimal. Connection secure."); }
-                        else { logToConsole(`Command '${val}' executed successfully. Data logged.`); }
-                    }, 400);
-                    
+                    if(val.toLowerCase() === 'clear') { document.getElementById('chatLog').innerHTML = ''; }
+                    else if(val.toLowerCase() === '/scan' || val.toLowerCase().startsWith('nmap')) {
+                        logToConsole("Initializing Stealth Nmap Scan...", false);
+                        let count = 0;
+                        let scanInt = setInterval(() => {
+                            let ip = `192.168.1.${Math.floor(Math.random()*255)}`;
+                            let ports = [22, 80, 443, 8080, 3306, 21];
+                            let port = ports[Math.floor(Math.random()*ports.length)];
+                            let isOpen = Math.random() > 0.7;
+                            let state = isOpen ? "OPEN" : "FILTERED";
+                            let color = isOpen ? "var(--red)" : "var(--cyan)";
+                            logToConsole(`[+] Target ${ip} - Port ${port} <span style="color:${color}">[${state}]</span>`, false);
+                            count++;
+                            if(count > 12) { 
+                                clearInterval(scanInt); 
+                                setTimeout(() => logToConsole("Scan Complete. 3 Vulnerabilities Found.", false), 500);
+                            }
+                        }, 400); // Speed of fake scan
+                    }
+                    else { setTimeout(() => { logToConsole(`Command '${val}' executed successfully. Data logged.`); }, 400); }
                     cli.value = ''; 
                 } 
             }); 
-        }
-
-        function runBreach() {
-            logToConsole("WARNING: Breach protocol initiated...", false);
-            document.body.style.filter = "hue-rotate(90deg) contrast(150%)";
-            setTimeout(() => {
-                logToConsole("Target secured. Downloading payload...", false);
-                document.body.style.filter = "none";
-            }, 2000);
         }
     </script>
 </body>
