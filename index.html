@@ -4,288 +4,351 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROOT // LEGEND OS</title>
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
+    <title>SecureChat // V8 (Pro Messenger + Video Call)</title>
     <style>
-        :root { --cyan: #00ffcc; --red: #ff003c; --green: #00ff41; --bg: #050505; }
-        * { box-sizing: border-box; }
-        body { margin: 0; padding: 0; background: var(--bg); color: var(--cyan); font-family: 'Courier New', Courier, monospace; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        #particles-js { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; opacity: 0.4; }
-        .grid-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background-image: linear-gradient(rgba(0, 255, 204, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 204, 0.05) 1px, transparent 1px); background-size: 30px 30px; pointer-events: none; }
-        .glitch { font-weight: bold; text-shadow: 2px 0 var(--red), -2px 0 blue; animation: glitch-anim 2s infinite; letter-spacing: 2px; }
-        @keyframes glitch-anim { 0%, 100% { text-shadow: 2px 0 var(--red), -2px 0 blue; } 50% { text-shadow: -2px 0 var(--red), 2px 0 blue; } }
-        #hud { width: 100%; background: #000; border-bottom: 1px solid var(--cyan); padding: 10px 20px; display: flex; justify-content: space-between; font-size: 0.8rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 0 15px rgba(0, 255, 204, 0.2); }
-        #hud span { color: var(--green); }
-        #panelContainer { width: 95%; max-width: 800px; margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 768px) { #panelContainer { grid-template-columns: 1fr; } }
-        .term-panel { background: rgba(0, 0, 0, 0.8); border: 1px solid var(--cyan); padding: 15px; position: relative; box-shadow: 0 0 10px rgba(0, 255, 204, 0.1); transition: 0.2s; }
-        .term-panel:hover { box-shadow: 0 0 20px rgba(0, 255, 204, 0.3); border-color: var(--green); }
-        .drag-handle { cursor: grab; font-size: 0.8rem; border-bottom: 1px dashed var(--cyan); padding-bottom: 5px; margin-bottom: 15px; display: flex; justify-content: space-between; }
-        .drag-handle::before { content: "[ MODULE_ACTIVE ]"; color: var(--green); }
-        .btn { background: transparent; color: var(--cyan); border: 1px solid var(--cyan); padding: 10px; cursor: pointer; width: 100%; font-family: inherit; font-weight: bold; text-transform: uppercase; transition: 0.2s; margin-top: 10px; }
-        .btn:hover { background: var(--cyan); color: #000; box-shadow: 0 0 15px var(--cyan); }
-        .btn-red { border-color: var(--red); color: var(--red); }
-        .btn-red:hover { background: var(--red); color: #000; box-shadow: 0 0 15px var(--red); }
-        .data-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; }
-        .data-val { color: var(--green); }
-        .cli-box { border: 1px solid var(--cyan); padding: 15px; background: #000; display: flex; align-items: center; width: 95%; max-width: 800px; margin-bottom: 30px; margin-top: 20px; box-shadow: inset 0 0 10px rgba(0, 255, 204, 0.2); }
-        #cliInput { background: transparent; border: none; color: var(--green); flex-grow: 1; outline: none; font-family: inherit; font-size: 1rem; }
-        .leaflet-tile { filter: invert(100%) hue-rotate(180deg) brightness(150%) contrast(150%) grayscale(80%); }
-        .radar-blip { background: var(--red); border-radius: 50%; box-shadow: 0 0 15px var(--red); animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { 
+            background: linear-gradient(rgba(15, 15, 19, 0.9), rgba(15, 15, 19, 0.95)), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat fixed;
+            color: white; display: flex; justify-content: center; align-items: center; height: 100dvh; overflow: hidden; 
+        }
+        .screen { display: none; width: 100%; max-width: 450px; height: 100%; background: rgba(28, 28, 36, 0.6); backdrop-filter: blur(15px); flex-direction: column; position: relative; border-left: 1px solid rgba(255,255,255,0.1); border-right: 1px solid rgba(255,255,255,0.1); }
+        .active-screen { display: flex; }
+
+        /* LOGIN */
+        #login-screen { justify-content: center; align-items: center; padding: 40px; }
+        .login-box { background: rgba(20, 20, 25, 0.9); padding: 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); width: 90%; text-align: center; border: 1px solid rgba(0,255,204,0.2); }
+        h2 { margin-bottom: 10px; color: #00ffcc; font-size: 2rem; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; border: 1px solid #333; background: rgba(0,0,0,0.5); color: white; outline: none; }
+        .btn { width: 100%; padding: 15px; background: #00ffcc; color: black; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1.1rem; transition: 0.3s; }
+
+        /* CONTACTS LIST */
+        .header { background: rgba(20, 20, 25, 0.95); padding: 15px 20px; border-bottom: 1px solid rgba(0,255,204,0.3); z-index: 10; display: flex; justify-content: space-between; align-items: center;}
+        .search-area { padding: 15px; background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex;}
+        .search-input { width: 70%; padding: 10px; border-radius: 8px; border: none; background: #1c1c24; color: white; outline: none; }
+        .add-btn { width: 25%; padding: 10px; background: #00ffcc; border-radius: 8px; border: none; font-weight: bold; margin-left: 5%; cursor: pointer; color: black;}
+        
+        #contacts-list { flex-grow: 1; overflow-y: auto; padding: 10px; }
+        .contact-card { display: flex; align-items: center; padding: 15px; background: rgba(0,0,0,0.4); margin-bottom: 10px; border-radius: 12px; cursor: pointer; border: 1px solid transparent;}
+        .contact-card:hover { background: rgba(0,255,204,0.1); border-color: rgba(0,255,204,0.3); }
+        .contact-avatar { width: 45px; height: 45px; background: #00ffcc; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: black; font-weight: bold; margin-right: 15px; }
+
+        /* CHAT AREA */
+        #messages { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .msg { padding: 12px 18px; border-radius: 18px; max-width: 80%; word-wrap: break-word; position: relative; }
+        .msg.sent { background: #005c4b; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .msg.received { background: #2a2a35; color: white; align-self: flex-start; border-bottom-left-radius: 4px; }
+
+        #input-area { display: flex; padding: 15px; background: rgba(20, 20, 25, 0.95); width: 100%; border-top: 1px solid rgba(255,255,255,0.05); }
+        #msg-input { flex-grow: 1; border-radius: 25px; padding: 12px 20px; margin-right: 12px; border: none; background: rgba(0,0,0,0.6); color: white; outline:none; }
+        #send-btn { background: #00ffcc; color: black; border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+
+        /* PRO VIDEO CALL UI (V4.2 WALA) */
+        #video-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; flex-direction: column; }
+        #remoteVideo { width: 100%; height: 100%; object-fit: cover; background: #111; }
+        #localVideo { width: 100px; height: 150px; position: absolute; bottom: 150px; right: 20px; object-fit: cover; border: 2px solid #00ffcc; border-radius: 10px; background: #333; z-index: 101; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        
+        #call-controls { position: absolute; bottom: 80px; width: 100%; display: flex; justify-content: center; z-index: 102; }
+        .end-btn { padding: 15px 40px; border-radius: 30px; font-weight: bold; cursor: pointer; border: none; font-size: 1.1rem; background: #ff003c; color: white; box-shadow: 0 4px 15px rgba(255,0,60,0.5); transition: 0.2s; }
+        .end-btn:hover { background: #d40032; transform: scale(1.05); }
+
+        .flip-btn { position: absolute; top: 20px; right: 20px; z-index: 105; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); color: white; border: 2px solid white; border-radius: 50%; width: 50px; height: 50px; font-size: 1.2rem; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s; }
+        .flip-btn:active { transform: rotate(180deg); }
+        
+        #incoming-alert { display: none; background: #ff003c; color: white; padding: 15px; text-align: center; font-weight: bold; cursor: pointer; animation: blink 1s infinite; z-index: 110; position: absolute; width: 100%; top: 0; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
-    <div class="grid-bg"></div>
-    <div id="particles-js"></div>
 
-    <div id="mainContent" style="width: 100%; flex-direction: column; align-items: center; display: flex;">
-        
-        <div id="hud">
-            <div>MEM: <span id="perf-mem">--</span></div>
-            <div id="weatherData" style="color: var(--cyan);">UPLINKING WEATHER...</div>
-            <div class="glitch" style="color: var(--red);">ROOT_ACCESS</div>
-            <div id="clockData">00:00:00</div>
+    <div id="login-screen" class="screen active-screen">
+        <div class="login-box">
+            <h2>SecureChat</h2>
+            <input type="text" id="username" placeholder="Choose a Username">
+            <input type="password" id="password" placeholder="Password">
+            <button class="btn" onclick="authenticate()">Login / Sign Up</button>
+            <p id="login-error" style="color: #ff003c; margin-top: 15px; font-size: 0.85rem; display: none;"></p>
         </div>
-
-        <h1 class="glitch" style="font-size: 2rem; margin: 30px 0; letter-spacing: 5px;">LEGEND_OS // 23</h1>
-
-        <div id="panelContainer">
-            
-            <div class="term-panel">
-                <div class="drag-handle">CCTV_HIJACK_CAM</div>
-                <div style="position: relative; width: 100%; border: 1px solid var(--cyan); background: #000; min-height: 150px; display: flex; justify-content: center; align-items: center;">
-                    <video id="cctvFeed" autoplay playsinline style="width: 100%; filter: sepia(100%) hue-rotate(90deg) contrast(150%) brightness(0.8); display: none;"></video>
-                    <div id="camOverlay" style="position: absolute; top: 10px; right: 10px; color: red; font-weight: bold; animation: blink 1s infinite; display: none;">🔴 REC</div>
-                    <div id="camTarget" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: rgba(0, 255, 65, 0.5); font-size: 3rem; display: none;">+</div>
-                    <button id="camBtn" class="btn btn-red" style="width: 80%;" onclick="startCCTV()">INITIALIZE CAM UPLINK</button>
-                </div>
-            </div>
-
-            <div class="term-panel">
-                <div class="drag-handle">BRUTE_FORCE_CRACKER</div>
-                <div style="font-size:0.9rem;">
-                    <div class="data-row"><span>TARGET_DB:</span> <span class="data-val">admin_master_01</span></div>
-                    <div class="data-row"><span>STATUS:</span> <span id="crackStatus" style="color:var(--red);">AWAITING COMMAND...</span></div>
-                    <div style="margin: 15px 0; border: 1px solid var(--cyan); height: 25px; width: 100%; background: #000; position: relative;">
-                        <div id="crackBar" style="height: 100%; width: 0%; background: var(--cyan); transition: width 0.1s;"></div>
-                    </div>
-                    <div style="text-align: center; font-family: monospace; font-size: 1.2rem; letter-spacing: 5px; margin-bottom: 10px;" id="crackHash">
-                        $2Y$10$*****
-                    </div>
-                    <button class="btn" onclick="startCracker()">LAUNCH DICTIONARY ATTACK</button>
-                </div>
-            </div>
-
-            <div class="term-panel">
-                <div class="drag-handle">GLOBAL_THREAT_MONITOR</div>
-                <div id="threatLog" style="height: 150px; overflow-y: hidden; font-size: 0.75rem; color: var(--red); font-family: monospace; line-height: 1.5;">
-                    </div>
-            </div>
-
-            <div class="term-panel">
-                <div class="drag-handle">SAT_TRACKER_ISS</div>
-                <div id="map" style="height: 150px; width:100%; border: 1px solid var(--cyan);"></div>
-            </div>
-
-            <div class="term-panel">
-                <div class="drag-handle">CRYPTO_UPLINK</div>
-                <div class="data-row"><span>BTC_USDT_LIVE</span> <span id="btcPrice" class="data-val">CONNECTING...</span></div>
-                <div style="height: 80px; margin-top: 15px;"><canvas id="trafficChart"></canvas></div>
-            </div>
-
-            <div class="term-panel">
-                <div class="drag-handle">SYSTEM_LOGS</div>
-                <div id="chatLog" style="height: 120px; overflow-y: auto; font-size: 0.8rem; padding-bottom: 5px;">
-                    <div style="color: var(--cyan);">> Root system initialized. Run '/scan' for network sweep.</div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="cli-box">
-            <span style="color:var(--red); margin-right:10px; font-weight:bold;">root@legend:~#</span>
-            <input type="text" id="cliInput" placeholder="Enter command (try /scan or /clear)">
-        </div>
-        
     </div>
 
-    <script>
-        window.onload = () => {
-            initParticles(); initDraggable(); initMap(); setupCLI(); initCrypto(); initChart(); initThreatLog();
-            updateWeather();
-            setInterval(updateClock, 1000); setInterval(updateISS, 3000); setInterval(updateMem, 2000);
-            setInterval(updateWeather, 600000); 
-        }
+    <div id="contacts-screen" class="screen">
+        <div class="header">
+            <h3 id="welcome-user">My Chats</h3>
+            <button class="btn" style="width: auto; padding: 5px 10px; margin: 0; font-size: 0.8rem;" onclick="location.reload()">Logout</button>
+        </div>
+        <div class="search-area">
+            <input type="text" id="search-friend" class="search-input" placeholder="Enter Friend's ID...">
+            <button class="add-btn" onclick="addFriend()">Add</button>
+        </div>
+        <div id="contacts-list">
+            <p style="text-align: center; color: #aaa; margin-top: 20px;">Your chat list is empty.<br>Add a friend by their ID above!</p>
+        </div>
+    </div>
 
-        // --- LEVEL 23: BRUTE FORCE CRACKER SCRIPT ---
-        function startCracker() {
-            let bar = document.getElementById('crackBar');
-            let hash = document.getElementById('crackHash');
-            let status = document.getElementById('crackStatus');
-            let width = 0;
-            status.innerText = "BYPASSING FIREWALL...";
-            status.style.color = "var(--red)";
-            
-            let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
-            let interval = setInterval(() => {
-                width += Math.random() * 8;
-                if (width >= 100) width = 100;
-                bar.style.width = width + '%';
-                
-                let randomHash = "";
-                for(let i=0; i<12; i++) randomHash += chars.charAt(Math.floor(Math.random() * chars.length));
-                hash.innerText = randomHash;
-                hash.style.color = "var(--cyan)";
+    <div id="chat-screen" class="screen">
+        <div id="incoming-alert" onclick="answerCall()">📲 INCOMING CALL! TAP TO ANSWER</div>
+        <div class="header">
+            <div style="display: flex; align-items: center;">
+                <button onclick="goBackToContacts()" style="background:none; border:none; color:#00ffcc; font-size:1.5rem; margin-right:15px; cursor:pointer;">⬅</button>
+                <h3 id="chat-target-name">Friend</h3>
+            </div>
+            <button class="btn" style="width: auto; padding: 8px 15px; margin: 0;" onclick="startCall()">📹 Call</button>
+        </div>
+        
+        <div id="messages"></div>
+        
+        <div id="input-area">
+            <input type="text" id="msg-input" placeholder="Message...">
+            <button id="send-btn" onclick="sendRealMsg()">➤</button>
+        </div>
 
-                if (width === 100) {
-                    clearInterval(interval);
-                    status.innerText = "ACCESS GRANTED [ROOT]";
-                    status.style.color = "var(--green)";
-                    hash.innerText = "P@ssw0rd_Byp@ssed_X";
-                    hash.style.color = "var(--green)";
-                    logToConsole("Admin Database Password successfully cracked.", false);
+        <div id="video-overlay">
+            <video id="remoteVideo" autoplay playsinline></video>
+            <video id="localVideo" autoplay playsinline muted></video>
+            <button class="flip-btn" onclick="flipCamera()">🔄</button>
+            <div id="call-controls">
+                <button class="end-btn" onclick="endCall()">❌ End Call</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, push, onChildAdded, set, get, child, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        // TUMHARI EXACT FIREBASE DETAILS
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbJmwbTt7Ds1GVAbQnn0yJPl2STl1B5WM",
+            authDomain: "chat-18904.firebaseapp.com",
+            databaseURL: "https://chat-18904-default-rtdb.firebaseio.com",
+            projectId: "chat-18904",
+            storageBucket: "chat-18904.firebasestorage.app",
+            messagingSenderId: "833373288874",
+            appId: "1:833373288874:web:ef87a7109f7f1fe9a853d3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
+        let currentUser = "";
+        let targetUser = "";
+        let privateRoomId = "";
+        let messagesRef, callRef;
+
+        // WEBRTC VARIABLES
+        let localStream;
+        let peerConnection;
+        let currentFacingMode = "user"; 
+        const servers = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
+
+        // 1. AUTH
+        window.authenticate = async function() {
+            let user = document.getElementById('username').value.trim().toLowerCase();
+            let pass = document.getElementById('password').value.trim();
+            if(user.length < 3 || pass.length < 3) return alert("Too short!");
+
+            const dbRef = ref(db);
+            get(child(dbRef, `users/${user}`)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    if(snapshot.val().password === pass) loginSuccess(user);
+                    else {
+                        document.getElementById('login-error').innerText = "Wrong password!";
+                        document.getElementById('login-error').style.display = "block";
+                    }
+                } else {
+                    set(ref(db, 'users/' + user), { password: pass });
+                    loginSuccess(user);
                 }
-            }, 100);
+            });
         }
 
-        // --- LEVEL 23: GLOBAL THREAT MONITOR SCRIPT ---
-        function initThreatLog() {
-            let threats = ["DDoS ATTACK DETECTED", "SQL INJECTION ATTEMPT", "UNAUTHORIZED SSH LOGIN", "MALWARE UPLOAD BLOCKED", "DATA EXFILTRATION PREVENTED", "PORT SCAN REJECTED"];
-            let countries = ["RU", "CN", "US", "IR", "KP", "BR", "IN", "UK", "FR"];
-            setInterval(() => {
-                let log = document.getElementById('threatLog');
-                let t = threats[Math.floor(Math.random()*threats.length)];
-                let c1 = countries[Math.floor(Math.random()*countries.length)];
-                let c2 = countries[Math.floor(Math.random()*countries.length)];
-                let ip = `${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`;
-                
-                let el = document.createElement('div');
-                el.innerHTML = `[!] <span style="color:#fff;">${c1} -> ${c2}</span> | IP: ${ip} | <span style="color:var(--cyan)">${t}</span>`;
-                log.prepend(el);
-                if(log.children.length > 8) log.lastChild.remove();
-            }, 700);
+        function loginSuccess(user) {
+            currentUser = user;
+            document.getElementById('login-screen').classList.remove('active-screen');
+            document.getElementById('contacts-screen').classList.add('active-screen');
+            document.getElementById('welcome-user').innerText = "Chats (" + currentUser + ")";
+            loadMyPersonalContacts();
         }
 
-        // --- REAL WEATHER API (Jaipur) ---
-        async function updateWeather() {
-            try {
-                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=26.9196&longitude=75.7878&current_weather=true');
-                const data = await res.json();
-                const temp = data.current_weather.temperature;
-                const wind = data.current_weather.windspeed;
-                document.getElementById('weatherData').innerHTML = `<span style="color:var(--red)">TMP:</span> ${temp}°C | <span style="color:var(--red)">WND:</span> ${wind} KM/H`;
-            } catch(e) { document.getElementById('weatherData').innerText = `UPLINK_FAILED`; }
+        // 2. SEARCH & ADD FRIEND
+        window.addFriend = async function() {
+            let friendId = document.getElementById('search-friend').value.trim().toLowerCase();
+            if(friendId === currentUser) return alert("You can't add yourself!");
+
+            const dbRef = ref(db);
+            get(child(dbRef, `users/${friendId}`)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    set(ref(db, `users/${currentUser}/my_friends/${friendId}`), true);
+                    document.getElementById('search-friend').value = "";
+                } else {
+                    alert("User ID not found!");
+                }
+            });
         }
 
-        // --- CCTV HIJACK SCRIPT ---
-        async function startCCTV() {
-            const btn = document.getElementById('camBtn');
-            const vid = document.getElementById('cctvFeed');
-            btn.innerText = "BYPASSING FIREWALL...";
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                vid.srcObject = stream;
-                vid.style.display = "block";
-                document.getElementById('camOverlay').style.display = "block";
-                document.getElementById('camTarget').style.display = "block";
-                btn.style.display = "none";
-                logToConsole("CCTV Feed hijacked successfully.", false);
-            } catch(err) {
-                btn.innerText = "ACCESS DENIED";
-                logToConsole("ERROR: Camera firewall blocked access.", false);
+        function loadMyPersonalContacts() {
+            const myFriendsRef = ref(db, `users/${currentUser}/my_friends`);
+            onValue(myFriendsRef, (snapshot) => {
+                const listDiv = document.getElementById('contacts-list');
+                listDiv.innerHTML = "";
+                if(!snapshot.exists()) {
+                    listDiv.innerHTML = "<p style='text-align:center; color:#aaa; margin-top:20px;'>No friends added yet.</p>";
+                    return;
+                }
+                snapshot.forEach((childSnapshot) => {
+                    let friendName = childSnapshot.key;
+                    listDiv.innerHTML += `
+                        <div class="contact-card" onclick="openChat('${friendName}')">
+                            <div class="contact-avatar">${friendName.charAt(0).toUpperCase()}</div>
+                            <div class="contact-info">
+                                <h4 style="color:white; margin-bottom:3px;">${friendName}</h4>
+                                <p style="color:#aaa; font-size:0.85rem;">Tap to open chat</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        // 3. CHAT LOGIC
+        window.openChat = function(friendName) {
+            targetUser = friendName;
+            privateRoomId = [currentUser, targetUser].sort().join("_");
+            messagesRef = ref(db, "chats/" + privateRoomId + "/messages");
+            callRef = ref(db, "chats/" + privateRoomId + "/call"); // Set specific call room
+            
+            document.getElementById('contacts-screen').classList.remove('active-screen');
+            document.getElementById('chat-screen').classList.add('active-screen');
+            document.getElementById('chat-target-name').innerText = targetUser;
+            document.getElementById('messages').innerHTML = "";
+            
+            onChildAdded(messagesRef, (snapshot) => {
+                const data = snapshot.val();
+                const msgBox = document.getElementById('messages');
+                const msgType = (data.sender === currentUser) ? "sent" : "received";
+                msgBox.innerHTML += `<div class="msg ${msgType}">${data.text}</div>`;
+                msgBox.scrollTop = msgBox.scrollHeight;
+            });
+
+            // Start listening for video calls when chat opens
+            listenForCalls();
+        }
+
+        window.goBackToContacts = function() {
+            document.getElementById('chat-screen').classList.remove('active-screen');
+            document.getElementById('contacts-screen').classList.add('active-screen');
+        }
+
+        window.sendRealMsg = function() {
+            let input = document.getElementById('msg-input');
+            if(input.value.trim() !== "") {
+                push(messagesRef, { sender: currentUser, text: input.value });
+                input.value = '';
+            }
+        }
+        document.getElementById("msg-input").addEventListener("keypress", (e) => { if(e.key === "Enter") window.sendRealMsg(); });
+
+        // 4. WEBRTC VIDEO CALL LOGIC (PRO UI ENABLED)
+        async function setupMedia() {
+            document.getElementById('video-overlay').style.display = 'flex';
+            currentFacingMode = "user"; 
+            localStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode }, audio: true });
+            document.getElementById('localVideo').srcObject = localStream;
+            
+            peerConnection = new RTCPeerConnection(servers);
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+            peerConnection.ontrack = (event) => {
+                document.getElementById('remoteVideo').srcObject = event.streams[0];
+            };
+        }
+
+        window.flipCamera = async function() {
+            if (!localStream) return;
+            currentFacingMode = (currentFacingMode === "user") ? "environment" : "user";
+            localStream.getVideoTracks().forEach(track => track.stop());
+            
+            const newStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } });
+            const newVideoTrack = newStream.getVideoTracks()[0];
+            
+            localStream.removeTrack(localStream.getVideoTracks()[0]);
+            localStream.addTrack(newVideoTrack);
+            document.getElementById('localVideo').srcObject = localStream;
+            
+            if (peerConnection) {
+                const sender = peerConnection.getSenders().find(s => s.track.kind === 'video');
+                if (sender) sender.replaceTrack(newVideoTrack);
             }
         }
 
-        // --- MAP ENGINE ---
-        let map, issMarker;
-        function initMap() {
-            map = L.map('map', { zoomControl: false, attributionControl: false }).setView([26.9, 75.8], 3);
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-            issMarker = L.circleMarker([0,0], { className: 'radar-blip', radius: 6 }).addTo(map);
-        }
-        async function updateISS() {
-            try {
-                const res = await fetch('https://api.wheretheiss.at/v1/satellites/25544');
-                const data = await res.json();
-                issMarker.setLatLng([data.latitude, data.longitude]);
-                map.panTo([data.latitude, data.longitude]);
-            } catch(e) {}
-        }
+        window.startCall = async function() {
+            await setupMedia();
+            peerConnection.onicecandidate = event => {
+                if(event.candidate) set(ref(db, `chats/${privateRoomId}/call/offerCandidate`), JSON.stringify(event.candidate));
+            };
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            set(callRef, { offer: JSON.stringify({ type: offer.type, sdp: offer.sdp, caller: currentUser }) });
 
-        // --- CRYPTO WEBSOCKET ---
-        function initCrypto() {
-            const btcWs = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
-            btcWs.onmessage = (e) => { document.getElementById('btcPrice').innerText = "$" + parseFloat(JSON.parse(e.data).p).toFixed(2); };
-        }
-
-        // --- CHART ENGINE ---
-        let trafficChart;
-        function initChart() {
-            const ctx = document.getElementById('trafficChart').getContext('2d');
-            trafficChart = new Chart(ctx, { 
-                type: 'line', 
-                data: { labels: Array(20).fill(''), datasets: [{ data: Array(20).fill(0), borderColor: '#00ffcc', borderWidth: 1, backgroundColor: 'rgba(0, 255, 204, 0.1)', fill: true, pointRadius: 0, tension: 0.1 }] }, 
-                options: { responsive: true, maintainAspectRatio: false, animation: false, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } }, plugins: { legend: false } } 
+            onValue(ref(db, `chats/${privateRoomId}/call/answer`), (snapshot) => {
+                const data = snapshot.val();
+                if(data && !peerConnection.currentRemoteDescription) peerConnection.setRemoteDescription(new RTCSessionDescription(JSON.parse(data)));
             });
-            setInterval(() => { let d = trafficChart.data.datasets[0].data; d.push(Math.floor(Math.random() * 100)); d.shift(); trafficChart.update(); }, 500);
+
+            onValue(ref(db, `chats/${privateRoomId}/call/answerCandidate`), (snapshot) => {
+                const data = snapshot.val();
+                if(data) peerConnection.addIceCandidate(new RTCIceCandidate(JSON.parse(data)));
+            });
         }
 
-        // --- SYSTEM FUNCTIONS ---
-        function updateClock() { document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', {hour12:false}); }
-        function updateMem() { if(window.performance && window.performance.memory) { document.getElementById('perf-mem').innerText = Math.round(window.performance.memory.usedJSHeapSize/1048576) + "MB"; } }
-        
-        function initParticles() {
-            particlesJS("particles-js", { "particles": { "number": { "value": 80 }, "color": { "value": "#00ffcc" }, "shape": { "type": "edge" }, "opacity": { "value": 0.5 }, "size": { "value": 2 }, "line_linked": { "enable": true, "distance": 150, "color": "#00ffcc", "opacity": 0.3, "width": 1 }, "move": { "enable": true, "speed": 1 } }, "interactivity": { "events": { "onhover": { "enable": true, "mode": "repulse" } } } });
-        }
-        function initDraggable() { Sortable.create(document.getElementById('panelContainer'), { handle: '.drag-handle', animation: 200 }); }
-
-        function logToConsole(msg, isUser=false) {
-            const log = document.getElementById('chatLog');
-            const color = isUser ? 'var(--green)' : 'var(--cyan)';
-            const prefix = isUser ? 'root@legend:~# ' : '> ';
-            log.innerHTML += `<div style="color:${color}; margin-top:5px;">${prefix}${msg}</div>`;
-            log.scrollTop = log.scrollHeight;
-        }
-
-        // --- THE HACKER CLI ---
-        function setupCLI() { 
-            const cli = document.getElementById('cliInput');
-            cli.addEventListener('keypress', (e) => { 
-                if(e.key === 'Enter') { 
-                    const val = cli.value.trim();
-                    if(!val) return;
-                    logToConsole(val, true);
-                    
-                    if(val.toLowerCase() === 'clear' || val.toLowerCase() === '/clear') { document.getElementById('chatLog').innerHTML = ''; }
-                    else if(val.toLowerCase() === '/scan' || val.toLowerCase().startsWith('nmap')) {
-                        logToConsole("Initializing Stealth Nmap Scan...", false);
-                        let count = 0;
-                        let scanInt = setInterval(() => {
-                            let ip = `192.168.1.${Math.floor(Math.random()*255)}`;
-                            let ports = [22, 80, 443, 8080, 3306, 21];
-                            let port = ports[Math.floor(Math.random()*ports.length)];
-                            let isOpen = Math.random() > 0.7;
-                            let state = isOpen ? "OPEN" : "FILTERED";
-                            let color = isOpen ? "var(--red)" : "var(--cyan)";
-                            logToConsole(`[+] Target ${ip} - Port ${port} <span style="color:${color}">[${state}]</span>`, false);
-                            count++;
-                            if(count > 12) { 
-                                clearInterval(scanInt); 
-                                setTimeout(() => logToConsole("Scan Complete. 3 Vulnerabilities Found.", false), 500);
-                            }
-                        }, 400);
+        function listenForCalls() {
+            onValue(ref(db, `chats/${privateRoomId}/call/offer`), (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    let offerObj = JSON.parse(data);
+                    if(offerObj.caller !== currentUser) {
+                        document.getElementById('incoming-alert').style.display = 'block';
+                        document.getElementById('incoming-alert').innerText = `📲 INCOMING VIDEO CALL FROM ${offerObj.caller.toUpperCase()}! TAP TO ANSWER`;
                     }
-                    else { setTimeout(() => { logToConsole(`Command '${val}' executed. Access logged.`); }, 400); }
-                    cli.value = ''; 
-                } 
-            }); 
+                } else {
+                    document.getElementById('incoming-alert').style.display = 'none';
+                    endCallUI(); 
+                }
+            });
+        }
+
+        window.answerCall = async function() {
+            document.getElementById('incoming-alert').style.display = 'none';
+            await setupMedia();
+
+            peerConnection.onicecandidate = event => {
+                if(event.candidate) set(ref(db, `chats/${privateRoomId}/call/answerCandidate`), JSON.stringify(event.candidate));
+            };
+
+            onValue(ref(db, `chats/${privateRoomId}/call/offer`), async (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(JSON.parse(data)));
+                    const answer = await peerConnection.createAnswer();
+                    await peerConnection.setLocalDescription(answer);
+                    set(ref(db, `chats/${privateRoomId}/call/answer`), JSON.stringify({ type: answer.type, sdp: answer.sdp }));
+                }
+            }, { onlyOnce: true });
+
+            onValue(ref(db, `chats/${privateRoomId}/call/offerCandidate`), (snapshot) => {
+                const data = snapshot.val();
+                if(data) peerConnection.addIceCandidate(new RTCIceCandidate(JSON.parse(data)));
+            });
+        }
+
+        window.endCall = function() {
+            remove(callRef); 
+            endCallUI();
+        }
+
+        function endCallUI() {
+            if(peerConnection) peerConnection.close();
+            if(localStream) localStream.getTracks().forEach(track => track.stop());
+            document.getElementById('video-overlay').style.display = 'none';
         }
     </script>
 </body>
