@@ -4,165 +4,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin OS | Kinetic Neon v20</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <title>ROOT // LEGEND OS</title>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
     <style>
         :root { 
-            --primary: #00f3ff; --secondary: #ff00ea; --accent: #eaff00; 
-            --glass: rgba(10, 10, 25, 0.8); 
+            --cyan: #00ffcc; 
+            --red: #ff003c; 
+            --green: #00ff41; 
+            --bg: #050505;
         }
+        
+        * { box-sizing: border-box; }
         
         body { 
-            margin: 0; padding: 0; color: #fff; font-family: 'Segoe UI', sans-serif; 
-            background: #050510; overflow-x: hidden; display: flex; 
-            flex-direction: column; align-items: center; min-height: 100vh;
+            margin: 0; padding: 0; background: var(--bg); color: var(--cyan); 
+            font-family: 'Courier New', Courier, monospace; overflow-x: hidden; 
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
+
+        #particles-js { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; opacity: 0.4; }
+
+        /* Hacker Grid Lines */
+        .grid-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            background-image: 
+                linear-gradient(rgba(0, 255, 204, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 204, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px; pointer-events: none;
+        }
+
+        /* Glitch Text Effect */
+        .glitch { font-weight: bold; text-shadow: 2px 0 var(--red), -2px 0 blue; animation: glitch-anim 2s infinite; letter-spacing: 2px; }
+        @keyframes glitch-anim { 
+            0% { text-shadow: 2px 0 var(--red), -2px 0 blue; } 
+            20% { text-shadow: -2px 0 var(--red), 2px 0 blue; }
+            40% { text-shadow: 2px 0 var(--red), -2px 0 blue; }
+            100% { text-shadow: 2px 0 var(--red), -2px 0 blue; }
+        }
+
+        /* Top Status Bar */
+        #hud { 
+            width: 100%; background: #000; border-bottom: 1px solid var(--cyan); 
+            padding: 10px 20px; display: flex; justify-content: space-between; 
+            font-size: 0.8rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+        }
+        #hud span { color: var(--green); }
+
+        /* Clean Terminal Panels */
+        #panelContainer { width: 95%; max-width: 700px; margin-top: 20px; }
         
-        /* The Background Engine */
-        #particles-js { 
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-            z-index: -2; background: radial-gradient(circle, #1a0033 0%, #050510 100%);
+        .term-panel { 
+            background: rgba(0, 0, 0, 0.8); border: 1px solid var(--cyan); 
+            margin-bottom: 20px; padding: 15px; position: relative;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.1); transition: 0.2s;
         }
+        .term-panel:hover { box-shadow: 0 0 20px rgba(0, 255, 204, 0.3); border-color: var(--green); }
 
-        .rainbow-text {
-            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--primary));
-            background-size: 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradientMove 3s linear infinite;
-            font-weight: 900;
+        .drag-handle { 
+            cursor: grab; font-size: 0.8rem; border-bottom: 1px dashed var(--cyan); 
+            padding-bottom: 5px; margin-bottom: 15px; display: flex; justify-content: space-between;
         }
-        @keyframes gradientMove { 0% {background-position: 0% 50%;} 100% {background-position: 100% 50%;} }
+        .drag-handle::before { content: "[ MODULE_ACTIVE ]"; color: var(--green); }
 
-        /* Panels with Neon Glow */
-        .glass-panel { 
-            background: var(--glass); 
-            backdrop-filter: blur(20px); 
-            border-radius: 20px; 
-            padding: 20px; 
-            margin-top: 25px; 
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2), inset 0 0 10px rgba(255, 0, 234, 0.1);
-            transition: 0.3s;
-        }
-
-        .drag-handle { cursor: grab; padding-bottom: 10px; border-bottom: 1px solid var(--primary); margin-bottom: 15px; font-weight: bold; color: var(--primary); text-transform: uppercase; }
-
+        /* Buttons & Inputs */
         .btn { 
-            background: linear-gradient(45deg, var(--primary), var(--secondary)); 
-            color: white; border: none; padding: 12px; cursor: pointer; border-radius: 10px; width: 100%; font-weight: bold; 
-            box-shadow: 0 5px 15px rgba(255, 0, 234, 0.4);
+            background: transparent; color: var(--cyan); border: 1px solid var(--cyan); 
+            padding: 10px; cursor: pointer; width: 100%; font-family: inherit; font-weight: bold; 
+            text-transform: uppercase; transition: 0.2s; margin-top: 10px;
         }
+        .btn:hover { background: var(--cyan); color: #000; box-shadow: 0 0 15px var(--cyan); }
+        .btn-red { border-color: var(--red); color: var(--red); }
+        .btn-red:hover { background: var(--red); color: #000; box-shadow: 0 0 15px var(--red); }
 
-        /* Kinetic Ripple effect */
-        .ripple {
-            position: fixed; border-radius: 50%; background: rgba(255, 255, 255, 0.3);
-            transform: scale(0); animation: ripple-anim 0.6s ease-out; pointer-events: none; z-index: 9999;
-        }
-        @keyframes ripple-anim { to { transform: scale(6); opacity: 0; } }
+        .data-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; }
+        .data-val { color: var(--green); }
 
+        /* CLI Box */
         .cli-box { 
-            border: 2px solid var(--primary); padding: 12px; background: #000; 
-            display: flex; align-items: center; border-radius: 12px; 
-            width: 90%; max-width: 500px; margin-top: 25px;
+            border: 1px solid var(--cyan); padding: 15px; background: #000; 
+            display: flex; align-items: center; width: 95%; max-width: 700px; 
+            margin-bottom: 30px; box-shadow: inset 0 0 10px rgba(0, 255, 204, 0.2);
         }
-        #cliInput { background: transparent; border: none; color: #fff; flex-grow: 1; outline: none; font-family: monospace; }
+        #cliInput { background: transparent; border: none; color: var(--green); flex-grow: 1; outline: none; font-family: inherit; font-size: 1rem; }
         
-        .leaflet-tile { filter: invert(100%) hue-rotate(180deg) brightness(130%); }
+        /* Map specific */
+        .leaflet-tile { filter: invert(100%) hue-rotate(180deg) brightness(150%) contrast(150%) grayscale(80%); }
+        .radar-blip { background: var(--red); border-radius: 50%; box-shadow: 0 0 15px var(--red); animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
+
+        /* Boot Screen */
+        #bootScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; padding: 20px; }
+        #bootText { font-size: 1rem; color: var(--green); line-height: 1.5; }
+        .cursor { display: inline-block; width: 10px; height: 15px; background: var(--green); animation: blink 0.8s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
     </style>
 </head>
 <body>
-
+    <div class="grid-bg"></div>
     <div id="particles-js"></div>
 
-    <div id="loginScreen" style="position:fixed; width:100%; height:100%; background:#050510; z-index:10000; display:flex; justify-content:center; align-items:center;">
-        <div class="glass-panel" style="width: 300px; text-align: center;">
-            <h2 class="rainbow-text">KINETIC_LINK</h2>
-            <input type="password" id="passInput" class="btn" style="background:rgba(255,255,255,0.05); border:1px solid var(--primary); text-align:center; margin-bottom:20px;" placeholder="USER PIN">
-            <button class="btn" onclick="processLogin()">BOOT SYSTEM</button>
-        </div>
+    <div id="bootScreen">
+        <div id="bootText"></div><div class="cursor"></div>
     </div>
 
     <div id="mainContent" style="display:none; width: 100%; flex-direction: column; align-items: center;">
-        <div id="panelContainer" style="width: 95%; max-width: 500px;">
+        
+        <div id="hud">
+            <div>SYS_MEM: <span id="perf-mem">--</span></div>
+            <div class="glitch" style="color: var(--red);">ROOT_ACCESS</div>
+            <div id="clockData">00:00:00</div>
+        </div>
+
+        <h1 class="glitch" style="font-size: 2rem; margin: 30px 0; letter-spacing: 5px;">LEGEND_OS // 21</h1>
+
+        <div id="panelContainer">
             
-            <h1 class="rainbow-text" style="font-size: 2rem; text-align: center; margin-top: 40px;">KINETIC_OS v20</h1>
-
-            <div class="glass-panel">
-                <div class="drag-handle">🛰️ ISS ORBITAL TRACKER</div>
-                <div id="map" style="height: 200px; width:100%; border-radius:15px; border: 1px solid var(--primary);"></div>
+            <div class="term-panel">
+                <div class="drag-handle">SAT_TRACKER_ISS</div>
+                <div id="map" style="height: 200px; width:100%; border: 1px solid var(--cyan);"></div>
+                <div style="font-size: 0.7rem; color: #555; margin-top: 5px; text-align: right;">TARGET: INTERNATIONAL SPACE STATION</div>
             </div>
 
-            <div class="glass-panel">
-                <div class="drag-handle">💻 NEURAL TERMINAL</div>
-                <button class="btn" onclick="confetti({particleCount:150, spread:70, origin:{y:0.6}})">TEST SYSTEM OVERLOAD</button>
+            <div class="term-panel">
+                <div class="drag-handle">CRYPTO_UPLINK</div>
+                <div class="data-row"><span>BTC_USDT_LIVE</span> <span id="btcPrice" class="data-val">CONNECTING...</span></div>
+                <div class="data-row"><span>ETH_USDT_LIVE</span> <span id="ethPrice" class="data-val">CONNECTING...</span></div>
+                <div style="height: 80px; margin-top: 15px;"><canvas id="trafficChart"></canvas></div>
             </div>
 
-            <div class="glass-panel">
-                <div class="drag-handle">📊 FREQUENCY PULSE</div>
-                <canvas id="visualizer" style="width:100%; height:50px;"></canvas>
-                <button class="btn" style="margin-top:10px;" onclick="toggleAudio()">SYNC AUDIO</button>
+            <div class="term-panel">
+                <div class="drag-handle">SYSTEM_LOGS</div>
+                <div id="chatLog" style="height: 100px; overflow-y: auto; font-size: 0.8rem; margin-bottom: 10px; border-bottom: 1px dashed #333; padding-bottom: 5px;">
+                    <div style="color: var(--cyan);">> Root system initialized.</div>
+                </div>
+                <button class="btn btn-red" onclick="runBreach()">EXECUTE BREACH PROTOCOL</button>
             </div>
 
         </div>
-
-        <audio id="myAudio" loop crossorigin="anonymous"><source src="music.mp3" type="audio/mpeg"></audio>
 
         <div class="cli-box">
-            <span style="color:var(--primary); margin-right:10px;">></span>
-            <input type="text" id="cliInput" placeholder="READY_FOR_COMMAND...">
+            <span style="color:var(--red); margin-right:10px; font-weight:bold;">root@legend:~#</span>
+            <input type="text" id="cliInput" placeholder="_">
         </div>
+        
     </div>
 
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSfx(f, t, d) {
-            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-            o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime);
-            g.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            o.connect(g); g.connect(audioCtx.destination);
-            o.start(); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + d);
-            o.stop(audioCtx.currentTime + d);
-        }
-
-        // --- THE KINETIC TOUCH ---
-        window.addEventListener('mousedown', (e) => {
-            const rip = document.createElement('div');
-            rip.className = 'ripple';
-            rip.style.left = e.clientX + 'px';
-            rip.style.top = e.clientY + 'px';
-            rip.style.width = rip.style.height = '40px';
-            rip.style.marginLeft = rip.style.marginTop = '-20px';
-            document.body.appendChild(rip);
-            setTimeout(() => rip.remove(), 600);
-            playSfx(100, 'sine', 0.1);
-        });
-
-        function processLogin() {
-            const p = document.getElementById('passInput').value.toUpperCase();
-            if(p === "ADMIN" || p === "KHUSHAL") {
-                playSfx(1000, 'square', 0.3);
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'flex';
-                startSystem();
+        // --- BOOT SEQUENCE TYPEWRITER ---
+        const bootLines = [
+            "Initiating core protocol...",
+            "Bypassing mainframe firewalls...",
+            "Decrypting RSA-2048 keys...",
+            "Establishing secure connection to Jaipur node...",
+            "ACCESS GRANTED."
+        ];
+        
+        let lineIdx = 0; let charIdx = 0;
+        const bootEl = document.getElementById("bootText");
+        
+        function typeBoot() {
+            if (lineIdx < bootLines.length) {
+                if (charIdx < bootLines[lineIdx].length) {
+                    bootEl.innerHTML += bootLines[lineIdx].charAt(charIdx);
+                    charIdx++;
+                    setTimeout(typeBoot, 20); // Typing speed
+                } else {
+                    bootEl.innerHTML += "<br>";
+                    lineIdx++;
+                    charIdx = 0;
+                    setTimeout(typeBoot, 300); // Pause between lines
+                }
+            } else {
+                setTimeout(() => {
+                    document.getElementById("bootScreen").style.display = "none";
+                    document.getElementById("mainContent").style.display = "flex";
+                    startSystem();
+                }, 800);
             }
         }
+        
+        // Start boot sequence on load
+        window.onload = () => { setTimeout(typeBoot, 500); };
 
         function startSystem() {
-            initParticles(); initDraggable(); initMap(); setupCLI();
+            initParticles(); initDraggable(); initMap(); setupCLI(); initCrypto(); initChart();
+            setInterval(updateClock, 1000);
             setInterval(updateISS, 3000);
+            setInterval(updateMem, 2000);
         }
 
+        // --- MAP ENGINE ---
         let map, issMarker;
         function initMap() {
-            map = L.map('map', { zoomControl: false, attributionControl: false }).setView([26.9, 75.8], 2);
+            map = L.map('map', { zoomControl: false, attributionControl: false }).setView([26.9, 75.8], 3);
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-            issMarker = L.circleMarker([0,0], {color: 'var(--secondary)', radius: 10, fillOpacity: 1}).addTo(map);
+            issMarker = L.circleMarker([0,0], { className: 'radar-blip', radius: 6 }).addTo(map);
         }
 
         async function updateISS() {
@@ -174,52 +216,73 @@
             } catch(e) {}
         }
 
+        // --- CRYPTO WEBSOCKET ---
+        function initCrypto() {
+            const btcWs = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade');
+            btcWs.onmessage = (e) => { document.getElementById('btcPrice').innerText = "$" + parseFloat(JSON.parse(e.data).p).toFixed(2); };
+            const ethWs = new WebSocket('wss://stream.binance.com:9443/ws/ethusdt@trade');
+            ethWs.onmessage = (e) => { document.getElementById('ethPrice').innerText = "$" + parseFloat(JSON.parse(e.data).p).toFixed(2); };
+        }
+
+        // --- CHART ENGINE ---
+        let trafficChart;
+        function initChart() {
+            const ctx = document.getElementById('trafficChart').getContext('2d');
+            trafficChart = new Chart(ctx, { 
+                type: 'line', 
+                data: { labels: Array(20).fill(''), datasets: [{ data: Array(20).fill(0), borderColor: '#00ffcc', borderWidth: 1, backgroundColor: 'rgba(0, 255, 204, 0.1)', fill: true, pointRadius: 0, tension: 0.1 }] }, 
+                options: { responsive: true, maintainAspectRatio: false, animation: false, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } }, plugins: { legend: false } } 
+            });
+            setInterval(() => { let d = trafficChart.data.datasets[0].data; d.push(Math.floor(Math.random() * 100)); d.shift(); trafficChart.update(); }, 500);
+        }
+
+        // --- SYSTEM FUNCTIONS ---
+        function updateClock() { document.getElementById('clockData').innerText = new Date().toLocaleTimeString('en-IN', {hour12:false}); }
+        function updateMem() { if(window.performance && window.performance.memory) { document.getElementById('perf-mem').innerText = Math.round(window.performance.memory.usedJSHeapSize/1048576) + "MB"; } }
+        
         function initParticles() {
-            particlesJS("particles-js", {
-                "particles": {
-                    "number": { "value": 80 },
-                    "color": { "value": ["#00f3ff", "#ff00ea", "#eaff00"] },
-                    "shape": { "type": "circle" },
-                    "opacity": { "value": 0.6 },
-                    "size": { "value": 3 },
-                    "line_linked": { "enable": true, "distance": 150, "color": "#00f3ff", "opacity": 0.4, "width": 1 },
-                    "move": { "enable": true, "speed": 4, "direction": "none", "out_mode": "bounce" }
-                },
-                "interactivity": {
-                    "events": {
-                        "onhover": { "enable": true, "mode": "grab" }, // Particles follow your finger!
-                        "onclick": { "enable": true, "mode": "push" }
-                    },
-                    "modes": {
-                        "grab": { "distance": 200, "line_linked": { "opacity": 1 } }
-                    }
-                }
+            particlesJS("particles-js", { 
+                "particles": { "number": { "value": 80 }, "color": { "value": "#00ffcc" }, "shape": { "type": "edge" }, "opacity": { "value": 0.5 }, "size": { "value": 2 }, "line_linked": { "enable": true, "distance": 150, "color": "#00ffcc", "opacity": 0.3, "width": 1 }, "move": { "enable": true, "speed": 1 } }, 
+                "interactivity": { "events": { "onhover": { "enable": true, "mode": "repulse" } } } 
             });
         }
 
-        function initDraggable() { Sortable.create(document.getElementById('panelContainer'), { handle: '.drag-handle', animation: 300 }); }
-        function setupCLI() { document.getElementById('cliInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') { playSfx(800, 'sine', 0.05); e.target.value = ''; } }); }
+        function initDraggable() { Sortable.create(document.getElementById('panelContainer'), { handle: '.drag-handle', animation: 200 }); }
 
-        let audioCtx2, analyser, source, dataArray, isAudioPlaying = false;
-        function toggleAudio() {
-            const a = document.getElementById("myAudio");
-            if(!audioCtx2) {
-                audioCtx2 = new (window.AudioContext || window.webkitAudioContext)();
-                analyser = audioCtx2.createAnalyser();
-                source = audioCtx2.createMediaElementSource(a);
-                source.connect(analyser); analyser.connect(audioCtx2.destination);
-                dataArray = new Uint8Array(analyser.frequencyBinCount);
-                renderViz();
-            }
-            if(isAudioPlaying) { a.pause(); isAudioPlaying = false; }
-            else { a.play(); isAudioPlaying = true; }
+        function logToConsole(msg, isUser=false) {
+            const log = document.getElementById('chatLog');
+            const color = isUser ? 'var(--green)' : 'var(--cyan)';
+            const prefix = isUser ? 'root@legend:~# ' : '> ';
+            log.innerHTML += `<div style="color:${color}; margin-top:5px;">${prefix}${msg}</div>`;
+            log.scrollTop = log.scrollHeight;
         }
-        function renderViz() {
-            requestAnimationFrame(renderViz); if(!isAudioPlaying) return;
-            const c = document.getElementById('visualizer'); const ctx = c.getContext('2d');
-            analyser.getByteFrequencyData(dataArray); ctx.clearRect(0,0,c.width,c.height);
-            ctx.fillStyle = "#00f3ff";
-            for(let i=0; i<40; i++) { ctx.fillRect(i*10, 50 - (dataArray[i]/6), 6, dataArray[i]/6); }
+
+        function setupCLI() { 
+            const cli = document.getElementById('cliInput');
+            cli.addEventListener('keypress', (e) => { 
+                if(e.key === 'Enter') { 
+                    const val = cli.value.trim();
+                    if(!val) return;
+                    logToConsole(val, true);
+                    
+                    setTimeout(() => {
+                        if(val.toLowerCase() === 'clear') { document.getElementById('chatLog').innerHTML = ''; }
+                        else if(val.toLowerCase() === 'status') { logToConsole("All systems optimal. Connection secure."); }
+                        else { logToConsole(`Command '${val}' executed successfully. Data logged.`); }
+                    }, 400);
+                    
+                    cli.value = ''; 
+                } 
+            }); 
+        }
+
+        function runBreach() {
+            logToConsole("WARNING: Breach protocol initiated...", false);
+            document.body.style.filter = "hue-rotate(90deg) contrast(150%)";
+            setTimeout(() => {
+                logToConsole("Target secured. Downloading payload...", false);
+                document.body.style.filter = "none";
+            }, 2000);
         }
     </script>
 </body>
