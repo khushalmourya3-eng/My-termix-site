@@ -99,13 +99,12 @@
             initParticles(); initDraggable(); initMap(); setupCLI(); initCrypto(); initChart();
             updateWeather();
             setInterval(updateClock, 1000); setInterval(updateISS, 3000); setInterval(updateMem, 2000);
-            setInterval(updateWeather, 600000); // Update weather every 10 mins
+            setInterval(updateWeather, 600000); 
         }
 
-        // --- REAL WEATHER API ---
+        // --- REAL WEATHER API (Jaipur) ---
         async function updateWeather() {
             try {
-                // Fetching real-time weather data
                 const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=26.9196&longitude=75.7878&current_weather=true');
                 const data = await res.json();
                 const temp = data.current_weather.temperature;
@@ -129,7 +128,7 @@
                 logToConsole("CCTV Feed hijacked successfully.", false);
             } catch(err) {
                 btn.innerText = "ACCESS DENIED";
-                logToConsole("ERROR: Camera firewall blocked access. Grant permission.", false);
+                logToConsole("ERROR: Camera firewall blocked access.", false);
             }
         }
 
@@ -210,9 +209,9 @@
                                 clearInterval(scanInt); 
                                 setTimeout(() => logToConsole("Scan Complete. 3 Vulnerabilities Found.", false), 500);
                             }
-                        }, 400); // Speed of fake scan
+                        }, 400);
                     }
-                    else { setTimeout(() => { logToConsole(`Command '${val}' executed successfully. Data logged.`); }, 400); }
+                    else { setTimeout(() => { logToConsole(`Command '${val}' executed. Access logged.`); }, 400); }
                     cli.value = ''; 
                 } 
             }); 
